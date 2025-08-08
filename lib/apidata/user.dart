@@ -79,7 +79,7 @@ class UserData with ChangeNotifier {
       debugPrint("Response status: ${response.statusCode}");
       debugPrint("Response body: ${response.body}");
       var result = json.decode(response.body);
-      // print("👉 Response: $result");
+      print("👉 Response: $result");
 
       setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -107,7 +107,7 @@ class UserData with ChangeNotifier {
       debugPrint("👉 Response status: ${response.statusCode}");
       debugPrint(" 👉 Response body: ${response.body}");
       var result = json.decode(response.body);
-      // print("👉 Response: $result");
+      print("👉 Response: $result");
 
       setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {

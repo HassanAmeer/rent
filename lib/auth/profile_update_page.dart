@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -64,16 +65,25 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 // Profile picture with edit icon
                 Stack(
                   children: [
-                    CacheImageWidget(
-                      width: 100,
-                      height: 100,
-                      isCircle: true,
-                      radius: 200,
-                      url:
-                          Config.imgUrl +
-                              ref.watch(userDataClass).userdata['image'] ??
-                          imgLinks.profileImage,
-                    ),
+                    pickedImgPath.isNotEmpty
+                        ? ClipOval(
+                            child: Image.file(
+                              File(pickedImgPath),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : CacheImageWidget(
+                            width: 100,
+                            height: 100,
+                            isCircle: true,
+                            radius: 200,
+                            url:
+                                (Config.imgUrl +
+                                (ref.watch(userDataClass).userdata['image'] ??
+                                    imgLinks.profileImage)),
+                          ),
                     Positioned(
                       right: 0,
                       bottom: 0,
@@ -97,7 +107,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(width: 30),
 
                 // Pick Images text
