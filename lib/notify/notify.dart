@@ -66,7 +66,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
           Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              "Notification Users",
+              "Notificatfjhjsion Users",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -202,6 +202,8 @@ class NotificationDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const NotificationsDetails(); // ✅ Yeh tumhari pehle wali screen hai
+    return const NotificationsDetails(
+      userData: {},
+    ); // ✅ Yeh tumhari pehle wali screen hai
   }
 }
