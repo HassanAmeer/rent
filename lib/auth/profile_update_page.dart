@@ -39,6 +39,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   bool sendEmails = true;
   bool acceptPrivacy = false;
   bool acceptTerms = false;
+  String pickedImgPath = "";
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,10 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                           ImagePicker()
                               .pickImage(source: ImageSource.gallery)
                               .then((pickedFile) {
-                                // Logic to pick image
+                                if (pickedFile != null) {
+                                  pickedImgPath = pickedFile.path;
+                                  setState(() {});
+                                }
                               });
                         },
                         child: CircleAvatar(
