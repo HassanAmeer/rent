@@ -1,104 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
-import 'package:rent/auth/profile_details_page.dart';
-import 'package:rent/temp/data.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+
+import '../widgets/casheimage.dart';
 
 class NotificationsDetails extends StatelessWidget {
-  final Map<String, dynamic> userData;
+  final Map<String, dynamic> fullData;
 
-  const NotificationsDetails({super.key, required this.userData});
+  const NotificationsDetails({super.key, required this.fullData});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color.fromARGB(255, 4, 254, 250),
-        title: Image.asset(AppAssets.logo, width: 80),
-        actions: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileDetailsPage(),
-                ),
-              );
-            },
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.cyan,
-              ),
-              clipBehavior: Clip.antiAlias,
-              width: 45,
-              height: 45,
-              child: Image.network(
-                Config.imgUrl + userData['image'],
-                semanticLabel: ImagesLinks.profileImage,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.white, size: 24),
-              ),
+      appBar: AppBar(title: const Text("Notification Details")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "${fullData['title'] ?? 'Title.......'}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(width: 12),
-        ],
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Center(
-                  child: Text(
-                    "User Details",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                infoText("👤 Name", userData['name']),
-                infoText("📧 Email", userData['email']),
-                infoText("📞 Phone", userData['phone']),
-                infoText("🆔 CNIC", userData['cnic']),
-                infoText("🏙️ City", userData['city']),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget infoText(String label, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Text(
-        "$label: ${value ?? 'N/A'}",
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
+            const SizedBox(height: 8),
+            // Text(
+            //   "${fullData['desc'] ?? 'Description.......'}",
+            //   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
+            // ),
+            HtmlWidget(fullData['desc'] ?? 'Description.......'),
+
+            Divider(),
+            ListTile(title: Text("From User")),
+            ListTile(
+              leading: CacheImageWidget(
+                width: 50,
+                height: 50,
+                isCircle: true,
+                radius: 200,
+                url:
+                    Config.imgUrl + fullData['fromuid']['image'] ??
+                    imgLinks.profileImage,
+              ),
+              title: Text(fullData['fromuid']['name'] ?? 'Unknown'),
+              subtitle: Text(fullData['fromuid']['email'] ?? 'Unknown'),
+            ),
+          ],
         ),
       ),
     );
