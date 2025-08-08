@@ -69,9 +69,9 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         children: [
           const SizedBox(height: 10),
           const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
             child: Text(
-              "Notification Users",
+              "Notifications Users",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -81,111 +81,53 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
               : ref.watch(notifyData).notify.isEmpty
               ? const Center(child: Text("Notifications Empty"))
               : Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: ref.watch(notifyData).notify.length,
+                    separatorBuilder: (context, index) => const Divider(),
                     itemBuilder: (context, index) {
                       final item = ref.watch(notifyData).notify[index];
-                      return Container(
-                        height: ScreenSize.height * 0.26,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade200),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+
+                      return ListTile(
+                        onTap: () {
+                          goto(NotificationsDetails(fullData: item));
+                        },
+                        leading: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Image.network(
+                                Config.imgUrl +
+                                    (item['fromuid']['image'] ?? ''),
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.cyan,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.notifications,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(24),
-                                  child: Image.network(
-                                    Config.imgUrl +
-                                        (item['fromuid']['image'] ?? ''),
-                                    width: 48,
-                                    height: 48,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.cyan,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.notifications,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['title'] ?? "Empty",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item['created_at'] ?? "Empty",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  const Spacer(), // Pushes button to bottom
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        goto(
-                                          NotificationDetailPage(
-                                            userData: item['fromuid'],
-                                          ),
-                                        );
-                                      },
-                                      child: const Text(
-                                        "Details",
-                                        style: TextStyle(
-                                          color: Colors.cyan,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                // _deleteNotification(index);
-                              },
-                            ),
-                          ],
+
+                        title: Text(item['title'] ?? "Empty"),
+                        subtitle: Text(item['date'] ?? "Empty"),
+                        trailing: InkWell(
+                          onTap: () {},
+                          child: const Icon(Icons.delete, color: Colors.red),
                         ),
                       );
                     },
@@ -194,15 +136,5 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         ],
       ),
     );
-  }
-}
-
-class NotificationDetailPage extends StatelessWidget {
-  final Map<String, dynamic> userData;
-  const NotificationDetailPage({super.key, required this.userData});
-
-  @override
-  Widget build(BuildContext context) {
-    return NotificationsDetails(userData: userData);
   }
 }

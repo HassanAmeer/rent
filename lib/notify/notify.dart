@@ -83,7 +83,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                       final item = ref.watch(notifyData).notify[index];
                       return GestureDetector(
                         onTap: () {
-                          goto(NotificationDetailPage());
+                          // goto(NotificationDetailPage());
                         },
                         child: Container(
                           height: ScreenSize.height * 0.23,
@@ -193,17 +193,5 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         ],
       ),
     );
-  }
-}
-
-// 🔻 Placeholder Page: You can customize later
-class NotificationDetailPage extends StatelessWidget {
-  const NotificationDetailPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const NotificationsDetails(
-      userData: {},
-    ); // ✅ Yeh tumhari pehle wali screen hai
   }
 }

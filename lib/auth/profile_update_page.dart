@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
+import 'package:rent/widgets/casheimage.dart';
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -59,21 +63,32 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 // Profile picture with edit icon
                 Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: NetworkImage(
-                        Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image'] ??
-                            imgLinks.profileImage,
-                      ),
+                    CacheImageWidget(
+                      width: 100,
+                      height: 100,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image'] ??
+                          imgLinks.profileImage,
                     ),
                     Positioned(
                       right: 0,
                       bottom: 0,
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.black,
-                        child: Icon(Icons.edit, size: 16, color: Colors.cyan),
+                      child: InkWell(
+                        onTap: () {
+                          ImagePicker()
+                              .pickImage(source: ImageSource.gallery)
+                              .then((pickedFile) {
+                                // Logic to pick image
+                              });
+                        },
+                        child: CircleAvatar(
+                          radius: 15,
+                          backgroundColor: Colors.black,
+                          child: Icon(Icons.edit, size: 16, color: Colors.cyan),
+                        ),
                       ),
                     ),
                   ],
