@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/user.dart';
-import 'package:rent/constants/data.dart';
 
-class ProfileUpdatePage extends ConsumerStatefulWidget {
+class ProfileUpdatePage extends StatefulWidget {
   const ProfileUpdatePage({super.key});
 
   @override
-  ConsumerState<ProfileUpdatePage> createState() => _ProfileUpdatePageState();
+  State<ProfileUpdatePage> createState() => _ProfileUpdatePageState();
 }
 
-class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
-  var nameController = TextEditingController();
-  var phoneController = TextEditingController();
-  var emailController = TextEditingController();
-  var aboutUsController = TextEditingController();
-  var addressController = TextEditingController();
-
-  //////
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      var userData = ref.watch(userDataClass).userdata;
-      nameController = TextEditingController(text: userData['name']);
-      phoneController = TextEditingController(text: userData['phone']);
-      emailController = TextEditingController(text: userData['email']);
-      addressController = TextEditingController(text: userData['address']);
-      aboutUsController = TextEditingController(text: userData['aboutUs']);
-      setState(() {});
-    });
-  }
+class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
+  final nameController = TextEditingController(text: "John David");
+  final phoneController = TextEditingController(text: "03012345678");
+  final emailController = TextEditingController(
+    text: "hasanameer386@gmail.com",
+  );
+  final aboutController = TextEditingController(
+    text: "Avid traveler\nEnjoy mountains and outdoors",
+  );
+  final addressController = TextEditingController(
+    text: "2452 Rooney Rd\nChattanooga , TN 21497",
+  );
 
   bool sendEmails = true;
   bool acceptPrivacy = false;
@@ -62,9 +50,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     CircleAvatar(
                       radius: 50,
                       backgroundImage: NetworkImage(
-                        Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image'] ??
-                            imgLinks.profileImage,
+                        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
                       ),
                     ),
                     Positioned(
@@ -156,7 +142,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
             // About Us multiline field
             TextField(
-              controller: aboutUsController,
+              controller: aboutController,
               maxLines: 4,
               decoration: InputDecoration(
                 labelText: "About Us",
@@ -280,39 +266,14 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
                 onPressed: (acceptPrivacy && acceptTerms)
                     ? () {
-                        debugPrint("about ${aboutUsController.text}");
-
                         // Profile update logic
-                        ref
-                            .read(userDataClass)
-                            .updateProfile(
-                              name: nameController.text,
-                              phone: phoneController.text,
-                              email: emailController.text,
-                              aboutUs: aboutUsController.text,
-                              address: addressController.text,
-                              // password: '',
-                            )
-                            .then((value) {
-                              // Navigator.pop(context);
-                            });
+                        Navigator.pop(context);
                       }
                     : null, // Disable if not accepted
-                child: ref.watch(userDataClass).isLoading == true
-                    ? Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: const CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      )
-                    : const Text(
-                        "Update Profile",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                child: const Text(
+                  "Update Profile",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

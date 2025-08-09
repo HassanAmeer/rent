@@ -111,9 +111,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(24),
                                     child: Image.network(
-                                      Config.imgUrl +
-                                              item['fromuid']['image']! ??
-                                          "Empty",
+                                      Config.imgUrl + item['fromuid']['image']!,
                                       width: 48,
                                       height: 48,
                                       fit: BoxFit.cover,

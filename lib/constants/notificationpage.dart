@@ -1,3 +1,4 @@
+git add .
 import 'package:flutter/material.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';

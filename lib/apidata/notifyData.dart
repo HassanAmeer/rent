@@ -34,7 +34,7 @@ class NotifyData with ChangeNotifier {
       debugPrint("👉 getNotifyData Response status: ${response.statusCode}");
       // log(" 👉 getNotifyData Response body: ${response.body}");
       var result = json.decode(response.body);
-      // print("👉 Response: $result");
+      print("👉 Response: $result");
 
       setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {
