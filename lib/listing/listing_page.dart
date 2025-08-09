@@ -1,17 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/listingapi.dart';
+import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
-import 'package:rent/add_new_listing_page.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/listing/add_new_listing_page.dart';
 import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/listing_edit_page.dart';
-import 'package:rent/api_service.dart';
-import 'package:rent/listing_detail_page.dart'; // ✅ Detail page import
+import 'package:rent/listing/listing_edit_page.dart';
+import 'package:rent/listing_detail_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
-import 'home_page.dart';
-// ✅ Make sure this file exists
-// Already present
+import '../home_page.dart';
+// import '../Auth/user_data.dart'; // ✅ UserData import
 
-class ListingPage extends StatelessWidget {
+class ListingPage extends ConsumerStatefulWidget {
   const ListingPage({super.key});
+
+  @override
+  ConsumerState<ListingPage> createState() => _ListingPageState();
+}
+
+class _ListingPageState extends ConsumerState<ListingPage> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((v) {
+      ref
+          .watch(listingDataProvider)
+          .fetchMyItems(
+            uid: ref.watch(userDataClass).userdata["id"].toString(),
+          );
+    });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,48 +70,39 @@ class ListingPage extends StatelessWidget {
             ),
             const SizedBox(height: 25),
 
-            /// Listings Grid from API
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: ApiService.fetchListings(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError ||
-                      !snapshot.hasData ||
-                      snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No listings found.'));
-                  }
-
-                  final listings = snapshot.data!;
-
-                  return GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 1.15,
-                    children: listings.map((listing) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ListingDetailPage(data: listing),
-                            ),
-                          );
-                        },
-
-                        child: ListingBox(
-                          id: listing['id'].toString(),
-                          title: listing['firstName'] ?? 'No Name',
-                          imageUrl: imgLinks.product,
-                          // imageUrl: listing['image'] ?? '${imgLinks.product}',
-                        ),
-                      );
-                    }).toList(),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                ),
+                itemCount: ref.watch(listingDataProvider).listings.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      //  goto(
+                      //     ListingDetailPage(
+                      //       listingId: ref.watch(listingDataProvider).listings[index]['id'].toString(),
+                      //     ),
+                      //     canBack: true,
+                      //   );
+                    },
+                    child: ListingBox(
+                      id: ref
+                          .watch(listingDataProvider)
+                          .listings[index]['id']
+                          .toString(),
+                      title:
+                          ref
+                              .watch(listingDataProvider)
+                              .listings[index]['firstName'] ??
+                          'No Name',
+                      imageUrl:
+                          Config.imgUrl +
+                              ref
+                                  .watch(listingDataProvider)
+                                  .listings[index]['images'][0] ??
+                          imgLinks.product, // ✅ Image from API
+                    ),
                   );
                 },
               ),

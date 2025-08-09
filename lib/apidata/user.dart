@@ -163,6 +163,8 @@ class UserData with ChangeNotifier {
       setLoading(false);
     }
   }
+
+  static fetchMyItems() {}
 }
 
 
