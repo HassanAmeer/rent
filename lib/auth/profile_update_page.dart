@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -40,6 +41,8 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   bool acceptPrivacy = false;
   bool acceptTerms = false;
 
+  var pikedImage = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,11 +80,16 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                       right: 0,
                       bottom: 0,
                       child: InkWell(
-                        onTap: () {
-                          ImagePicker()
+                        onTap: () async {
+                          await ImagePicker()
                               .pickImage(source: ImageSource.gallery)
                               .then((pickedFile) {
-                                // Logic to pick image
+                                if (pickedFile != null) {
+                                  setState(() {
+                                    pikedImage = pickedFile.path;
+                                  });
+                                  // Logic to pick image
+                                }
                               });
                         },
                         child: CircleAvatar(
@@ -94,7 +102,10 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                   ],
                 ),
 
-                const SizedBox(width: 30),
+                pikedImage.isEmpty
+                    ? SizedBox.shrink()
+                    : const SizedBox(width: 30),
+                Image.file(File(pikedImage)),
 
                 // Pick Images text
                 Expanded(
