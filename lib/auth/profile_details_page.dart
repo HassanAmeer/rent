@@ -8,6 +8,7 @@ import 'package:rent/auth/login.dart';
 import '../apidata/user.dart';
 import '../constants/data.dart';
 import '../home_page.dart';
+import '../widgets/casheimage.dart';
 import 'profile_update_page.dart';
 import '../widgets/btmnavbar.dart';
 
@@ -48,48 +49,31 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 15),
-                    Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(100),
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: NetworkImage(
-                              Config.imgUrl +
-                                      ref
-                                          .watch(userDataClass)
-                                          .userdata['image'] ??
-                                  imgLinks.profileImage,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.black45,
-                            child: IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: const Icon(
-                                Icons.camera_alt_sharp,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ProfileUpdatePage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+
+                    // ClipRRect(
+                    //   borderRadius: const BorderRadius.all(
+                    //     Radius.circular(100),
+                    //   ),
+                    //   child: CircleAvatar(
+                    //     radius: 50,
+                    //     backgroundImage: NetworkImage(
+                    //       Config.imgUrl +
+                    //               ref.watch(userDataClass).userdata['image'] ??
+                    //           imgLinks.profileImage,
+                    //     ),
+                    //   ),
+                    // ),
+                    CacheImageWidget(
+                      width: 100,
+                      height: 100,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image'] ??
+                          imgLinks.profileImage,
                     ),
+
                     const SizedBox(height: 20),
                     ListTile(
                       title: Text(

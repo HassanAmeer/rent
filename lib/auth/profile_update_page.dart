@@ -1,13 +1,20 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:math';
 
-class ProfileUpdatePage extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/data.dart';
+
+class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
 
   @override
-  State<ProfileUpdatePage> createState() => _ProfileUpdatePageState();
+  ConsumerState<ProfileUpdatePage> createState() => _ProfileUpdatePageState();
 }
 
-class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
+class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   final nameController = TextEditingController(text: "John David");
   final phoneController = TextEditingController(text: "03012345678");
   final emailController = TextEditingController(
@@ -23,6 +30,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   bool sendEmails = true;
   bool acceptPrivacy = false;
   bool acceptTerms = false;
+  String pickedImgPath = "";
 
   @override
   Widget build(BuildContext context) {
@@ -50,21 +58,34 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     CircleAvatar(
                       radius: 50,
                       backgroundImage: NetworkImage(
-                        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+                        Config.imgUrl +
+                                ref.watch(userDataClass).userdata['image'] ??
+                            imgLinks.profileImage,
                       ),
                     ),
                     Positioned(
                       right: 0,
                       bottom: 0,
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.black,
-                        child: Icon(Icons.edit, size: 16, color: Colors.cyan),
+                      child: InkWell(
+                        onTap: () {
+                          ImagePicker()
+                              .pickImage(source: ImageSource.gallery)
+                              .then((pickedFile) {
+                                if (pickedFile != null) {
+                                  pickedImgPath = pickedFile.path;
+                                  setState(() {});
+                                }
+                              });
+                        },
+                        child: CircleAvatar(
+                          radius: 15,
+                          backgroundColor: Colors.black,
+                          child: Icon(Icons.edit, size: 16, color: Colors.cyan),
+                        ),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(width: 30),
 
                 // Pick Images text

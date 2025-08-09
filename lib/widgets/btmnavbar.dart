@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../constants/goto.dart';
 import '../home_page.dart';
-import '../listing_page.dart';
+import '../listing/listing_page.dart';
 import '../my_booking_page.dart';
 import '../auth/profile_details_page.dart';
 

@@ -1,56 +1,42 @@
-git add .
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/notifyData.dart';
+import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';
 import 'package:rent/auth/profile_details_page.dart';
 import 'package:rent/temp/data.dart';
-import 'data.dart' hide AppAssets, ImagesLinks;
+import '../constants/data.dart';
 
-class NotificationPage extends StatefulWidget {
+class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});
 
   @override
-  State<NotificationPage> createState() => _MyWidgetState();
+  ConsumerState<NotificationPage> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<NotificationPage> {
-  List<Map<String, String>> notifications = [
-    {
-      "name": "Ashley",
-      "message": "New Booking for Vintage Type Writer",
-      "date": "2025-02-17",
-      "time": "17:48:59",
-      "image": "https://randomuser.me/api/portraits/women/1.jpg",
-    },
-    {
-      "name": "Ashley A.",
-      "message": "New Booking for Vintage Type Writer",
-      "date": "2024-12-19",
-      "time": "17:52:09",
-      "image": "https://randomuser.me/api/portraits/women/2.jpg",
-    },
-    {
-      "name": "Ashley A.",
-      "message": "New Booking for Kayake",
-      "date": "2024-10-25",
-      "time": "13:47:49",
-      "image": "https://randomuser.me/api/portraits/women/3.jpg",
-    },
-  ];
-
-  void _deleteNotification(int index) {
-    setState(() {
-      notifications.removeAt(index);
+class _MyWidgetState extends ConsumerState<NotificationPage> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .watch(notifyData)
+          .getNotifyData(
+            uid: ref.watch(userDataClass).userdata['id'].toString(),
+          );
     });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var userData = ref.watch(userDataClass).userdata;
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: Image.asset(AppAssets.logo, width: 100),
-
         actions: [
           InkWell(
             onTap: () {
@@ -62,12 +48,18 @@ class _MyWidgetState extends State<NotificationPage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.cyan.shade700,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(30),
               ),
-              width: 35,
-              height: 35,
+              width: 45,
+              height: 45,
               clipBehavior: Clip.antiAlias,
-              child: Image.network(ImagesLinks.profileImage, fit: BoxFit.cover),
+              child: Image.network(
+                Config.imgUrl + userData['image'],
+                semanticLabel: ImagesLinks.profileImage,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.person, color: Colors.white, size: 24),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -75,155 +67,74 @@ class _MyWidgetState extends State<NotificationPage> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+          const SizedBox(height: 10),
+          const Padding(
+            padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
             child: Text(
-              "Notification Users",
+              "Notifications Users",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final item = notifications[index];
-                return Container(
-                  height: ScreenSize.height * 0.23,
+          const SizedBox(height: 10),
+          ref.watch(notifyData).isLoading == true
+              ? const Center(child: CircularProgressIndicator.adaptive())
+              : ref.watch(notifyData).notify.isEmpty
+              ? const Center(child: Text("Notifications Empty"))
+              : Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: ref.watch(notifyData).notify.length,
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final item = ref.watch(notifyData).notify[index];
 
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(24),
-                            child: Image.network(
-                              item['image']!,
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: Colors.cyan,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.notifications,
-                                size: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      return ListTile(
+                        onTap: () {
+                          goto(NotificationsDetails(fullData: item));
+                        },
+                        leading: Stack(
                           children: [
-                            Text(
-                              item['name']!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Image.network(
+                                Config.imgUrl +
+                                    (item['fromuid']['image'] ?? ''),
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(item['message']!),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Text(
-                                  item['date']!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.cyan,
+                                  shape: BoxShape.circle,
                                 ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  item['time']!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
+                                child: const Icon(
+                                  Icons.notifications,
+                                  size: 14,
+                                  color: Colors.white,
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const NotificationDetailPage(),
-                                  ),
-                                );
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(
-                                    Icons.keyboard_arrow_down,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "Details",
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteNotification(index),
-                      ),
-                    ],
+
+                        title: Text(item['title'] ?? "Empty"),
+                        subtitle: Text(item['date'] ?? "Empty"),
+                        trailing: InkWell(
+                          onTap: () {},
+                          child: const Icon(Icons.delete, color: Colors.red),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
         ],
       ),
     );
-  }
-}
-
-// 🔻 Placeholder Page: You can customize later
-class NotificationDetailPage extends StatelessWidget {
-  const NotificationDetailPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const NotificationsDetails(); // ✅ Yeh tumhari pehle wali screen hai
   }
 }
