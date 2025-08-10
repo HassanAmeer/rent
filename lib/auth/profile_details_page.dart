@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
 import 'package:rent/auth/login.dart';
 import '../apidata/user.dart';
 import '../constants/data.dart';

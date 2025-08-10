@@ -29,6 +29,79 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
     super.initState();
   }
 
+  Future<void> _deleteNotification(
+    BuildContext context,
+    String notificationId,
+  ) async {
+    bool confirmDelete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Notification'),
+        content: const Text(
+          'Are you sure you want to delete this notification?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmDelete == true) {
+      try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
+        );
+
+        // Call delete API
+        await ref
+            .read(notifyData)
+            .deleteNotification(
+              notificationId: notificationId,
+              uid: ref.read(userDataClass).userdata['id'].toString(),
+            );
+
+        // Close loading indicator
+        Navigator.pop(context);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notification deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Refresh notifications
+        ref
+            .read(notifyData)
+            .getNotifyData(
+              uid: ref.read(userDataClass).userdata['id'].toString(),
+            );
+      } catch (e) {
+        // Close loading indicator if still open
+        Navigator.pop(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var userData = ref.watch(userDataClass).userdata;
@@ -88,47 +161,73 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                     itemBuilder: (context, index) {
                       final item = ref.watch(notifyData).notify[index];
 
-                      return ListTile(
-                        onTap: () {
-                          goto(NotificationsDetails(fullData: item));
-                        },
-                        leading: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.network(
-                                Config.imgUrl +
-                                    (item['fromuid']['image'] ?? ''),
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              ),
+                      return Stack(
+                        children: [
+                          ListTile(
+                            onTap: () {
+                              goto(NotificationsDetails(fullData: item));
+                            },
+                            leading: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.network(
+                                    Config.imgUrl +
+                                        (item['fromuid']['image'] ?? ''),
+                                    width: 48,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.cyan,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.notifications,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
+                            title: Text(item['title'] ?? "Empty"),
+                            subtitle: Text(item['date'] ?? "Empty"),
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: GestureDetector(
+                              onTap: () => _deleteNotification(
+                                context,
+                                item['id'].toString(),
+                              ),
                               child: Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: const BoxDecoration(
-                                  color: Colors.cyan,
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(
+                                    255,
+                                    238,
+                                    236,
+                                    236,
+                                  ).withOpacity(0.5),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
-                                  Icons.notifications,
-                                  size: 14,
-                                  color: Colors.white,
+                                  Icons.delete,
+                                  size: 18,
+                                  color: Color.fromARGB(255, 193, 16, 4),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-
-                        title: Text(item['title'] ?? "Empty"),
-                        subtitle: Text(item['date'] ?? "Empty"),
-                        trailing: InkWell(
-                          onTap: () {},
-                          child: const Icon(Icons.delete, color: Colors.red),
-                        ),
+                          ),
+                        ],
                       );
                     },
                   ),

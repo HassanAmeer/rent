@@ -6,7 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
-import 'package:rent/widgets/casheimage.dart';
+
+import '../widgets/casheimage.dart';
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -16,31 +17,23 @@ class ProfileUpdatePage extends ConsumerStatefulWidget {
 }
 
 class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
-  var nameController = TextEditingController();
-  var phoneController = TextEditingController();
-  var emailController = TextEditingController();
-  var aboutUsController = TextEditingController();
-  var addressController = TextEditingController();
-
-  //////
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      var userData = ref.watch(userDataClass).userdata;
-      nameController = TextEditingController(text: userData['name']);
-      phoneController = TextEditingController(text: userData['phone']);
-      emailController = TextEditingController(text: userData['email']);
-      addressController = TextEditingController(text: userData['address']);
-      aboutUsController = TextEditingController(text: userData['aboutUs']);
-      setState(() {});
-    });
-  }
+  final nameController = TextEditingController(text: "John David");
+  final phoneController = TextEditingController(text: "03012345678");
+  final emailController = TextEditingController(
+    text: "hasanameer386@gmail.com",
+  );
+  final aboutController = TextEditingController(
+    text: "Avid traveler\nEnjoy mountains and outdoors",
+  );
+  final addressController = TextEditingController(
+    text: "2452 Rooney Rd\nChattanooga , TN 21497",
+  );
 
   bool sendEmails = true;
   bool acceptPrivacy = false;
   bool acceptTerms = false;
-  String pickedImgPath = "";
+
+  var pikedImage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -65,36 +58,29 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 // Profile picture with edit icon
                 Stack(
                   children: [
-                    pickedImgPath.isNotEmpty
-                        ? ClipOval(
-                            child: Image.file(
-                              File(pickedImgPath),
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : CacheImageWidget(
-                            width: 100,
-                            height: 100,
-                            isCircle: true,
-                            radius: 200,
-                            url:
-                                (Config.imgUrl +
-                                (ref.watch(userDataClass).userdata['image'] ??
-                                    imgLinks.profileImage)),
-                          ),
+                    CacheImageWidget(
+                      width: 100,
+                      height: 100,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image'] ??
+                          imgLinks.profileImage,
+                    ),
                     Positioned(
                       right: 0,
                       bottom: 0,
                       child: InkWell(
-                        onTap: () {
-                          ImagePicker()
+                        onTap: () async {
+                          await ImagePicker()
                               .pickImage(source: ImageSource.gallery)
                               .then((pickedFile) {
                                 if (pickedFile != null) {
-                                  pickedImgPath = pickedFile.path;
-                                  setState(() {});
+                                  setState(() {
+                                    pikedImage = pickedFile.path;
+                                  });
+                                  // Logic to pick image
                                 }
                               });
                         },
@@ -107,7 +93,11 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 30),
+
+                pikedImage.isEmpty
+                    ? SizedBox.shrink()
+                    : const SizedBox(width: 30),
+                Image.file(File(pikedImage)),
 
                 // Pick Images text
                 Expanded(
@@ -184,7 +174,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
             // About Us multiline field
             TextField(
-              controller: aboutUsController,
+              controller: aboutController,
               maxLines: 4,
               decoration: InputDecoration(
                 labelText: "About Us",
@@ -308,39 +298,14 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
                 onPressed: (acceptPrivacy && acceptTerms)
                     ? () {
-                        debugPrint("about ${aboutUsController.text}");
-
                         // Profile update logic
-                        ref
-                            .read(userDataClass)
-                            .updateProfile(
-                              name: nameController.text,
-                              phone: phoneController.text,
-                              email: emailController.text,
-                              aboutUs: aboutUsController.text,
-                              address: addressController.text,
-                              // password: '',
-                            )
-                            .then((value) {
-                              // Navigator.pop(context);
-                            });
+                        Navigator.pop(context);
                       }
                     : null, // Disable if not accepted
-                child: ref.watch(userDataClass).isLoading == true
-                    ? Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: const CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      )
-                    : const Text(
-                        "Update Profile",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                child: const Text(
+                  "Update Profile",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

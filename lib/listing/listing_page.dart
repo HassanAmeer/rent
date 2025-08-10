@@ -73,6 +73,9 @@ class _ListingPageState extends ConsumerState<ListingPage> {
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
                 ),
                 itemCount: ref.watch(listingDataProvider).listings.length,
                 itemBuilder: (context, index) {
@@ -96,7 +99,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                               ref
                                   .watch(listingDataProvider)
                                   .listings[index]['images'][0] ??
-                          imgLinks.product, // ✅ Image from API
+                          imgLinks.product,
                     ),
                   );
                 },
@@ -114,9 +117,10 @@ class _ListingPageState extends ConsumerState<ListingPage> {
             MaterialPageRoute(builder: (context) => const AddNewListingPage()),
           );
         },
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 11, 11, 11),
         child: const Icon(Icons.add, color: Colors.white),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       /// Bottom Navigation
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
@@ -151,28 +155,108 @@ class ListingBox extends StatelessWidget {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          /// Image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.network(
-              imageUrl,
-              height: ScreenSize.height * 0.12,
-              width: double.infinity,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 50),
+          // Image container with expanded height
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Expanded(
+              flex: 4,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(Icons.broken_image, size: 40),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: () {
+                        // TODO: Add delete functionality
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Listing'),
+                            content: const Text(
+                              'Are you sure you want to delete this listing?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // TODO: Implement delete logic
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(
+                            255,
+                            238,
+                            236,
+                            236,
+                          ).withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.delete,
+                          size: 18,
+                          color: Color.fromARGB(255, 193, 16, 4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 20),
 
-          /// Title
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-              textAlign: TextAlign.center,
+          // Text container with reduced height
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 4.0,
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
           ),
         ],

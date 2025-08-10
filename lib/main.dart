@@ -21,6 +21,10 @@ class MyApp extends StatelessWidget {
       title: 'Rent',
       navigatorKey: contextKey,
       theme: ThemeData(
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: Colors.grey.shade100,
         appBarTheme: AppBarTheme(backgroundColor: Colors.cyan),

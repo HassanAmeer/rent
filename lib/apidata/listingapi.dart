@@ -51,5 +51,27 @@ class ListingData with ChangeNotifier {
     }
   }
 
+  editsmyitems({
+    required String itemId,
+    required String uid,
+    Map? newItemData,
+  }) async {
+    try {
+      final response = await http.put(
+        Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
+        body: newItemData,
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        fetchMyItems(uid: uid);
+        toast(data["msg"], backgroundColor: Colors.green);
+      } else {
+        toast(data["msg"], backgroundColor: Colors.red);
+      }
+    } catch (e) {
+      print("errore$e");
+    }
+  }
+
   //
 }

@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/Blogs.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/fvrt.dart';
+import 'package:rent/fvart/fvrt.dart';
 import 'package:rent/help.dart';
 import 'package:rent/listing/listing_page.dart';
 import 'package:rent/my_booking_page.dart';
@@ -311,24 +311,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text(
-                  "View Listings",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),

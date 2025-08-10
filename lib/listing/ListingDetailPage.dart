@@ -21,15 +21,18 @@ class ListingDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Main Image
-              CacheImageWidget(
-                width: 300,
-                height: 150,
-                isCircle: false,
-                radius: 0,
-                url:
-                    Config.imgUrl + fullData['images'][0] ??
-                    imgLinks.profileImage,
+              Stack(
+                children: [
+                  CacheImageWidget(
+                    width: 300,
+                    height: 150,
+                    isCircle: false,
+                    radius: 0,
+                    url:
+                        Config.imgUrl + fullData['images'][0] ??
+                        imgLinks.profileImage,
+                  ),
+                ],
               ),
 
               const SizedBox(height: 10),
@@ -46,6 +49,7 @@ class ListingDetailPage extends StatelessWidget {
               HtmlWidget(fullData['description'] ?? 'Description.......'),
 
               Divider(),
+
               ListTile(
                 title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
               ),
@@ -73,45 +77,35 @@ class ListingDetailPage extends StatelessWidget {
               ),
               Divider(),
 
-              /// From User Section with Edit Icon in Corner
               const ListTile(title: Text("From User")),
-              Stack(
-                alignment: Alignment.centerRight,
-                children: [
-                  ListTile(
-                    leading: CacheImageWidget(
-                      width: 50,
-                      height: 50,
-                      isCircle: true,
-                      radius: 200,
-                      url:
-                          Config.imgUrl + fullData['images'][0] ??
-                          imgLinks.profileImage,
-                    ),
-                  ),
-                  Positioned(
-                    right: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.black),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ListingEditPage(listingData: fullData),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+              ListTile(
+                leading: CacheImageWidget(
+                  width: 50,
+                  height: 50,
+                  isCircle: true,
+                  radius: 200,
+                  url:
+                      Config.imgUrl + fullData['images'][0] ??
+                      imgLinks.profileImage,
+                ),
               ),
             ],
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "editListing",
+        child: const Icon(Icons.edit),
+
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditListingPage(itemData: fullData),
+            ),
+          );
+        },
+      ),
     );
   }
 }
-
-ListingEditPage({required Map<String, dynamic> listingData}) {}
