@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'auth/login.dart';
 import 'auth/signup.dart';
 import 'home_page.dart';
-import 'listing_page.dart';
+import 'listing/listing_page.dart';
 
 GlobalKey<NavigatorState> contextKey = GlobalKey();
 

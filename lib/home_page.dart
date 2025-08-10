@@ -5,7 +5,7 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/fvrt.dart';
 import 'package:rent/help.dart';
-import 'package:rent/listing_page.dart';
+import 'package:rent/listing/listing_page.dart';
 import 'package:rent/my_booking_page.dart';
 import 'package:rent/constants/notificationpage.dart';
 import 'package:rent/myrentalpage.dart';
