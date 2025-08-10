@@ -107,16 +107,6 @@ class _ListingPageState extends ConsumerState<ListingPage> {
       ),
 
       /// Floating Add Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const EditListingPage()),
-          );
-        },
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
 
       /// Bottom Navigation
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
@@ -193,23 +183,13 @@ class ListingBox extends StatelessWidget {
           left: 5,
           child: Row(
             children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditListingPage(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.edit, size: 16, color: Colors.blue),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(Icons.edit, size: 16, color: Colors.blue),
               ),
               const SizedBox(width: 6),
               GestureDetector(

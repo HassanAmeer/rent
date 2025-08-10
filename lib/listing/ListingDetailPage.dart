@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rent/booking_edit_page.dart';
 import 'package:rent/constants/data.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/listing/listing_edit_page.dart';
 
 import '../widgets/casheimage.dart';
 
@@ -84,6 +87,29 @@ class ListingDetailPage extends StatelessWidget {
                   url:
                       Config.imgUrl + fullData['images'][0] ??
                       imgLinks.profileImage,
+                ),
+              ),
+
+              // Floating Action Button for editing
+              Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    // goto(EditListingPage(fullData: fullData));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditListingPage(
+                          itemId: '',
+                          uid: '',
+                          itemData: {},
+                          fullData: {},
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.edit),
+                  tooltip: 'Edit Listing',
                 ),
               ),
             ],

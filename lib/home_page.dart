@@ -311,24 +311,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text(
-                  "View Listings",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),

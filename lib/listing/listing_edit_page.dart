@@ -1,33 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class EditListingPage extends StatefulWidget {
-  final String? title;
-  final String? price;
-  final String? rating;
-  final String? imageUrl;
+import 'package:image_picker/image_picker.dart';
+
+class EditListingPage extends ConsumerStatefulWidget {
+  final String itemId;
+  final String uid;
+  final Map<String, dynamic> itemData;
 
   const EditListingPage({
     super.key,
-    this.title,
-    this.price,
-    this.rating,
-    this.imageUrl,
+    required this.itemId,
+    required this.uid,
+    required this.itemData,
+    required Map<String, dynamic> fullData,
   });
 
   @override
-  State<EditListingPage> createState() => _EditListingPageState();
+  ConsumerState<EditListingPage> createState() => _EditListingPageState();
 }
 
-class _EditListingPageState extends State<EditListingPage> {
+class _EditListingPageState extends ConsumerState<EditListingPage> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _dailyRateController = TextEditingController();
-  final _weeklyRateController = TextEditingController();
-  final _monthlyRateController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _dailyRateController;
+  late final TextEditingController _weeklyRateController;
+  late final TextEditingController _monthlyRateController;
 
-  String? _selectedCategory = 'Electronics';
+  String? _selectedCategory;
   final List<String> _selectedImages = [];
+  bool _isLoading = false;
 
   final List<String> _categories = [
     'Electronics',
@@ -45,13 +50,23 @@ class _EditListingPageState extends State<EditListingPage> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill form with existing data
-    _titleController.text = 'Electrical Box';
-    _descriptionController.text =
-        'Electrical Box\nVintage model 23\nOnly used 6 months';
-    _dailyRateController.text = '0';
-    _weeklyRateController.text = '0';
-    _monthlyRateController.text = '0';
+    // Initialize controllers with existing data
+    _titleController = TextEditingController(
+      text: widget.itemData['title'] ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.itemData['description'] ?? '',
+    );
+    _dailyRateController = TextEditingController(
+      text: widget.itemData['dailyRate']?.toString() ?? '0',
+    );
+    _weeklyRateController = TextEditingController(
+      text: widget.itemData['weeklyRate']?.toString() ?? '0',
+    );
+    _monthlyRateController = TextEditingController(
+      text: widget.itemData['monthlyRate']?.toString() ?? '0',
+    );
+    _selectedCategory = widget.itemData['category'] ?? 'Electronics';
   }
 
   @override
@@ -70,7 +85,6 @@ class _EditListingPageState extends State<EditListingPage> {
         'assets/images/sample${_selectedImages.length + 1}.jpg',
       );
     });
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Image added! (Demo mode)'),
@@ -85,15 +99,54 @@ class _EditListingPageState extends State<EditListingPage> {
     });
   }
 
-  void _updateListing() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> editsmyitems() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.put(
+        Uri.parse("https://thelocalrent.com/api/myitems/${widget.itemId}"),
+        body: {
+          "title": _titleController.text,
+          "description": _descriptionController.text,
+          "dailyRate": _dailyRateController.text,
+          "weeklyRate": _weeklyRateController.text,
+          "monthlyRate": _monthlyRateController.text,
+          "category": _selectedCategory,
+          // Add other fields as needed by your API
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        // fetchMyItems(uid: widget.uid); // Uncomment if you need to refresh parent
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data["msg"] ?? "Item updated successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, true); // Return success
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(data["msg"] ?? "Failed to update item"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Listing updated successfully!'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: Colors.red,
         ),
       );
-      Navigator.pop(context);
+      print("Error: $e");
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -111,245 +164,232 @@ class _EditListingPageState extends State<EditListingPage> {
         iconTheme: const IconThemeData(color: Colors.black87),
         centerTitle: true,
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Category Selection
-              _buildSectionLabel('Category'),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Item Title
-              _buildSectionLabel('Item Title'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _titleController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter item title';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Item Description
-              _buildSectionLabel('Item Description'),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Rich Text Toolbar
+                    // Category Selection
+                    _buildSectionLabel('Category'),
+                    const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[300]!),
                       ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            const Text(
-                              'Paragraph',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildToolbarButton(Icons.format_bold, () {}),
-                            _buildToolbarButton(Icons.format_italic, () {}),
-                            _buildToolbarButton(Icons.link, () {}),
-                            _buildToolbarButton(
-                              Icons.format_list_bulleted,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_list_numbered,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_indent_increase,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_indent_decrease,
-                              () {},
-                            ),
-                            _buildToolbarButton(Icons.image, () {}),
-                            _buildToolbarButton(Icons.format_quote, () {}),
-                          ],
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCategory,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
+                        items: _categories.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value;
+                          });
+                        },
                       ),
                     ),
-                    // Text Area
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 6,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(16),
-                      ),
+
+                    const SizedBox(height: 20),
+
+                    // Item Title
+                    _buildSectionLabel('Item Title'),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _titleController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter item description';
+                          return 'Please enter item title';
                         }
                         return null;
                       },
                     ),
-                  ],
-                ),
-              ),
 
-              const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-              // Pricing Section
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Daily Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
-                          controller: _dailyRateController,
-                          keyboardType: TextInputType.number,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Weekly Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
-                          controller: _weeklyRateController,
-                          keyboardType: TextInputType.number,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Monthly Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
-                          controller: _monthlyRateController,
-                          keyboardType: TextInputType.number,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Pick Images Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildSectionLabel('Pick Images'),
-                  TextButton.icon(
-                    onPressed: _pickImages,
-                    icon: const Icon(Icons.upload, size: 18),
-                    label: const Text('Upload Images'),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.blue[50],
-                      foregroundColor: Colors.blue[700],
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                    // Item Description
+                    _buildSectionLabel('Item Description'),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[300]!),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Images Display
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: _selectedImages.isEmpty
-                    ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.image_outlined,
-                              size: 48,
-                              color: Colors.grey,
+                      child: Column(
+                        children: [
+                          // Rich Text Toolbar (simplified)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'No Images',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
                               ),
                             ),
-                          ],
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  _buildToolbarButton(Icons.format_bold, () {}),
+                                  _buildToolbarButton(
+                                    Icons.format_italic,
+                                    () {},
+                                  ),
+                                  _buildToolbarButton(Icons.link, () {}),
+                                ],
+                              ),
+                            ),
+                          ),
+                          TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 6,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(16),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter item description';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Pricing Section
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionLabel('Daily Rate'),
+                              const SizedBox(height: 8),
+                              _buildTextField(
+                                controller: _dailyRateController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionLabel('Weekly Rate'),
+                              const SizedBox(height: 8),
+                              _buildTextField(
+                                controller: _weeklyRateController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionLabel('Monthly Rate'),
+                              const SizedBox(height: 8),
+                              _buildTextField(
+                                controller: _monthlyRateController,
+                                keyboardType: TextInputType.number,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Images Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildSectionLabel('Item Images'),
+                        InkWell(
+                          onTap: () {
+                            ImagePicker()
+                                .pickImage(source: ImageSource.gallery)
+                                .then((pickedFile) {
+                                  if (pickedFile != null) {
+                                    var pickedImgPath = pickedFile.path;
+                                    setState(() {});
+                                  }
+                                });
+                          },
+                          child: TextButton.icon(
+                            onPressed: _pickImages,
+
+                            icon: const Icon(Icons.upload, size: 18),
+                            label: const Text('Add Images'),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue[50],
+                              foregroundColor: Colors.blue[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Images Grid
+                    if (_selectedImages.isEmpty)
+                      Container(
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image,
+                                size: 40,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'No images added',
+                                style: TextStyle(color: Colors.grey[500]),
+                              ),
+                            ],
+                          ),
                         ),
                       )
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(8),
+                    else
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
@@ -364,13 +404,9 @@ class _EditListingPageState extends State<EditListingPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: Colors.grey[200],
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    color: Colors.grey,
-                                    size: 24,
+                                  image: DecorationImage(
+                                    image: AssetImage(_selectedImages[index]),
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
@@ -380,16 +416,15 @@ class _EditListingPageState extends State<EditListingPage> {
                                 child: GestureDetector(
                                   onTap: () => _removeImage(index),
                                   child: Container(
-                                    width: 20,
-                                    height: 20,
+                                    padding: const EdgeInsets.all(2),
                                     decoration: const BoxDecoration(
                                       color: Colors.red,
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(
                                       Icons.close,
-                                      color: Colors.white,
                                       size: 14,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -398,33 +433,35 @@ class _EditListingPageState extends State<EditListingPage> {
                           );
                         },
                       ),
-              ),
 
-              const SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
-              // Update Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _updateListing,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    // Update Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: editsmyitems,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.cyan,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Update Listing',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Update Listing',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -468,253 +505,6 @@ class _EditListingPageState extends State<EditListingPage> {
       icon: Icon(icon, size: 18, color: Colors.grey[600]),
       padding: const EdgeInsets.all(4),
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-    );
-  }
-}
-
-// Updated ListingEditPage with navigation to EditListingPage
-class ListingEditPage extends StatelessWidget {
-  const ListingEditPage({super.key});
-
-  final List<Map<String, String>> listings = const [
-    {
-      "image":
-          "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-      "title": "Bed Apartment",
-      "price": "\$ 0/Day",
-      "rating": "★★★★☆",
-    },
-    {
-      "image":
-          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-      "title": "Luxury Villa",
-      "price": "\$ 10/Day",
-      "rating": "★★★☆☆",
-    },
-    {
-      "image":
-          "https://images.unsplash.com/photo-1600585154172-3b5f3c6ae3ea?auto=format&fit=crop&w=800&q=80",
-      "title": "Family House",
-      "price": "\$ 5/Day",
-      "rating": "★★★★★",
-    },
-    {
-      "image":
-          "https://images.unsplash.com/photo-1572120360610-d971b9b78836?auto=format&fit=crop&w=800&q=80",
-      "title": "Studio Flat",
-      "price": "\$ 0/Day",
-      "rating": "★★☆☆☆",
-    },
-    {
-      "image":
-          "https://images.unsplash.com/photo-1615874959474-d609969a6a84?auto=format&fit=crop&w=800&q=80",
-      "title": "Modern Condo",
-      "price": "\$ 12/Day",
-      "rating": "★★★☆☆",
-    },
-    {
-      "image":
-          "https://images.unsplash.com/photo-1600585153943-24d048c1a9a0?auto=format&fit=crop&w=800&q=80",
-      "title": "Beachfront Home",
-      "price": "\$ 0/Day",
-      "rating": "★★★☆☆",
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan,
-        leading: const Icon(Icons.arrow_back, size: 20, color: Colors.black),
-        title: const Text(
-          "My Listing",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  icon: Icon(Icons.search),
-                  border: InputBorder.none,
-                  hintText: 'Search Listings...',
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.77,
-                children: listings.map((listing) {
-                  return ListingBox(
-                    image: listing["image"]!,
-                    title: listing["title"]!,
-                    price: listing["price"]!,
-                    rating: listing["rating"]!,
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.cyan[700],
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddNewListingPage()),
-          );
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
-  }
-}
-
-class ListingBox extends StatelessWidget {
-  final String image;
-  final String title;
-  final String price;
-  final String rating;
-
-  const ListingBox({
-    super.key,
-    required this.image,
-    required this.title,
-    required this.price,
-    required this.rating,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: Image.network(
-                    image,
-                    height: 130,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 6,
-                  left: 6,
-                  child: Row(
-                    children: [
-                      _iconCircle(Icons.edit, Colors.cyan, () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditListingPage(
-                              title: title,
-                              price: price,
-                              rating: rating,
-                              imageUrl: image,
-                            ),
-                          ),
-                        );
-                      }),
-                      const SizedBox(width: 5),
-                      _iconCircle(Icons.delete, Colors.red, () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Delete tapped")),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    price,
-                    style: const TextStyle(color: Colors.orange, fontSize: 12),
-                  ),
-                  Text(rating, style: const TextStyle(fontSize: 11)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _iconCircle(IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2)],
-        ),
-        child: Icon(icon, size: 14, color: color),
-      ),
-    );
-  }
-}
-
-// Placeholder for AddNewListingPage import
-class AddNewListingPage extends StatelessWidget {
-  const AddNewListingPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Listing'),
-        backgroundColor: Colors.cyan,
-      ),
-      body: const Center(child: Text('Add New Listing Page')),
     );
   }
 }

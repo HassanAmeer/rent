@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class EditBookingPage extends StatefulWidget {
+class EditListingPage extends ConsumerStatefulWidget {
   final String? title;
   final String? price;
   final String? rating;
   final String? imageUrl;
 
-  const EditBookingPage({
+  const EditListingPage({
     super.key,
     this.title,
     this.price,
     this.rating,
     this.imageUrl,
+    required Map<String, dynamic> fullData,
   });
 
   @override
-  State<EditBookingPage> createState() => _EditBookingPageState();
+  ConsumerState<EditListingPage> createState() => _EditListingPageState();
 }
 
-class _EditBookingPageState extends State<EditBookingPage> {
+class _EditListingPageState extends ConsumerState<EditListingPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -474,7 +476,7 @@ class _EditBookingPageState extends State<EditBookingPage> {
 
 // Updated ListingEditPage with navigation to EditListingPage
 class ListingEditPage extends StatelessWidget {
-  const ListingEditPage({super.key, required fulldta});
+  const ListingEditPage({super.key});
 
   final List<Map<String, String>> listings = const [
     {
@@ -634,19 +636,19 @@ class ListingBox extends StatelessWidget {
                   left: 6,
                   child: Row(
                     children: [
-                      _iconCircle(Icons.edit, Colors.cyan, () {
-                        // Navigator.push(
-                        // context,
-                        // MaterialPageRoute(
-                        //   builder: (context) => EditListingPage(
-                        //     title: title,
-                        //     price: price,
-                        //     rating: rating,
-                        //     imageUrl: image,
-                        //   ),
-                        // ),
-                        // );
-                      }),
+                      // _iconCircle(Icons.edit, Colors.cyan, () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => EditListingPage(
+                      //         title: title,
+                      //         price: price,
+                      //         rating: rating,
+                      //         imageUrl: image,
+                      //       ),
+                      //     ),
+                      //   );
+                      // }),
                       const SizedBox(width: 5),
                       _iconCircle(Icons.delete, Colors.red, () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -659,7 +661,6 @@ class ListingBox extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Column(
