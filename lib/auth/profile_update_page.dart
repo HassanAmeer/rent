@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 
+import '../widgets/casheimage.dart';
+
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
 
@@ -30,7 +32,8 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   bool sendEmails = true;
   bool acceptPrivacy = false;
   bool acceptTerms = false;
-  String pickedImgPath = "";
+
+  var pikedImage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -55,25 +58,29 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 // Profile picture with edit icon
                 Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: NetworkImage(
-                        Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image'] ??
-                            imgLinks.profileImage,
-                      ),
+                    CacheImageWidget(
+                      width: 100,
+                      height: 100,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image'] ??
+                          imgLinks.profileImage,
                     ),
                     Positioned(
                       right: 0,
                       bottom: 0,
                       child: InkWell(
-                        onTap: () {
-                          ImagePicker()
+                        onTap: () async {
+                          await ImagePicker()
                               .pickImage(source: ImageSource.gallery)
                               .then((pickedFile) {
                                 if (pickedFile != null) {
-                                  pickedImgPath = pickedFile.path;
-                                  setState(() {});
+                                  setState(() {
+                                    pikedImage = pickedFile.path;
+                                  });
+                                  // Logic to pick image
                                 }
                               });
                         },
@@ -86,7 +93,11 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 30),
+
+                pikedImage.isEmpty
+                    ? SizedBox.shrink()
+                    : const SizedBox(width: 30),
+                Image.file(File(pikedImage)),
 
                 // Pick Images text
                 Expanded(

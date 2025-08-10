@@ -108,8 +108,8 @@ class ListingDetailPage extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Icon(Icons.edit),
                   tooltip: 'Edit Listing',
+                  child: const Icon(Icons.edit),
                 ),
               ),
             ],
