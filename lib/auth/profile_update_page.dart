@@ -40,7 +40,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   bool sendEmails = true;
   bool acceptPrivacy = false;
   bool acceptTerms = false;
-  String pickedImgPath = "";
 
   var pikedImage = '';
 
@@ -67,25 +66,16 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                 // Profile picture with edit icon
                 Stack(
                   children: [
-                    pickedImgPath.isNotEmpty
-                        ? ClipOval(
-                            child: Image.file(
-                              File(pickedImgPath),
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : CacheImageWidget(
-                            width: 100,
-                            height: 100,
-                            isCircle: true,
-                            radius: 200,
-                            url:
-                                (Config.imgUrl +
-                                (ref.watch(userDataClass).userdata['image'] ??
-                                    imgLinks.profileImage)),
-                          ),
+                    CacheImageWidget(
+                      width: 100,
+                      height: 100,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image'] ??
+                          imgLinks.profileImage,
+                    ),
                     Positioned(
                       right: 0,
                       bottom: 0,
@@ -95,15 +85,10 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                               .pickImage(source: ImageSource.gallery)
                               .then((pickedFile) {
                                 if (pickedFile != null) {
-<<<<<<< HEAD
                                   setState(() {
                                     pikedImage = pickedFile.path;
                                   });
                                   // Logic to pick image
-=======
-                                  pickedImgPath = pickedFile.path;
-                                  setState(() {});
->>>>>>> 822bb7e745fccef5c6009d1ab50bfa2a578ffd42
                                 }
                               });
                         },
@@ -115,16 +100,13 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                       ),
                     ),
                   ],
+                  t,
                 ),
-<<<<<<< HEAD
 
                 pikedImage.isEmpty
                     ? SizedBox.shrink()
                     : const SizedBox(width: 30),
                 Image.file(File(pikedImage)),
-=======
-                const SizedBox(width: 30),
->>>>>>> 822bb7e745fccef5c6009d1ab50bfa2a578ffd42
 
                 // Pick Images text
                 Expanded(
