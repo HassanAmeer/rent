@@ -3,6 +3,7 @@ import 'package:rent/constants/data.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../widgets/casheimage.dart';
+import 'listing_edit_page.dart'; // ✅ Edit page import
 
 class ListingDetailPage extends StatelessWidget {
   final Map<String, dynamic> fullData;
@@ -20,6 +21,7 @@ class ListingDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /// Main Image
               CacheImageWidget(
                 width: 300,
                 height: 150,
@@ -30,6 +32,8 @@ class ListingDetailPage extends StatelessWidget {
                     imgLinks.profileImage,
               ),
 
+              const SizedBox(height: 10),
+
               Text(
                 "${fullData['title'] ?? 'Title.......'}",
                 style: const TextStyle(
@@ -39,14 +43,9 @@ class ListingDetailPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              // Text(
-              //   "${fullData['desc'] ?? 'Description.......'}",
-              //   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-              // ),
               HtmlWidget(fullData['description'] ?? 'Description.......'),
 
               Divider(),
-
               ListTile(
                 title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
               ),
@@ -74,17 +73,38 @@ class ListingDetailPage extends StatelessWidget {
               ),
               Divider(),
 
-              ListTile(title: Text("From User")),
-              ListTile(
-                leading: CacheImageWidget(
-                  width: 50,
-                  height: 50,
-                  isCircle: true,
-                  radius: 200,
-                  url:
-                      Config.imgUrl + fullData['images'][0] ??
-                      imgLinks.profileImage,
-                ),
+              /// From User Section with Edit Icon in Corner
+              const ListTile(title: Text("From User")),
+              Stack(
+                alignment: Alignment.centerRight,
+                children: [
+                  ListTile(
+                    leading: CacheImageWidget(
+                      width: 50,
+                      height: 50,
+                      isCircle: true,
+                      radius: 200,
+                      url:
+                          Config.imgUrl + fullData['images'][0] ??
+                          imgLinks.profileImage,
+                    ),
+                  ),
+                  Positioned(
+                    right: 10,
+                    child: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.black),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ListingEditPage(listingData: fullData),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -93,3 +113,5 @@ class ListingDetailPage extends StatelessWidget {
     );
   }
 }
+
+ListingEditPage({required Map<String, dynamic> listingData}) {}

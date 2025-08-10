@@ -111,7 +111,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const EditListingPage()),
+            MaterialPageRoute(builder: (context) => const AddNewListingPage()),
           );
         },
         backgroundColor: Colors.black,
@@ -138,97 +138,45 @@ class ListingBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        /// Main Box
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.15),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
-          child: Column(
-            children: [
-              /// Image
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(10),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  height: ScreenSize.height * 0.12,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image, size: 50),
-                ),
-              ),
-              const SizedBox(height: 20),
+        ],
+      ),
+      child: Column(
+        children: [
+          /// Image
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Image.network(
+              imageUrl,
+              height: ScreenSize.height * 0.12,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 50),
+            ),
+          ),
+          const SizedBox(height: 20),
 
-              /// Title
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+          /// Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-
-        /// Edit/Delete Icons
-        Positioned(
-          top: 5,
-          left: 5,
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditListingPage(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.edit, size: 16, color: Colors.blue),
-                ),
-              ),
-              const SizedBox(width: 6),
-              GestureDetector(
-                onTap: () {
-                  // TODO: Delete action
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.delete, size: 16, color: Colors.red),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
