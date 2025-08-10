@@ -37,7 +37,7 @@ class ListingData with ChangeNotifier {
       final data = jsonDecode(response.body);
 
       print("👉Response status: ${response.statusCode}");
-      print("👉 data: ${data}");
+      print("👉 data: $data");
       if (response.statusCode == 200) {
         listings = data['items'] ?? [];
         // listings =  [];

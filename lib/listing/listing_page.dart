@@ -4,13 +4,12 @@ import 'package:rent/apidata/listingapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/listing/ListingDetailPage.dart';
 import 'package:rent/listing/add_new_listing_page.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/listing/listing_edit_page.dart';
-import 'package:rent/listing_detail_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import '../home_page.dart';
-// import '../Auth/user_data.dart'; // ✅ UserData import
 
 class ListingPage extends ConsumerStatefulWidget {
   const ListingPage({super.key});
@@ -77,14 +76,10 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                 ),
                 itemCount: ref.watch(listingDataProvider).listings.length,
                 itemBuilder: (context, index) {
+                  final item = ref.watch(listingDataProvider).listings[index];
                   return GestureDetector(
                     onTap: () {
-                      //  goto(
-                      //     ListingDetailPage(
-                      //       listingId: ref.watch(listingDataProvider).listings[index]['id'].toString(),
-                      //     ),
-                      //     canBack: true,
-                      //   );
+                      goto(ListingDetailPage(fullData: item));
                     },
                     child: ListingBox(
                       id: ref
@@ -94,7 +89,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       title:
                           ref
                               .watch(listingDataProvider)
-                              .listings[index]['firstName'] ??
+                              .listings[index]['title'] ??
                           'No Name',
                       imageUrl:
                           Config.imgUrl +
