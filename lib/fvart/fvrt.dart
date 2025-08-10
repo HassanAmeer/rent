@@ -3,6 +3,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/favrtapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/fvart/allitems.dart';
+import 'package:rent/fvart/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 
 import '../constants/data.dart';
@@ -126,70 +128,79 @@ class _FavouriteState extends ConsumerState<Favourite> {
                     itemBuilder: (context, index) {
                       final item = favrtProvider.favrt[index];
                       // return Text(item.toString()); // Example usage of item
-                      return Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.cyan.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.cyan.withOpacity(0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                CacheImageWidget(
-                                  isCircle: false,
-                                  height: 150,
-                                  width: 165,
-                                  url:
-                                      Config.imgUrl +
-                                      item['products']['images'][0],
-                                ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black26,
-                                      border: Border.all(
-                                        width: 1,
-                                        color: Colors.black,
-                                      ),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Icon(
-                                      Icons.bookmark,
-                                      color: Colors.white,
-                                      size: 28,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black.withOpacity(0.3),
-                                          blurRadius: 4,
-                                          offset: const Offset(1, 2),
+                      return GestureDetector(
+                        onTap: () {
+                          goto(FavDetailsPage(fullData: item['products']));
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.cyan.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.cyan.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: Stack(
+                                children: [
+                                  CacheImageWidget(
+                                    isCircle: false,
+                                    height: 150,
+                                    width: 165,
+                                    url:
+                                        Config.imgUrl +
+                                        item['products']['images'][0],
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black26,
+                                        border: Border.all(
+                                          width: 1,
+                                          color: Colors.black,
                                         ),
-                                      ],
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.bookmark,
+                                        color: Colors.white,
+                                        size: 28,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withOpacity(
+                                              0.3,
+                                            ),
+                                            blurRadius: 4,
+                                            offset: const Offset(1, 2),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 8),
-                          Text(
-                            item['products']['title'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 8),
+                            Text(
+                              item['products']['title'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -207,7 +218,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
           padding: const EdgeInsets.only(top: 30.0, right: 8.0, bottom: 20),
           child: FloatingActionButton(
             onPressed: () {
-              // goto(pageName)
+              goto(AllItemsPage());
             },
             child: const Icon(Icons.add, color: Colors.white),
           ),
