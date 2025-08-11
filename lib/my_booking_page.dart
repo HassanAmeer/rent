@@ -1,10 +1,37 @@
-import 'package:flutter/material.dart';
-import 'package:rent/constants/scrensizes.dart';
-import 'booking_edit_page.dart';
-import 'add_new_booking_page.dart';
+import 'dart:convert';
 
-class MyBookingPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/bookingapi.dart';
+import 'package:rent/apidata/user.dart' show userDataClass;
+import 'package:rent/booking/bookingdetails.dart';
+import 'package:rent/constants/data.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/itemsrent.dart';
+import 'package:rent/widgets/casheimage.dart';
+import '../booking_edit_page.dart';
+import '../add_new_booking_page.dart';
+
+class MyBookingPage extends ConsumerStatefulWidget {
   const MyBookingPage({super.key});
+
+  @override
+  ConsumerState<MyBookingPage> createState() => _MyBookingPageState();
+}
+
+class _MyBookingPageState extends ConsumerState<MyBookingPage> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((v) {
+      ref
+          .watch(bookingDataProvider)
+          .fetchComingOrders(
+            uid: ref.watch(userDataClass).userdata["id"].toString(),
+          );
+      super.initState();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +72,11 @@ class MyBookingPage extends StatelessWidget {
               style: const TextStyle(color: Colors.black87, fontSize: 16),
             ),
           ),
+
+          // Text("${ref.watch(bookingDataProvider).comingOrders}"),
+          // Text(
+          //   "${jsonDecode(ref.watch(bookingDataProvider).comingOrders[0]['productImage'])}",
+          // ),
           // Bookings grid
           Expanded(
             child: GridView.builder(
@@ -104,87 +136,70 @@ class MyBookingPage extends StatelessWidget {
                   vertical: 18,
                   horizontal: 6,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _iconCircleButton(Icons.edit, Colors.white, () {
-                      // Navigate to Edit Booking Page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditBookingPage(),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 4),
-                    _iconCircleButton(Icons.delete, Colors.red, () {
-                      // Delete logic here
-                      // You can add your delete confirmation/dialog
-                    }),
-                  ],
-                ),
               ),
-              // Main content (image and texts, centered)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          booking["imageUrl"],
-                          height: 85,
-                          width: ScreenSize.width * .6,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                height: ScreenSize.height * 0.5,
-                                width: ScreenSize.width * 0.5,
 
-                                color: Colors.grey[300],
-                                alignment: Alignment.center,
-                                child: const Icon(
-                                  Icons.image_not_supported,
-                                  size: 30,
-                                  color: Colors.grey,
-                                ),
-                              ),
+              // Main content (image and texts, centered)
+              InkWell(
+                onTap: () {
+                  goto(Bookindetails(comingOrders: ItemsRent()));
+                },
+                child: Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CacheImageWidget(
+                            url:
+                                Config.imgUrl +
+                                    jsonDecode(
+                                      ref
+                                          .watch(bookingDataProvider)
+                                          .comingOrders[0]['productImage'],
+                                    )[0] ??
+                                imgLinks.product,
+
+                            height: 85,
+                            width: 100,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "Request By: ${booking["requestBy"]}",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w500,
+                        const SizedBox(height: 10),
+                        Text(
+                          ref
+                              .watch(bookingDataProvider)
+                              .comingOrders[0]["orderby"]['name']
+                              .toString(),
+
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        booking["name"],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                        const SizedBox(height: 2),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ],
           ),
           // Right-top Status Label
-          Positioned(right: 8, top: 8, child: _statusLabel(booking["status"])),
+          Positioned(
+            right: 8,
+            top: 8,
+            child: _statusLabel(
+              ref
+                  .watch(bookingDataProvider)
+                  .comingOrders[0]["deliverd"]
+                  .toString(),
+            ),
+          ),
         ],
       ),
     );

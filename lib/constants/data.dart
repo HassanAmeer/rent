@@ -1,5 +1,6 @@
 class Config {
   static const String imgUrl = "https://thelocalrent.com/uploads/";
+  // static const String imgsUrl = "https://thelocalrent.com/";
   static const String apiUrl = "https://thelocalrent.com/api/";
 }
 

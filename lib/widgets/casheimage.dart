@@ -18,6 +18,8 @@ class CacheImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(url);
+    // return Text("${url}");
     return SizedBox(
       width: width.toDouble(),
       height: height.toDouble(),
@@ -29,7 +31,8 @@ class CacheImageWidget extends StatelessWidget {
                 fit: BoxFit.cover,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     CircularProgressIndicator(value: downloadProgress.progress),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+                errorWidget: (context, url, error) =>
+                    Icon(Icons.image_not_supported),
               ),
             )
           : CachedNetworkImage(
@@ -37,7 +40,8 @@ class CacheImageWidget extends StatelessWidget {
               fit: BoxFit.cover,
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   CircularProgressIndicator(value: downloadProgress.progress),
-              errorWidget: (context, url, error) => Icon(Icons.error),
+              errorWidget: (context, url, error) =>
+                  Icon(Icons.image_not_supported),
             ),
     );
   }
