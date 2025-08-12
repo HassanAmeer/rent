@@ -7,9 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 
-import '../apidata/listingapi.dart';
-import '../apidata/user.dart';
-import '../constants/toast.dart';
+import '../../apidata/listingapi.dart';
+import '../../apidata/user.dart';
+import '../../constants/toast.dart';
 
 class EditListingPage extends ConsumerStatefulWidget {
   final Map<String, dynamic> itemData;

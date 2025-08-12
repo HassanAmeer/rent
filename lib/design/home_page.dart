@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/Blogs.dart';
+import 'package:rent/constants/appColors.dart';
+import 'package:rent/design/blogs/Blogs.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/fvart/fvrt.dart';
-import 'package:rent/help.dart';
-import 'package:rent/listing/listing_page.dart';
-import 'package:rent/my_booking_page.dart';
+import 'package:rent/design/fav/fvrt.dart';
+import 'package:rent/design/help.dart';
+import 'package:rent/design/listing/listing_page.dart';
+import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/constants/notificationpage.dart';
-import 'package:rent/myrentalpage.dart';
+import 'package:rent/design/myrentals/myrentalpage.dart';
 import 'package:rent/constants/data.dart';
 
-import 'auth/profile_details_page.dart';
-import 'widgets/btmnavbar.dart';
+import '../Auth/profile_details_page.dart';
+import '../widgets/btmnavbar.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -109,7 +110,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           "Total Earning",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.cyan,
+                            color: AppColors.mainColor,
                           ),
                         ),
                         SizedBox(height: 5),
@@ -136,7 +137,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           "Total Rating",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.cyan,
+                            color: AppColors.mainColor,
                           ),
                         ),
                         SizedBox(height: 5),
@@ -180,7 +181,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           children: [
                             Icon(
                               Icons.bookmark_border,
-                              color: Colors.cyan,
+                              color: AppColors.mainColor,
                               size: 50,
                             ),
                             SizedBox(height: 10),
@@ -219,7 +220,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           children: const [
                             Icon(
                               Icons.shopping_cart_outlined,
-                              color: Colors.cyan,
+                              color: AppColors.mainColor,
                               size: 50,
                             ),
                             SizedBox(height: 10),
@@ -258,7 +259,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: [
                           Icon(
                             Icons.support_agent,
-                            color: Colors.cyan,
+                            color: AppColors.mainColor,
                             size: 50,
                           ),
                           SizedBox(height: 10),
@@ -296,7 +297,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: const [
                           Icon(
                             Icons.article_outlined,
-                            color: Colors.cyan,
+                            color: AppColors.mainColor,
                             size: 50,
                           ),
                           SizedBox(height: 10),

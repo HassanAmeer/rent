@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/allitems.dart';
 import 'package:rent/apidata/listingapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/listing/ListingDetailPage.dart';
-import 'package:rent/listing/add_new_listing_page.dart';
+import 'package:rent/design/listing/ListingDetailPage.dart';
+import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/listing/listing_edit_page.dart';
+import 'package:rent/design/listing/listing_edit_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import '../home_page.dart';
 
-class AllItemsPage extends ConsumerStatefulWidget {
-  const AllItemsPage({super.key});
+class ListingPage extends ConsumerStatefulWidget {
+  const ListingPage({super.key});
 
   @override
-  ConsumerState<AllItemsPage> createState() => _AllItemsPageState();
+  ConsumerState<ListingPage> createState() => _ListingPageState();
 }
 
-class _AllItemsPageState extends ConsumerState<AllItemsPage> {
+class _ListingPageState extends ConsumerState<ListingPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref.watch(getAllItems).fetchAllItems();
+      ref
+          .watch(listingDataProvider)
+          .fetchMyItems(
+            uid: ref.watch(userDataClass).userdata["id"].toString(),
+          );
     });
 
     super.initState();
@@ -31,7 +34,6 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var allItemsList = ref.watch(getAllItems).allItems;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
@@ -42,7 +44,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
           child: const Icon(Icons.arrow_back, size: 20, color: Colors.black),
         ),
         title: const Text(
-          "All Items",
+          "My Listings",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
@@ -51,59 +53,75 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
         child: Column(
           children: [
             /// Search Bar
-            // Container(
-            //   padding: const EdgeInsets.symmetric(horizontal: 12),
-            //   decoration: BoxDecoration(
-            //     color: Colors.grey.shade300,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: const TextField(
-            //     decoration: InputDecoration(
-            //       icon: Icon(Icons.search),
-            //       border: InputBorder.none,
-            //       hintText: 'Search Listings...',
-            //     ),
-            //   ),
-            // ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const TextField(
+                decoration: InputDecoration(
+                  icon: Icon(Icons.search),
+                  border: InputBorder.none,
+                  hintText: 'Search Listings...',
+                ),
+              ),
+            ),
             const SizedBox(height: 25),
 
-            ref.watch(getAllItems).isLoading == true
-                ? Center(child: CircularProgressIndicator())
-                : ref.watch(getAllItems).allItems.isEmpty
-                ? Center(child: Text("Items Empty"))
-                : Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                          ),
-                      itemCount: allItemsList.length,
-                      itemBuilder: (context, index) {
-                        final item = allItemsList[index];
-                        return GestureDetector(
-                          onTap: () {
-                            goto(ListingDetailPage(fullData: item));
-                          },
-                          child: ListingBox(
-                            id: item['id'].toString(),
-                            title: item['title'] ?? 'No Name',
-                            imageUrl: item['images'].toList().isEmpty
-                                ? imgLinks.product
-                                : (Config.imgUrl + item['images'][0]) ??
-                                      imgLinks.product,
-                          ),
-                        );
-                      },
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                ),
+                itemCount: ref.watch(listingDataProvider).listings.length,
+                itemBuilder: (context, index) {
+                  final item = ref.watch(listingDataProvider).listings[index];
+                  return GestureDetector(
+                    onTap: () {
+                      goto(ListingDetailPage(fullData: item));
+                    },
+                    child: ListingBox(
+                      id: ref
+                          .watch(listingDataProvider)
+                          .listings[index]['id']
+                          .toString(),
+                      title:
+                          ref
+                              .watch(listingDataProvider)
+                              .listings[index]['title'] ??
+                          'No Name',
+                      imageUrl:
+                          Config.imgUrl +
+                              ref
+                                  .watch(listingDataProvider)
+                                  .listings[index]['images'][0] ??
+                          ImgLinks.product,
                     ),
-                  ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
 
-      //
+      /// Floating Add Button
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddNewListingPage()),
+          );
+        },
+        backgroundColor: const Color.fromARGB(255, 11, 11, 11),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
       /// Bottom Navigation
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
     );
@@ -197,13 +215,18 @@ class ListingBox extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.2),
+                          color: const Color.fromARGB(
+                            255,
+                            238,
+                            236,
+                            236,
+                          ).withOpacity(0.5),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.bookmark,
+                          Icons.delete,
                           size: 18,
-                          color: Colors.black,
+                          color: Color.fromARGB(255, 193, 16, 4),
                         ),
                       ),
                     ),

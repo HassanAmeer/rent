@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/data.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-import '../constants/data.dart';
-import '../widgets/casheimage.dart';
+import '../../widgets/casheimage.dart';
 
-class Bookindetails extends ConsumerStatefulWidget {
-  const Bookindetails({super.key});
+class FavDetailsPage extends StatelessWidget {
+  final Map<String, dynamic> fullData;
 
-  @override
-  ConsumerState<Bookindetails> createState() => _BookindetailsState();
-}
+  const FavDetailsPage({super.key, required this.fullData});
 
-class _BookindetailsState extends ConsumerState<Bookindetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Booking Details")),
+      appBar: AppBar(
+        title: const Text("Favourite Details"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: CircleAvatar(
+              backgroundColor: Colors.black12,
+              child: IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.bookmark_added),
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -32,7 +44,7 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                     radius: 0,
                     url:
                         Config.imgUrl + fullData['images'][0] ??
-                        imgLinks.profileImage,
+                        ImgLinks.profileImage,
                   ),
                 ],
               ),
@@ -88,25 +100,12 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                   radius: 200,
                   url:
                       Config.imgUrl + fullData['images'][0] ??
-                      imgLinks.profileImage,
+                      ImgLinks.profileImage,
                 ),
               ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "editListing",
-        child: const Icon(Icons.edit),
-
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditListingPage(itemData: fullData),
-            ),
-          );
-        },
       ),
     );
   }

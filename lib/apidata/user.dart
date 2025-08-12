@@ -5,10 +5,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
-import 'package:rent/auth/profile_details_page.dart';
+import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
-import 'package:rent/home_page.dart';
+import 'package:rent/design/home_page.dart';
 
 import '../main.dart';
 

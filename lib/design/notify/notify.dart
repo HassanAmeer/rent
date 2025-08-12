@@ -5,10 +5,10 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';
-import 'package:rent/auth/profile_details_page.dart';
-import 'package:rent/temp/data.dart';
+import 'package:rent/Auth/profile_details_page.dart';
+// import 'package:rent/temp/data.dart';
 
-import '../constants/data.dart';
+import '../../constants/data.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});
@@ -36,7 +36,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Image.asset(AppAssets.logo, width: 100),
+        title: Image.asset(imgAssets.logo, width: 100),
 
         actions: [
           InkWell(
@@ -54,7 +54,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
               width: 35,
               height: 35,
               clipBehavior: Clip.antiAlias,
-              child: Image.network(ImagesLinks.profileImage, fit: BoxFit.cover),
+              child: Image.network(ImgLinks.profileImage, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: 16),

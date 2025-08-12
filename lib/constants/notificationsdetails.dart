@@ -40,7 +40,7 @@ class NotificationsDetails extends StatelessWidget {
                 radius: 200,
                 url:
                     Config.imgUrl + fullData['fromuid']['image'] ??
-                    imgLinks.profileImage,
+                    ImgLinks.profileImage,
               ),
               title: Text(fullData['fromuid']['name'] ?? 'Unknown'),
               subtitle: Text(fullData['fromuid']['email'] ?? 'Unknown'),

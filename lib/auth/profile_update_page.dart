@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/data.dart';
+import 'package:rent/widgets/casheimage.dart';
 
-import '../widgets/casheimage.dart';
+// import '../widgets/casheimage.dart'
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -66,7 +68,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                       url:
                           Config.imgUrl +
                               ref.watch(userDataClass).userdata['image'] ??
-                          imgLinks.profileImage,
+                          ImgLinks.profileImage,
                     ),
                     Positioned(
                       right: 0,
@@ -87,7 +89,11 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                         child: CircleAvatar(
                           radius: 15,
                           backgroundColor: Colors.black,
-                          child: Icon(Icons.edit, size: 16, color: Colors.cyan),
+                          child: Icon(
+                            Icons.edit,
+                            size: 16,
+                            color: AppColors.mainColor,
+                          ),
                         ),
                       ),
                     ),

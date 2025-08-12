@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/user.dart';
-import 'package:rent/auth/signup.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/widgets/dotloader.dart';
+
+import 'signup.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -82,10 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ? const SizedBox(
                           width: 25,
                           height: 25,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.cyan,
-                          ),
+                          child: DotLoader(),
                         )
                       : const Text(
                           "Login",

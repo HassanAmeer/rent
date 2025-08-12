@@ -5,8 +5,8 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';
-import 'package:rent/auth/profile_details_page.dart';
-import 'package:rent/temp/data.dart';
+import 'package:rent/Auth/profile_details_page.dart';
+// import 'package:rent/temp/data.dart';
 import '../constants/data.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
@@ -109,7 +109,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Image.asset(AppAssets.logo, width: 100),
+        title: Image.asset(imgAssets.logo, width: 100),
         actions: [
           InkWell(
             onTap: () {
@@ -128,7 +128,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
               clipBehavior: Clip.antiAlias,
               child: Image.network(
                 Config.imgUrl + userData['image'],
-                semanticLabel: ImagesLinks.profileImage,
+                semanticLabel: ImgLinks.profileImage,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) =>
                     const Icon(Icons.person, color: Colors.white, size: 24),

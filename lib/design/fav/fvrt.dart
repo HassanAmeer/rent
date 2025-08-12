@@ -3,11 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/favrtapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/fvart/allitems.dart';
-import 'package:rent/fvart/favdetails.dart';
+import 'package:rent/design/fav/allitems.dart';
+import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 
-import '../constants/data.dart';
+import '../../constants/data.dart';
 
 class Favourite extends ConsumerStatefulWidget {
   const Favourite({super.key});

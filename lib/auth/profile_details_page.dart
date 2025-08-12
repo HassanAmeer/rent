@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
-import 'package:rent/auth/login.dart';
+// import 'package:rent/auth/login.dart';
+import 'package:rent/constants/data.dart';
+import 'package:rent/Auth/login.dart';
+import 'package:rent/widgets/casheimage.dart';
 import '../apidata/user.dart';
-import '../constants/data.dart';
-import '../home_page.dart';
-import '../widgets/casheimage.dart';
-import 'profile_update_page.dart';
 import '../widgets/btmnavbar.dart';
+// import '../apidata/user.dart';
+// import '../constants/data.dart';
+import '../design/home_page.dart';
+// import '../widgets/casheimage.dart';
+import 'profile_update_page.dart';
+// import '../widgets/btmnavbar.dart';
 
 class ProfileDetailsPage extends ConsumerStatefulWidget {
   const ProfileDetailsPage({super.key});
@@ -71,7 +76,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                       url:
                           Config.imgUrl +
                               ref.watch(userDataClass).userdata['image'] ??
-                          imgLinks.profileImage,
+                          ImgLinks.profileImage,
                     ),
 
                     const SizedBox(height: 20),

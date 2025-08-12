@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rent/temp/data.dart';
+import 'package:rent/constants/data.dart';
+// import 'package:rent/temp/data.dart';
 
 class ItemsRent extends StatefulWidget {
   const ItemsRent({super.key});
@@ -27,7 +28,7 @@ class _ItemsRentState extends State<ItemsRent> {
             width: 28,
             height: 28,
             child: Image.network(
-              ImagesLinks.profileImage,
+              ImgLinks.profileImage,
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) =>
                   const Icon(Icons.person, color: Colors.white, size: 16),
@@ -136,7 +137,6 @@ class _ItemsRentState extends State<ItemsRent> {
                     ),
                   ),
                 ),
-                
 
                 // GO Button
                 const SizedBox(width: 10),

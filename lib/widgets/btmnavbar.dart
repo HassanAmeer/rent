@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../constants/goto.dart';
-import '../home_page.dart';
-import '../listing/listing_page.dart';
-import '../my_booking_page.dart';
-import '../auth/profile_details_page.dart';
+import '../design/home_page.dart';
+import '../design/listing/listing_page.dart';
+import '../design/booking/my_booking_page.dart';
+import '../Auth/profile_details_page.dart';
 
 // ignore: must_be_immutable
 class BottomNavBarWidget extends StatefulWidget {

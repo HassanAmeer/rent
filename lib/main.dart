@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'auth/login.dart';
-import 'auth/signup.dart';
-import 'home_page.dart';
-import 'listing/listing_page.dart';
+import 'package:rent/constants/appColors.dart';
+import 'Auth/login.dart';
+import 'Auth/signup.dart';
+import 'design/home_page.dart';
+import 'design/listing/listing_page.dart';
 
 GlobalKey<NavigatorState> contextKey = GlobalKey();
 
@@ -22,13 +23,12 @@ class MyApp extends StatelessWidget {
       navigatorKey: contextKey,
       theme: ThemeData(
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.btnBgColor,
+          foregroundColor: AppColors.btnIconColor,
         ),
-        primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: Colors.grey.shade100,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.cyan),
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primarySwatch: AppColors.mainColor,
+        scaffoldBackgroundColor: AppColors.scaffoldBgColor,
+        appBarTheme: AppBarTheme(backgroundColor: AppColors.mainColor),
       ),
       debugShowCheckedModeBanner: false,
       home: LoginPage(),

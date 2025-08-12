@@ -1,33 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:rent/constants/data.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/goto.dart';
 
-import '../widgets/casheimage.dart';
+import '../../constants/data.dart';
+import '../../widgets/casheimage.dart';
 
-class FavDetailsPage extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+class Bookindetails extends ConsumerStatefulWidget {
+  var data;
+  Bookindetails({super.key, this.data});
 
-  const FavDetailsPage({super.key, required this.fullData});
+  @override
+  ConsumerState<Bookindetails> createState() => _BookindetailsState();
+}
 
+class _BookindetailsState extends ConsumerState<Bookindetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Favourite Details"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: CircleAvatar(
-              backgroundColor: Colors.black12,
-              child: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.bookmark_added),
-              ),
-            ),
-          ),
-          SizedBox(width: 10),
-        ],
-      ),
+      appBar: AppBar(title: const Text("Booking Details")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -35,6 +28,7 @@ class FavDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Text("${widget.data}"),
               Stack(
                 children: [
                   CacheImageWidget(
@@ -43,8 +37,9 @@ class FavDetailsPage extends StatelessWidget {
                     isCircle: false,
                     radius: 0,
                     url:
-                        Config.imgUrl + fullData['images'][0] ??
-                        imgLinks.profileImage,
+                        Config.imgUrl +
+                            jsonDecode(widget.data['productImage'])[0] ??
+                        ImgLinks.profileImage,
                   ),
                 ],
               ),
@@ -52,7 +47,7 @@ class FavDetailsPage extends StatelessWidget {
               const SizedBox(height: 10),
 
               Text(
-                "${fullData['title'] ?? 'Title.......'}",
+                "${widget.data['productTitle'] ?? 'Title.......'}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -60,38 +55,42 @@ class FavDetailsPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(fullData['description'] ?? 'Description.......'),
 
               Divider(),
 
               ListTile(
-                title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
+                title: Text("dailyrate: ${widget.data['dailyrate'] ?? '0'}"),
               ),
               Divider(),
               ListTile(
-                title: Text("weeklyrate: ${fullData['weeklyrate'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(" monthlyrate: ${fullData['monthlyrate'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text("created_at: ${fullData['created_at'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(" updated_at: ${fullData[' updated_at'] ?? '0'}"),
+                title: Text("weeklyrate: ${widget.data['weeklyrate'] ?? '0'}"),
               ),
               Divider(),
               ListTile(
                 title: Text(
-                  " availabilityDays: ${fullData['availabilityDays'] ?? '0'}",
+                  " monthlyrate: ${widget.data['monthlyrate'] ?? '0'}",
+                ),
+              ),
+              Divider(),
+              ListTile(
+                title: Text("created_at: ${widget.data['created_at'] ?? '0'}"),
+              ),
+              Divider(),
+              ListTile(
+                title: Text(
+                  " updated_at: ${widget.data[' updated_at'] ?? '0'}",
+                ),
+              ),
+              Divider(),
+              ListTile(
+                title: Text(
+                  " availabilityDays: ${widget.data['availabilityDays'] ?? '0'}",
                 ),
               ),
               Divider(),
 
-              const ListTile(title: Text("From User")),
+              ListTile(title: Text("From User")),
+
               ListTile(
                 leading: CacheImageWidget(
                   width: 50,
@@ -99,10 +98,14 @@ class FavDetailsPage extends StatelessWidget {
                   isCircle: true,
                   radius: 200,
                   url:
-                      Config.imgUrl + fullData['images'][0] ??
-                      imgLinks.profileImage,
+                      Config.imgUrl + widget.data["orderby"]['image'][0] ??
+                      ImgLinks.profileImage,
                 ),
+                title: Text(widget.data['orderby']['name'] ?? 'Unknown'),
+                subtitle: Text(widget.data['orderby']['email'] ?? 'Unknown'),
               ),
+
+              //
             ],
           ),
         ),

@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/appColors.dart';
 import 'dart:convert';
-import 'package:rent/auth/login.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/toast.dart'; // ✅ Update path if needed
+import 'package:rent/constants/toast.dart';
+import 'package:rent/widgets/dotloader.dart';
+
+import 'login.dart'; // ✅ Update path if needed
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -142,14 +145,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     backgroundColor: const Color.fromARGB(255, 12, 12, 12),
                   ),
                   child: ref.read(userDataClass).isLoading == true
-                      ? SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.cyan,
-                          ),
-                        )
+                      ? SizedBox(width: 25, height: 25, child: DotLoader())
                       : const Text(
                           "Sign Up",
                           style: TextStyle(fontSize: 16, color: Colors.white),

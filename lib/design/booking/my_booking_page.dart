@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/bookingapi.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
+import 'package:rent/constants/appColors.dart';
 import 'package:rent/design/booking/bookingdetails.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
@@ -97,8 +98,8 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
 
       // Floating Action Button for Add New Booking
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.cyan,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColors.btnBgColor,
+        child: Icon(Icons.add, color: AppColors.btnIconColor),
         onPressed: () {},
       ),
 
