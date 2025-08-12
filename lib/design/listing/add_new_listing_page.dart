@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent/constants/appColors.dart';
 
 class AddNewListingPage extends StatefulWidget {
   const AddNewListingPage({super.key});
@@ -398,7 +399,7 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
                 child: ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
+                    backgroundColor: AppColors.mainColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

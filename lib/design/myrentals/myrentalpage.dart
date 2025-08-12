@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/design/myrentals/itemsrent.dart';
 // import 'package:rent/temp/data.dart' hide ImagesLinks;
@@ -35,7 +36,7 @@ class MyRentalPage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.cyan.shade700,
+        backgroundColor: AppColors.btnBgColor,
         onPressed: () {
           Navigator.push(
             context,

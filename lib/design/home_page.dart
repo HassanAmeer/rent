@@ -161,9 +161,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const Favourite(),
-                        ),
+                        MaterialPageRoute(builder: (context) => Favourite()),
                       );
                     },
                     child: Container(

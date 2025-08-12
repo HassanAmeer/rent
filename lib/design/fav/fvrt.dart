@@ -6,11 +6,13 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/design/fav/allitems.dart';
 import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/data.dart';
 
 class Favourite extends ConsumerStatefulWidget {
-  const Favourite({super.key});
+  var fvrt;
+  Favourite({super.key, this.fvrt});
 
   @override
   ConsumerState<Favourite> createState() => _FavouriteState();
@@ -27,7 +29,9 @@ class _FavouriteState extends ConsumerState<Favourite> {
 
   Future<void> _loadFavorites() async {
     final userId = ref.read(userDataClass).userdata["id"].toString();
-    await ref.read(favrtdata).favoritems(uid: userId);
+    await ref
+        .read(favrtdata)
+        .favoritems(loadingFor: "loadFullData", uid: userId);
   }
 
   @override
@@ -101,8 +105,14 @@ class _FavouriteState extends ConsumerState<Favourite> {
               ),
 
               // Favorites Grid
-              if (favrtProvider.isLoading)
-                const Center(child: CircularProgressIndicator())
+              if (favrtProvider.isLoading &&
+                  favrtProvider.loadingFor == "loadFullData")
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 260),
+                    child: DotLoader(),
+                  ),
+                )
               else if (favrtProvider.favrt.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(20.0),
@@ -159,32 +169,54 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                   Positioned(
                                     top: 8,
                                     right: 8,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.black26,
-                                        border: Border.all(
-                                          width: 1,
-                                          color: Colors.black,
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                          100,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        Icons.bookmark,
-                                        color: Colors.white,
-                                        size: 28,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black.withOpacity(
-                                              0.3,
+                                    child:
+                                        ref.watch(favrtdata).isLoading ==
+                                                true &&
+                                            ref.watch(favrtdata).loadingFor ==
+                                                item['id'].toString()
+                                        ? DotLoader(showDots: 1)
+                                        // ? Icon(Icons.h_mobiledata_outlined)
+                                        : InkWell(
+                                            onTap: () {
+                                              ref
+                                                  .watch(favrtdata)
+                                                  .addfavrt(
+                                                    uid: ref
+                                                        .watch(userDataClass)
+                                                        .userdata['id']
+                                                        .toString(),
+                                                    itemId:
+                                                        item['products']["id"]
+                                                            .toString(),
+                                                    loadingFor: item["id"]
+                                                        .toString(),
+                                                  );
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.black26,
+                                                border: Border.all(
+                                                  width: 1,
+                                                  color: Colors.black,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                              ),
+                                              child: Icon(
+                                                Icons.bookmark,
+                                                color: Colors.white,
+                                                size: 28,
+                                                shadows: [
+                                                  Shadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.3),
+                                                    blurRadius: 4,
+                                                    offset: const Offset(1, 2),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            blurRadius: 4,
-                                            offset: const Offset(1, 2),
                                           ),
-                                        ],
-                                      ),
-                                    ),
                                   ),
                                 ],
                               ),

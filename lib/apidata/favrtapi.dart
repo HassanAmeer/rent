@@ -9,6 +9,7 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
 
+import '../design/fav/fvrt.dart';
 import '../main.dart';
 
 // Use the correct class name in the provider
@@ -17,17 +18,19 @@ final favrtdata = ChangeNotifierProvider<Favrt>((ref) => Favrt());
 class Favrt with ChangeNotifier {
   var favrt = [];
   //////
+  String loadingFor = "";
   bool isLoading = false;
-  setLoading(bool value) {
+  setLoading(bool value, [String loadingName = ""]) {
+    loadingFor = loadingName;
     isLoading = value;
     notifyListeners();
   }
 
-  favoritems({required String uid}) async {
+  favoritems({required String uid, String loadingFor = ""}) async {
     try {
       print("Fetching my items for user ID: $uid");
 
-      setLoading(true);
+      setLoading(true, loadingFor);
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/getfav/$uid"),
       );
@@ -37,6 +40,7 @@ class Favrt with ChangeNotifier {
       print("👉Response status: ${response.statusCode}");
       print("👉 data: $data");
       if (response.statusCode == 200) {
+        favrt.clear();
         favrt = data['favItems'] ?? [];
         // listings =  []
         setLoading(false);
@@ -49,8 +53,13 @@ class Favrt with ChangeNotifier {
     }
   }
 
-  removefromfav({required String itemId, required String uid}) async {
+  removefromfav({
+    required String itemId,
+    required String uid,
+    String loadingFor = "",
+  }) async {
     try {
+      setLoading(true, loadingFor);
       final response = await http.delete(
         Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
       );
@@ -70,11 +79,15 @@ class Favrt with ChangeNotifier {
     }
   }
 
-  addfavrt({required String uid}) async {
+  addfav({
+    required String itemId,
+    required String uid,
+    String loadingFor = "",
+  }) async {
+    setLoading(true, loadingFor);
     try {
-      print("Fetching my items for user ID: $uid");
-      final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/addfav/$uid"),
+      final response = await http.delete(
+        Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
       );
 
       final data = jsonDecode(response.body);
@@ -82,15 +95,45 @@ class Favrt with ChangeNotifier {
       print("👉Response status: ${response.statusCode}");
       print("👉 data: $data");
       if (response.statusCode == 200) {
-        favrt = data['items'] ?? [];
-        // listings =  [];
-
-        notifyListeners();
-      } else {
         toast(data['msg']);
+        favoritems(uid: uid);
+      } else {
+        toast(data['msg'], backgroundColor: Colors.red);
       }
+      setLoading(false);
     } catch (e) {
-      print("Error fetching my items: $e");
+      setLoading(false);
+      print("Error removing from favorites: $e");
+    }
+  }
+
+  addfavrt({
+    required String uid,
+    required itemId,
+    String loadingFor = "",
+  }) async {
+    try {
+      print("👉 loadingFor: $loadingFor");
+      setLoading(true, loadingFor);
+      // print("Fetching my items for user ID: $uid");
+      final response = await http.post(
+        Uri.parse("https://thelocalrent.com/api/addfav/"),
+        body: {"uid": uid, "itemid": itemId},
+      );
+
+      final data = jsonDecode(response.body);
+
+      // print("👉Response status: ${response.statusCode}");
+      // print("👉 data: $data");
+      if (response.statusCode == 200) {
+      } else {}
+      //
+      toast(data['msg']);
+      await favoritems(uid: uid);
+      setLoading(false);
+    } catch (e) {
+      debugPrint("Error fetching my items: $e");
+      setLoading(false);
     }
   }
 

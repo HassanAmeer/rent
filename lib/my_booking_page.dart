@@ -96,11 +96,6 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       ),
 
       // Floating Action Button for Add New Booking
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.cyan,
-        child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {},
-      ),
 
       // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );
