@@ -145,7 +145,11 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     backgroundColor: const Color.fromARGB(255, 12, 12, 12),
                   ),
                   child: ref.read(userDataClass).isLoading == true
-                      ? SizedBox(width: 25, height: 25, child: DotLoader())
+                      ? SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: DotLoader(size: 12),
+                        )
                       : const Text(
                           "Sign Up",
                           style: TextStyle(fontSize: 16, color: Colors.white),

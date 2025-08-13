@@ -3,17 +3,17 @@ import 'package:rent/constants/data.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../widgets/casheimage.dart';
-import 'listing_edit_page.dart'; // ✅ Edit page import
+// ✅ Edit page import
 
-class ListingDetailPage extends StatelessWidget {
+class Allitemdetailspage extends StatelessWidget {
   final Map<String, dynamic> fullData;
 
-  const ListingDetailPage({super.key, required this.fullData});
+  const Allitemdetailspage({super.key, required this.fullData});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("listing Details")),
+      appBar: AppBar(title: const Text("Item Details")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -77,6 +77,7 @@ class ListingDetailPage extends StatelessWidget {
               ),
               Divider(),
 
+              // Text("$fullData"),
               const ListTile(title: Text("From User")),
               ListTile(
                 leading: CacheImageWidget(
@@ -92,19 +93,6 @@ class ListingDetailPage extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "editListing",
-        child: const Icon(Icons.edit),
-
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditListingPage(itemData: fullData),
-            ),
-          );
-        },
       ),
     );
   }

@@ -84,7 +84,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ? const SizedBox(
                           width: 25,
                           height: 25,
-                          child: DotLoader(),
+                          child: DotLoader(size: 12),
                         )
                       : const Text(
                           "Login",

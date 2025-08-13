@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/bookingapi.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
-import 'package:rent/constants/appColors.dart';
 import 'package:rent/design/booking/bookingdetails.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/design/myrentals/itemsrent.dart';
+// import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {
@@ -97,11 +96,6 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       ),
 
       // Floating Action Button for Add New Booking
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.btnBgColor,
-        child: Icon(Icons.add, color: AppColors.btnIconColor),
-        onPressed: () {},
-      ),
 
       // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );

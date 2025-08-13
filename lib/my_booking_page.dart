@@ -8,7 +8,7 @@ import 'package:rent/design/booking/bookingdetails.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/design/myrentals/itemsrent.dart';
+// import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {

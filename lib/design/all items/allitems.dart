@@ -9,6 +9,7 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/design/all%20items/allitemdetails.dart';
 import 'package:rent/design/fav/fvrt.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/constants/scrensizes.dart';
@@ -54,7 +55,12 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
           children: [
             const SizedBox(height: 25),
             ref.watch(getAllItems).isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 250),
+                      child: DotLoader(),
+                    ),
+                  )
                 : allItemsList.isEmpty
                 ? const Center(child: Text("Items Empty"))
                 : Expanded(
@@ -71,7 +77,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                         final item = allItemsList[index];
                         return GestureDetector(
                           onTap: () {
-                            goto(ListingDetailPage(fullData: item));
+                            goto(Allitemdetailspage(fullData: item));
                           },
                           child: ListingBox(
                             fullDataBytIndex: item,

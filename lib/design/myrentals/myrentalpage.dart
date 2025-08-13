@@ -1,340 +1,360 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
+import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/data.dart';
-import 'package:rent/design/myrentals/itemsrent.dart';
-// import 'package:rent/temp/data.dart' hide ImagesLinks;
+import 'package:rent/constants/goto.dart';
+import 'package:rent/design/all%20items/allitems.dart';
+// import 'package:rent/design/myrentals/itemsrent.dart';
+import 'package:rent/design/myrentals/rentaldetails.dart';
+import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/dotloader.dart';
 
-class MyRentalPage extends StatelessWidget {
+class MyRentalPage extends ConsumerStatefulWidget {
   const MyRentalPage({super.key});
 
   @override
+  ConsumerState<MyRentalPage> createState() => _MyRentalPageState();
+}
+
+class _MyRentalPageState extends ConsumerState<MyRentalPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+      ref
+          .read(rentalDataProvider)
+          .fetchMyRentals(
+            userId: userId,
+            loadingFor: "fetchMyRentals",
+            search: "",
+          );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final rentalData = ref.watch(rentalDataProvider);
+
     return Scaffold(
-      backgroundColor: Colors.white, // ✅ white background
+      backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
-        elevation: 0,
+        titleSpacing: 0,
         title: const Text(
-          'My Rentals',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          "My Rentals",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        actions: [
+        backgroundColor: Colors.cyan,
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 1,
+      ),
+      body: Column(
+        children: [
+          // Search bar just below AppBar (with grey background)
           Container(
-            decoration: BoxDecoration(
-              color: Colors.cyan.shade700,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            width: 28,
-            height: 28,
-            child: Image.network(
-              ImgLinks.profileImage,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const Icon(Icons.person, color: Colors.white, size: 16),
+            color: Colors.grey[300],
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: TextField(
+              decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    final userId =
+                        ref.read(userDataClass).userdata['id']?.toString() ??
+                        '1';
+                    ref
+                        .watch(rentalDataProvider)
+                        .fetchMyRentals(userId: userId, search: "");
+                  },
+                  icon: Icon(Icons.search),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                hintText: "Search How to & More",
+                hintStyle: const TextStyle(color: Colors.black54, fontSize: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              style: const TextStyle(color: Colors.black87, fontSize: 16),
             ),
           ),
-          const SizedBox(width: 16),
+
+          // Rentals content with loading and empty states
+          Expanded(
+            child: rentalData.isLoading
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 100),
+                      child: DotLoader(),
+                    ),
+                  )
+                : rentalData.rentals.isEmpty
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inbox_outlined,
+                          size: 80,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          "No Rentals Found",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          "Your rental items will appear here",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      final userId =
+                          ref.read(userDataClass).userdata['id']?.toString() ??
+                          '1';
+                      await ref
+                          .read(rentalDataProvider)
+                          .fetchMyRentals(
+                            userId: userId,
+                            loadingFor: "refreshRentals",
+                            search: "",
+                          );
+                    },
+                    child: GridView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      itemCount: rentalData.rentals.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, // Mobile 2 columns
+                            mainAxisSpacing: 18,
+                            crossAxisSpacing: 18,
+                            childAspectRatio: 0.85,
+                          ),
+                      itemBuilder: (context, index) =>
+                          _buildRentalItem(context, rentalData.rentals[index]),
+                    ),
+                  ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.btnBgColor,
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ItemsRent()),
-          );
+          goto(AllItemsPage()); // Add new rental logic here
         },
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColors.btnBgColor,
+        child: Icon(Icons.add, color: AppColors.btnIconColor),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10), // ✅ Replaces Divider
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 50,
-                      padding: const EdgeInsets.only(left: 8, right: 4),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(228, 213, 213, 1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.search,
-                            size: 28,
-                            color: Color.fromARGB(255, 66, 63, 63),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                hintText: 'Search How to & More',
-                                hintStyle: TextStyle(
-                                  color: Color.fromARGB(255, 66, 63, 63),
-                                  fontSize: 14,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Color.fromARGB(255, 66, 63, 63),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: const Text(
-                              'GO',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 15), // ✅ Replaces Divider
-            const Divider(height: 1, thickness: 0.5),
 
-            for (int i = 1; i < 10; i++) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-                child: Column(
-                  children: () {
-                    List<Map<String, dynamic>> buttons = [];
-                    if (i == 1) {
-                      buttons = [
-                        {
-                          'label': 'Rent Out',
-                          'color': Colors.cyan.shade700,
-                          'item': 'ultrapod',
-                          'listed By': 'john David',
-                        },
-                        {
-                          'label': 'Pending',
-                          'color': Colors.amber[900]!,
-                          'item': 'ultrapod',
-                          'listed By': 'john david',
-                        },
-                        {
-                          'label': 'Pending',
-                          'color': Colors.amber[900]!,
-                          'item': 'q32',
-                          'listed By': 'John David',
-                        },
-                        {
-                          'label': 'Closed',
-                          'color': Colors.green,
-                          'item': 'q32',
-                          'listed By': 'John David',
-                        },
-                      ];
-                    } else if (i == 2) {
-                      buttons = [
-                        {
-                          'label': 'Closed',
-                          'color': Colors.green,
-                          'item': 'q32',
-                          'listed By': 'john David',
-                        },
-                        {
-                          'label': 'Pending',
-                          'color': Colors.amber[900]!,
-                          'item': 'q32',
-                          'listed By': 'john David',
-                        },
-                        {
-                          'label': 'Pending',
-                          'color': Colors.amber[900]!,
-                          'item': 'q32',
-                          'listed By': 'john David',
-                        },
-                        {
-                          'label': 'Pending',
-                          'color': Colors.amber[900]!,
-                          'item': 'q32',
-                          'listed By': 'John Dvid',
-                        },
-                      ];
-                    }
+      // Floating Action Button for Add New rental
 
-                    List<Widget> rows = [];
-                    for (int j = 0; j < buttons.length; j += 2) {
-                      rows.add(
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: _buildRentalItemWithCustomButton(
-                                  buttons[j]['item'],
-                                  buttons[j]['label'],
-                                  buttons[j]['color'],
-                                  buttons[j]['listed By'],
-                                ),
-                              ),
-                            ),
-                            if (j + 1 < buttons.length)
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: _buildRentalItemWithCustomButton(
-                                    buttons[j + 1]['item'],
-                                    buttons[j + 1]['label'],
-                                    buttons[j + 1]['color'],
-                                    buttons[j + 1]['listed By'],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                      rows.add(const SizedBox(height: 12));
-                    }
-                    return rows;
-                  }(),
-                ),
-              ),
-              const SizedBox(height: 10), // ✅ Replaces Divider
-            ],
-          ],
-        ),
-      ),
+      // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );
   }
 
-  static Widget _buildRentalItemWithCustomButton(
-    String itemName,
-    String buttonText,
-    Color color,
-    String listedBy,
-  ) {
+  Widget _buildRentalItem(BuildContext context, dynamic rental) {
+    // ✅ Fixed status: No backend/API logic now, always shows "Delivered"
+    const status = 'Delivered';
+    final statusColor = Colors.green;
+
     return Container(
-      height: 180,
-      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            spreadRadius: 0.5,
-            blurRadius: 4,
-            offset: const Offset(0, 1.5),
+            color: Colors.grey.withOpacity(0.14),
+            blurRadius: 7,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Stack(
         children: [
-          Center(
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.question_mark,
-                size: 36,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 5,
-            top: 30,
-            child: Column(
-              children: [
-                _circleIcon(Icons.remove_red_eye, Colors.cyan),
-                const SizedBox(height: 6),
-                _circleIcon(Icons.delete, Colors.redAccent),
-              ],
-            ),
-          ),
-          Positioned(
-            right: 5,
-            top: 5,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                minimumSize: const Size(90, 32),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left-side icons column
+              Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+                  vertical: 18,
+                  horizontal: 6,
                 ),
               ),
-              onPressed: () {},
-              child: Text(
-                buttonText,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
+
+              // Main content (image and texts, centered)
+              InkWell(
+                onTap: () {
+                  goto(Rentaldetails(renting: rental));
+                },
+                child: Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CacheImageWidget(
+                            isCircle: false,
+                            url: _getImageUrl(rental),
+                            height: 85,
+                            width: 100,
+                          ),
+                        ),
+                        Text(
+                          _getProductTitle(rental),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _getUserName(rental),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 2),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
+          // Right-top Status Label
           Positioned(
-            bottom: 5,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Text(
-                  'Listed By: $listedBy',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color.fromARGB(255, 19, 19, 19),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  itemName,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            right: 8,
+            top: 8,
+            child: _statusLabel(rental["deliverd"].toString()),
           ),
         ],
       ),
     );
   }
 
-  static Widget _circleIcon(IconData icon, Color color) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        shape: BoxShape.circle,
+  Widget _iconCircleButton(
+    IconData icon,
+    Color iconColor,
+    VoidCallback onPressed,
+  ) {
+    return InkWell(
+      onTap: onPressed,
+      child: CircleAvatar(
+        radius: 15,
+        backgroundColor: Colors.black,
+        child: Icon(icon, color: iconColor, size: 16.5),
       ),
-      child: Center(child: Icon(icon, size: 18, color: color)),
     );
+  }
+
+  Widget _statusLabel(String? status) {
+    Color bgColor = Colors.orange;
+    String label = "Delivered";
+
+    if (status.toString() == "0") {
+      bgColor = Colors.orange.withOpacity(0.5);
+      label = "Not delivered";
+    } else {
+      bgColor = Colors.green.withOpacity(0.7);
+      label = "Delivered";
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  // Helper method to safely get image URL
+  String _getImageUrl(dynamic rental) {
+    try {
+      if (rental['productImage'] != null) {
+        var images = jsonDecode(rental['productImage']);
+        if (images is List && images.isNotEmpty) {
+          return Config.imgUrl + images[0];
+        }
+      }
+    } catch (e) {
+      print("Error parsing image: $e");
+    }
+    return ImgLinks.product;
+  }
+
+  // Helper method to safely get user name
+  String _getUserName(dynamic rental) {
+    try {
+      if (rental['orderby'] != null && rental['orderby']['name'] != null) {
+        return rental['orderby']['name'].toString();
+      }
+      // Try alternative field names
+      if (rental['user'] != null && rental['user']['name'] != null) {
+        return rental['user']['name'].toString();
+      }
+      if (rental['productby']["name"] != null) {
+        return rental['productby']["name"].toString();
+      }
+    } catch (e) {
+      print("Error getting user name: $e");
+    }
+    return "Unknown User";
+  }
+
+  // Helper method to safely get product title
+  String _getProductTitle(dynamic rental) {
+    try {
+      if (rental['productTitle'] != null) {
+        return rental['productTitle'].toString();
+      }
+      if (rental['title'] != null) {
+        return rental['title'].toString();
+      }
+      if (rental['name'] != null) {
+        return rental['name'].toString();
+      }
+    } catch (e) {
+      print("Error getting product title: $e");
+    }
+    return "Unknown Product";
   }
 }
