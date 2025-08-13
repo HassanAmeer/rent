@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/appColors.dart';
+import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/Blogs.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
@@ -103,7 +104,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
@@ -234,7 +235,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
@@ -292,7 +293,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.article_outlined,
                             color: AppColors.mainColor,
@@ -310,7 +311,32 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
+            InkWell(
+              onTap: () {
+                goto(AllItemsPage());
+              },
+              child: Container(
+                // height: 30,
+                width: 300,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Center(
+                    child: Text(
+                      "All Items",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
