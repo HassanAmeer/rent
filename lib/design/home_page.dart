@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/Blogs.dart';
-import 'package:rent/apidata/user.dart';
+// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/fav/fvrt.dart';
 import 'package:rent/design/help.dart';

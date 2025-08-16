@@ -10,8 +10,6 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
 
-import '../main.dart';
-
 final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 
 class UserData with ChangeNotifier {

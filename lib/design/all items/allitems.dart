@@ -2,10 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:rent/apidata/allitems.dart';
-import 'package:rent/apidata/favrtapi.dart';
-import 'package:rent/apidata/listingapi.dart';
-import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -15,6 +11,10 @@ import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/dotloader.dart';
+
+import '../../constants/apidata/allitems.dart';
+import '../../constants/apidata/favrtapi.dart';
+import '../../constants/apidata/user.dart';
 
 class AllItemsPage extends ConsumerStatefulWidget {
   const AllItemsPage({super.key});

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/apidata/user.dart' show userDataClass;
+// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/appColors.dart';
 import 'dart:convert';
 import 'package:rent/constants/goto.dart';

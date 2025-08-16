@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/listingapi.dart';
-import 'package:rent/apidata/user.dart';
+// import 'package:rent/apidata/listingapi.dart';
+// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
@@ -9,6 +9,8 @@ import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/listing/listing_edit_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
+import '../../constants/apidata/listingapi.dart';
+import '../../constants/apidata/user.dart';
 import '../home_page.dart';
 
 class ListingPage extends ConsumerStatefulWidget {

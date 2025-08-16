@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/notifyData.dart';
-import 'package:rent/apidata/user.dart';
+// import 'package:rent/apidata/notifyData.dart';
+// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 // import 'package:rent/temp/data.dart';
 
+import '../../constants/apidata/notifyData.dart';
+import '../../constants/apidata/user.dart';
 import '../../constants/data.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {

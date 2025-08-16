@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/appColors.dart';
+import 'package:rent/constants/apidata/addnewlistingapi.dart';
+import 'package:rent/constants/apidata/user.dart';
+import 'package:rent/widgets/dotloader.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class AddNewListingPage extends StatefulWidget {
+class AddNewListingPage extends ConsumerStatefulWidget {
   const AddNewListingPage({super.key});
 
   @override
-  State<AddNewListingPage> createState() => _AddNewListingPageState();
+  ConsumerState<AddNewListingPage> createState() => _AddNewListingPageState();
 }
 
-class _AddNewListingPageState extends State<AddNewListingPage> {
+class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -17,7 +23,8 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
   final _monthlyRateController = TextEditingController();
 
   String? _selectedCategory;
-  final List<String> _selectedImages = [];
+  final List<File> _selectedImages = [];
+  final ImagePicker _picker = ImagePicker();
 
   final List<String> _categories = [
     'Electronics',
@@ -43,41 +50,167 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
   }
 
   Future<void> _pickImages() async {
-    // Simulated image picker - you can integrate with actual image picker
-    setState(() {
-      _selectedImages.add(
-        'assets/images/sample${_selectedImages.length + 1}.jpg',
-      );
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Image added! (Demo mode)'),
-        duration: Duration(seconds: 1),
-      ),
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromGallery();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromCamera();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> _getImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImages.add(File(image.path));
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image added from gallery!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _getImageFromCamera() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      setState(() {
+        _selectedImages.add(File(image.path));
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image captured from camera!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
   }
 
   void _removeImage(int index) {
     setState(() {
       _selectedImages.removeAt(index);
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Image removed!'),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
-  void _submitForm() {
+  /// ✅ Form Submit with API Call
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Item added successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context);
+      // Additional validation
+      if (_selectedCategory == null || _selectedCategory!.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a category'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      try {
+        final listingApi = ref.read(listingDataProvider);
+        final userId =
+            ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+
+        print("👉 Submitting form with User ID: $userId");
+        print("👉 Title: ${_titleController.text.trim()}");
+        print("👉 Category: $_selectedCategory");
+        print("👉 Description: ${_descriptionController.text.trim()}");
+
+        await listingApi.addNewListing(
+          uid: userId,
+          title: _titleController.text.trim(),
+          catgname: _selectedCategory ?? "",
+          dailyRate: _dailyRateController.text.trim().isEmpty
+              ? "0"
+              : _dailyRateController.text.trim(),
+          weeklyRate: _weeklyRateController.text.trim().isEmpty
+              ? "0"
+              : _weeklyRateController.text.trim(),
+          monthlyRate: _monthlyRateController.text.trim().isEmpty
+              ? "0"
+              : _monthlyRateController.text.trim(),
+          availabilityDays: "Mon-Sun",
+          description: _descriptionController.text.trim(),
+        );
+
+        if (!mounted) return;
+
+        // Clear form after successful submission
+        _titleController.clear();
+        _descriptionController.clear();
+        _dailyRateController.clear();
+        _weeklyRateController.clear();
+        _monthlyRateController.clear();
+        setState(() {
+          _selectedCategory = null;
+          _selectedImages.clear();
+        });
+
+        // Show success message and navigate back
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Item added successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Wait a bit before navigating back
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        print("Error in form submission: $e");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final listingApi = ref.watch(listingDataProvider);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -91,328 +224,249 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
       ),
       body: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Category Selection
-              _buildSectionLabel('Category'),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
-                  hint: const Text('Select a category'),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 🔽 Category Selection
+                  _buildSectionLabel('Category'),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Item Title
-              _buildSectionLabel('Item Title'),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _titleController,
-                hintText: 'Enter product title',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter item title';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Item Description
-              _buildSectionLabel('Item Description'),
-              const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: Column(
-                  children: [
-                    // Rich Text Toolbar
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            const Text(
-                              'Paragraph',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildToolbarButton(Icons.format_bold, () {}),
-                            _buildToolbarButton(Icons.format_italic, () {}),
-                            _buildToolbarButton(Icons.link, () {}),
-                            _buildToolbarButton(
-                              Icons.format_list_bulleted,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_list_numbered,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_indent_increase,
-                              () {},
-                            ),
-                            _buildToolbarButton(
-                              Icons.format_indent_decrease,
-                              () {},
-                            ),
-                            _buildToolbarButton(Icons.image, () {}),
-                            _buildToolbarButton(Icons.format_quote, () {}),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Text Area
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 6,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      hint: const Text('Select a category'),
                       decoration: const InputDecoration(
-                        hintText: 'Write Description',
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(16),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter item description';
+                          return 'Please select a category';
                         }
                         return null;
                       },
+                      items: _categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value;
+                        });
+                      },
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Pricing Section
-              Row(
-                children: [
-                  Expanded(
+                  // 🔽 Title
+                  _buildSectionLabel('Item Title'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _titleController,
+                    hintText: 'Enter product title',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter item title';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 🔽 Description
+                  _buildSectionLabel('Item Description'),
+                  const SizedBox(height: 8),
+                  _buildTextField(
+                    controller: _descriptionController,
+                    hintText: 'Enter description',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter item description';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 🔽 Images Section
+                  _buildSectionLabel('Images'),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionLabel('Daily Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
+                        // Add New Image Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: _pickImages,
+                            icon: const Icon(Icons.add_photo_alternate),
+                            label: const Text('Add New Image'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[100],
+                              foregroundColor: Colors.black87,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(color: Colors.grey[300]!),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Display Selected Images
+                        if (_selectedImages.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            'Selected Images (${_selectedImages.length})',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 100,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _selectedImages.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          _selectedImages[index],
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: GestureDetector(
+                                          onTap: () => _removeImage(index),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 🔽 Pricing
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
                           controller: _dailyRateController,
                           hintText: 'Daily rate',
                           keyboardType: TextInputType.number,
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Weekly Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildTextField(
                           controller: _weeklyRateController,
                           hintText: 'Weekly rate',
                           keyboardType: TextInputType.number,
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionLabel('Monthly Rate'),
-                        const SizedBox(height: 8),
-                        _buildTextField(
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildTextField(
                           controller: _monthlyRateController,
                           hintText: 'Monthly rate',
                           keyboardType: TextInputType.number,
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Pick Images Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildSectionLabel('Pick Images'),
-                  TextButton.icon(
-                    onPressed: _pickImages,
-                    icon: const Icon(Icons.upload, size: 18),
-                    label: const Text('Upload Images'),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.blue[50],
-                      foregroundColor: Colors.blue[700],
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
 
-              const SizedBox(height: 12),
+                  const SizedBox(height: 30),
 
-              // Images Display
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: _selectedImages.isEmpty
-                    ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.image_outlined,
-                              size: 48,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'No Images',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                  // 🔽 Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: listingApi.isLoading ? null : _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.mainColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(8),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                            ),
-                        itemCount: _selectedImages.length,
-                        itemBuilder: (context, index) {
-                          return Stack(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey[200],
-                                  border: Border.all(color: Colors.grey[300]!),
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    color: Colors.grey,
-                                    size: 24,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: GestureDetector(
-                                  onTap: () => _removeImage(index),
-                                  child: Container(
-                                    width: 20,
-                                    height: 20,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.close,
-                                      color: Colors.white,
-                                      size: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
                       ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.mainColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      child: listingApi.isLoading
+                          ? const DotLoader()
+                          : const Text(
+                              'Add Item',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
-                  child: const Text(
-                    'Add Item',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // 🔽 Loading Overlay (optional)
+            if (listingApi.isLoading)
+              Container(
+                color: Colors.black.withValues(alpha: 0.2),
+                child: const Center(child: DotLoader()),
+              ),
+          ],
         ),
       ),
     );
@@ -436,6 +490,7 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
     String? Function(String?)? validator,
   }) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -453,242 +508,6 @@ class _AddNewListingPageState extends State<AddNewListingPage> {
             vertical: 12,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildToolbarButton(IconData icon, VoidCallback onPressed) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18, color: Colors.grey[600]),
-      padding: const EdgeInsets.all(4),
-      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-    );
-  }
-}
-
-// Preview Page
-class PreviewPage extends StatelessWidget {
-  final String title;
-  final String description;
-  final String category;
-  final String dailyRate;
-  final String weeklyRate;
-  final String monthlyRate;
-  final int imageCount;
-
-  const PreviewPage({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.category,
-    required this.dailyRate,
-    required this.weeklyRate,
-    required this.monthlyRate,
-    required this.imageCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Preview Item',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.cyan,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Images Section
-            if (imageCount > 0)
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.image, size: 48, color: Colors.grey),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$imageCount Images',
-                      style: const TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  ],
-                ),
-              )
-            else
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.image_outlined, size: 48, color: Colors.grey),
-                    SizedBox(height: 8),
-                    Text(
-                      'No Images',
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-
-            const SizedBox(height: 16),
-
-            // Title
-            Text(
-              title.isEmpty ? 'Item Title' : title,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Category
-            if (category.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.cyan.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  category,
-                  style: TextStyle(
-                    color: Colors.cyan[700],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
-            const SizedBox(height: 16),
-
-            // Description
-            const Text(
-              'Description',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description.isEmpty
-                  ? 'Item description will appear here.'
-                  : description,
-              style: const TextStyle(fontSize: 16),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Pricing
-            const Text(
-              'Pricing',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _buildPriceCard('Daily', dailyRate)),
-                const SizedBox(width: 8),
-                Expanded(child: _buildPriceCard('Weekly', weeklyRate)),
-                const SizedBox(width: 8),
-                Expanded(child: _buildPriceCard('Monthly', monthlyRate)),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      foregroundColor: Colors.black87,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text('Edit'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Item published successfully!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.cyan,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text('Publish'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceCard(String period, String price) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            period,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            price.isEmpty ? '\$0' : '\$$price',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-        ],
       ),
     );
   }
