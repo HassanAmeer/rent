@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/constants/apidata/blogapi.dart' show blogDataProvider;
+import 'package:rent/apidata/blogapi.dart' show blogDataProvider;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/blogs/blogsdetails.dart';

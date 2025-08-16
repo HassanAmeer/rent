@@ -8,8 +8,8 @@ import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../constants/apidata/favrtapi.dart';
-import '../../constants/apidata/user.dart';
+import '../../apidata/favrtapi.dart';
+import '../../apidata/user.dart';
 import '../../constants/data.dart';
 
 class Favourite extends ConsumerStatefulWidget {

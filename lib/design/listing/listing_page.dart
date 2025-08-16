@@ -9,8 +9,8 @@ import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/listing/listing_edit_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
-import '../../constants/apidata/listingapi.dart';
-import '../../constants/apidata/user.dart';
+import '../../apidata/listingapi.dart';
+import '../../apidata/user.dart';
 import '../home_page.dart';
 
 class ListingPage extends ConsumerStatefulWidget {

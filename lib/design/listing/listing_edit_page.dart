@@ -9,8 +9,8 @@ import 'package:rent/constants/goto.dart';
 
 // import '../../apidata/listingapi.dart';
 // import '../../apidata/user.dart';
-import '../../constants/apidata/listingapi.dart';
-import '../../constants/apidata/user.dart';
+import '../../apidata/listingapi.dart';
+import '../../apidata/user.dart';
 import '../../constants/toast.dart';
 
 class EditListingPage extends ConsumerStatefulWidget {

@@ -11,8 +11,8 @@ import 'package:rent/constants/scrensizes.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
 
-import 'constants/apidata/bookingapi.dart';
-import 'constants/apidata/user.dart';
+import 'apidata/bookingapi.dart';
+import 'apidata/user.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {
   const MyBookingPage({super.key});

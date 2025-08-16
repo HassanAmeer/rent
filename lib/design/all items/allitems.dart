@@ -12,9 +12,9 @@ import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../constants/apidata/allitems.dart';
-import '../../constants/apidata/favrtapi.dart';
-import '../../constants/apidata/user.dart';
+import '../../apidata/allitems.dart';
+import '../../apidata/favrtapi.dart';
+import '../../apidata/user.dart';
 
 class AllItemsPage extends ConsumerStatefulWidget {
   const AllItemsPage({super.key});

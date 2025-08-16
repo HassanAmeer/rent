@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/constants/apidata/addnewlistingapi.dart';
-import 'package:rent/constants/apidata/user.dart';
+import 'package:rent/apidata/addnewlistingapi.dart';
+import 'package:rent/apidata/user.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -427,6 +427,15 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                           keyboardType: TextInputType.number,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildTextField(
+                          controller: _dailyRateController,
+                          hintText: 'daily_rate',
+                          keyboardType: TextInputType.text,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
                     ],
                   ),
 
@@ -437,7 +446,40 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: listingApi.isLoading ? null : _submitForm,
+                      onPressed: listingApi.isLoading
+                          ? null
+                          : () {
+                              ref
+                                  .watch(listingDataProvider)
+                                  .addNewListing(
+                                    uid: ref
+                                        .watch(userDataClass)
+                                        .userdata['id']
+                                        .toString(),
+                                    title: _titleController.text.trim(),
+                                    catgname: _selectedCategory ?? "",
+                                    dailyRate:
+                                        _dailyRateController.text.trim().isEmpty
+                                        ? "0"
+                                        : _dailyRateController.text.trim(),
+                                    weeklyRate:
+                                        _weeklyRateController.text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : _weeklyRateController.text.trim(),
+                                    monthlyRate:
+                                        _monthlyRateController.text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : _monthlyRateController.text.trim(),
+                                    availabilityDays: "Mon-Sun",
+                                    description: _descriptionController.text
+                                        .trim(),
+                                    images: _selectedImages,
+                                  );
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.mainColor,
                         foregroundColor: Colors.white,

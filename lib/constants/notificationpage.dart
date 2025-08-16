@@ -7,8 +7,8 @@ import 'package:rent/constants/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 // import 'package:rent/temp/data.dart';
 import '../constants/data.dart';
-import 'apidata/notifyData.dart';
-import 'apidata/user.dart';
+import '../apidata/notifyData.dart';
+import '../apidata/user.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});

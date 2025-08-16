@@ -5,7 +5,7 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../constants/apidata/user.dart';
+import '../apidata/user.dart';
 import 'signup.dart';
 
 class LoginPage extends ConsumerStatefulWidget {

@@ -13,8 +13,8 @@ import 'package:rent/design/myrentals/rentaldetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../constants/apidata/myrentalapi.dart';
-import '../../constants/apidata/user.dart';
+import '../../apidata/myrentalapi.dart';
+import '../../apidata/user.dart';
 
 class MyRentalPage extends ConsumerStatefulWidget {
   const MyRentalPage({super.key});
