@@ -12,9 +12,11 @@ import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../apidata/allitems.dart';
+import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
+// import '../../design/orders/mybooking.dart';
+import '../booking/my_booking_page.dart'; // ✅ Import MyBooking page
 
 class AllItemsPage extends ConsumerStatefulWidget {
   const AllItemsPage({super.key});
@@ -156,6 +158,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                     ),
                   ),
                 ),
+                // ✅ Favourite Button (Top Right)
                 Positioned(
                   top: 5,
                   right: 5,
@@ -191,16 +194,60 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                                           i['itemId'].toString() ==
                                           widget.id.toString(),
                                     )
-                                ? Icon(
+                                ? const Icon(
                                     Icons.bookmark,
                                     size: 22,
                                     color: Colors.black,
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.bookmark_border,
                                     size: 22,
                                     color: Colors.black,
                                   ),
+                          ),
+                        ),
+                ),
+                // ✅ Order Now Button (Top Left → Goes to MyBookingPage)
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child:
+                      ref.watch(getAllItems).isLoading == true &&
+                          ref.watch(getAllItems).orderedItems == widget.id
+                      ? DotLoader(showDots: 1)
+                      : GestureDetector(
+                          onTap: () {
+                            ref
+                                .read(getAllItems)
+                                .orderitems(
+                                  userId: ref
+                                      .watch(userDataClass)
+                                      .userdata['id']
+                                      .toString(),
+                                  itemId: widget.id,
+                                  loadingFor: widget.id,
+
+                                  context: context,
+                                );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              ref
+                                      .watch(getAllItems)
+                                      .orderedItems
+                                      .contains(widget.id)
+                                  ? Icons
+                                        .shopping_cart // Filled cart
+                                  : Icons
+                                        .shopping_cart_outlined, // Outlined cart
+                              size: 22,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                 ),

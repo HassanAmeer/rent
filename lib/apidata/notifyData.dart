@@ -16,17 +16,16 @@ final notifyData = ChangeNotifierProvider<NotifyData>((ref) => NotifyData());
 
 class NotifyData with ChangeNotifier {
   //////
-  bool isLoading = false;
-  setLoading(bool value) {
-    notifyListeners();
-    isLoading = value;
+  String loadingFor = "";
+  setLoading([String value = ""]) {
+    loadingFor = value;
     notifyListeners();
   }
 
   List notify = [];
-  Future getNotifyData({required String uid}) async {
+  Future getNotifyData({required String uid, String loadingFor = ""}) async {
     try {
-      setLoading(true);
+      setLoading(loadingFor);
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/notifications/$uid"),
       );
@@ -35,24 +34,45 @@ class NotifyData with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-      setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg']);
         notify = result['notifications'];
-        setLoading(false);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
-      setLoading(false);
+      setLoading();
     } catch (e) {
-      setLoading(false);
+      setLoading();
     }
+  }
+
+  statusCode(response) {
+    return response.statusCode == 200 || response.statusCode == 201;
   }
 
   Future<void> deleteNotification({
     required String notificationId,
     required String uid,
-  }) async {}
+    String loadingfor = "",
+  }) async {
+    // print("$loadingfor");
+    setLoading(loadingfor);
+    debugPrint("notificationId : $notificationId");
+    // debugPrint("uid : $uid");
+
+    final respnse = await http.delete(
+      Uri.parse("https://thelocalrent.com/api/delnotification/$notificationId"),
+    );
+
+    final data = jsonDecode(respnse.body);
+    if (statusCode(respnse)) {
+      toast(data['msg'], backgroundColor: Colors.green);
+      getNotifyData(uid: uid);
+    } else {
+      toast(data['msg'], backgroundColor: Colors.red);
+    }
+    setLoading();
+  }
 }
 
 

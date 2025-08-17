@@ -5,10 +5,11 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
-import '../constants/data.dart';
-import '../apidata/notifyData.dart';
-import '../apidata/user.dart';
+import '../../constants/data.dart';
+import '../../apidata/notifyData.dart';
+import '../../apidata/user.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});
@@ -24,6 +25,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
       ref
           .watch(notifyData)
           .getNotifyData(
+            loadingFor: "fetchNotifyData",
             uid: ref.watch(userDataClass).userdata['id'].toString(),
           );
     });
@@ -43,64 +45,29 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () {
+              callDelFunction(notificationId);
+            },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
+  }
 
-    if (confirmDelete == true) {
-      try {
-        // Show loading indicator
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) =>
-              const Center(child: CircularProgressIndicator()),
+  callDelFunction(notifyId) {
+    ref
+        .read(notifyData)
+        .deleteNotification(
+          loadingfor: notifyId,
+          notificationId: notifyId,
+          uid: ref.read(userDataClass).userdata['id'].toString(),
         );
-
-        // Call delete API
-        await ref
-            .read(notifyData)
-            .deleteNotification(
-              notificationId: notificationId,
-              uid: ref.read(userDataClass).userdata['id'].toString(),
-            );
-
-        // Close loading indicator
-        Navigator.pop(context);
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Notification deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Refresh notifications
-        ref
-            .read(notifyData)
-            .getNotifyData(
-              uid: ref.read(userDataClass).userdata['id'].toString(),
-            );
-      } catch (e) {
-        // Close loading indicator if still open
-        Navigator.pop(context);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+    Navigator.pop(context);
   }
 
   @override
@@ -150,8 +117,8 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
             ),
           ),
           const SizedBox(height: 10),
-          ref.watch(notifyData).isLoading == true
-              ? const Center(child: CircularProgressIndicator.adaptive())
+          ref.watch(notifyData).loadingFor == "fetchNotifyData"
+              ? const Center(child: DotLoader())
               : ref.watch(notifyData).notify.isEmpty
               ? const Center(child: Text("Notifications Empty"))
               : Expanded(
@@ -199,34 +166,41 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                               ],
                             ),
                             title: Text(item['title'] ?? "Empty"),
-                            subtitle: Text(item['date'] ?? "Empty"),
+                            subtitle: Text(
+                              item['created_at'] ?? "Empty",
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ),
                           Positioned(
                             top: 5,
                             right: 5,
-                            child: GestureDetector(
-                              onTap: () => _deleteNotification(
-                                context,
-                                item['id'].toString(),
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromARGB(
-                                    255,
-                                    238,
-                                    236,
-                                    236,
-                                  ).withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.delete,
-                                  size: 18,
-                                  color: Color.fromARGB(255, 193, 16, 4),
-                                ),
-                              ),
-                            ),
+                            child:
+                                ref.watch(notifyData).loadingFor ==
+                                    item['id'].toString()
+                                ? DotLoader(showDots: 1)
+                                : GestureDetector(
+                                    onTap: () => _deleteNotification(
+                                      context,
+                                      item['id'].toString(),
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          238,
+                                          236,
+                                          236,
+                                        ).withOpacity(0.5),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete,
+                                        size: 18,
+                                        color: Color.fromARGB(255, 193, 16, 4),
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ],
                       );

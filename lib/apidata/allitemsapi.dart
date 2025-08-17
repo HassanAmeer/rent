@@ -7,6 +7,7 @@ import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/home_page.dart';
 
 // import '../main.dart';
@@ -50,28 +51,53 @@ class GetAllItems with ChangeNotifier {
     }
   }
 
-  orderitems() async {
+  List orderedItems = [];
+
+  /// ✅ Place Order
+  Future<void> orderitems({
+    required String userId,
+    required String itemId,
+    var availablityRange,
+    String loadingFor = "",
+    required BuildContext context,
+  }) async {
     try {
       setLoading(true);
+
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/addorder"),
+        body: {
+          "uid": userId,
+          "productId ": itemId,
+          'userCanPickupInDateRange': true,
+        },
       );
 
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
+      print("👉 Response status: ${response.statusCode}");
       print("👉 data: $data");
-      if (response.statusCode == 200) {
-        order = data['errors'] ?? [];
 
-        setLoading(false);
+      if (response.statusCode == 200) {
+        // Add item to ordered list
+        if (!orderedItems.contains(itemId)) {
+          orderedItems.add(itemId);
+        }
+
+        toast(data['success'] ?? "Order placed successfully ✅");
+
+        // Wait a bit then navigate to MyBookingPage
+        await Future.delayed(const Duration(milliseconds: 1000));
+        goto(const MyBookingPage());
       } else {
-        toast(data['msg']);
+        toast(data['msg'] ?? "Failed to place order ❌");
       }
+
       setLoading(false);
     } catch (e) {
       setLoading(false);
-      print("Error fetching my items: $e");
+      print("❌ Error placing order: $e");
+      toast("Something went wrong!");
     }
   }
 }
