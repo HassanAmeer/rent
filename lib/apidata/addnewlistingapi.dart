@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -50,17 +51,13 @@ class ListingData with ChangeNotifier {
       req.fields['monthly_rate'] = monthlyRate;
       req.fields['dailyRate'] = dailyRate;
 
-      // for files
       if (images.isNotEmpty) {
         for (var i = 0; i < images.length; i++) {
-          final imagePath =
-              images[i].path; // Agar `XFile` ya `File` use kar rhy ho
-          req.files.add(
-            await http.MultipartFile.fromPath(
-              'images[]', // ✅ Backend agar multiple images array accept kare
-              imagePath,
-            ),
-          );
+          if (await File(images[i].path!).exists()) {
+            req.files.add(
+              await http.MultipartFile.fromPath('images[$i]', images[i].path!),
+            );
+          }
         }
       }
 

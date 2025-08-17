@@ -16,7 +16,7 @@ final getAllItems = ChangeNotifierProvider<GetAllItems>((ref) => GetAllItems());
 
 class GetAllItems with ChangeNotifier {
   var allItems = [];
-
+  var order = [];
   //////
   bool isLoading = false;
   setLoading(bool value) {
@@ -38,6 +38,31 @@ class GetAllItems with ChangeNotifier {
       if (response.statusCode == 200) {
         allItems.clear();
         allItems = data['items'] ?? [];
+
+        setLoading(false);
+      } else {
+        toast(data['msg']);
+      }
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      print("Error fetching my items: $e");
+    }
+  }
+
+  orderitems() async {
+    try {
+      setLoading(true);
+      final response = await http.post(
+        Uri.parse("https://thelocalrent.com/api/addorder"),
+      );
+
+      final data = jsonDecode(response.body);
+
+      print("👉Response status: ${response.statusCode}");
+      print("👉 data: $data");
+      if (response.statusCode == 200) {
+        order = data['errors'] ?? [];
 
         setLoading(false);
       } else {

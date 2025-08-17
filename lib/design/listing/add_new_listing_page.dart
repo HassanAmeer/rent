@@ -164,6 +164,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
               : _monthlyRateController.text.trim(),
           availabilityDays: "Mon-Sun",
           description: _descriptionController.text.trim(),
+          images: _selectedImages,
         );
 
         if (!mounted) return;
@@ -174,6 +175,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         _dailyRateController.clear();
         _weeklyRateController.clear();
         _monthlyRateController.clear();
+
         setState(() {
           _selectedCategory = null;
           _selectedImages.clear();

@@ -55,8 +55,8 @@ class _BlogsState extends ConsumerState<Blogs> {
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
                 childAspectRatio: 0.65, // ✅ thoda lamba card
               ),
               itemCount: blogProvider.blogs.length,
@@ -84,7 +84,7 @@ class _BlogsState extends ConsumerState<Blogs> {
                           url: imageUrl != null && imageUrl.isNotEmpty
                               ? Config.imgUrl + imageUrl
                               : ImgLinks.product,
-                          height: (ScreenSize.height * 0.25).toInt(),
+                          height: (ScreenSize.height * 0.24).toInt(),
                           width: ScreenSize.width.toInt(),
                         ),
                       ),
