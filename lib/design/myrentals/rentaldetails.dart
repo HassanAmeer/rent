@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
+// import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 import 'package:rent/constants/data.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
@@ -16,10 +16,23 @@ class Rentaldetails extends ConsumerStatefulWidget {
 }
 
 class _RentaldetailsState extends ConsumerState<Rentaldetails> {
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    // No need to fetch additional data - use the data passed from previous page
+    // Simulate loading time
+    _loadData();
+  }
+
+  void _loadData() async {
+    // Simulate loading delay
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -28,121 +41,173 @@ class _RentaldetailsState extends ConsumerState<Rentaldetails> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Rental Details")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Text("${widget.renting}"),
-              Stack(
-                children: [
-                  CacheImageWidget(
-                    width: 300,
-                    height: 150,
-                    isCircle: false,
-                    radius: 0,
-                    url: _getImageUrl(rentalData),
-                  ),
-                ],
-              ),
+      body: isLoading
+          ? const Center(child: DotLoader())
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Text("${widget.renting}"),
+                    Stack(
+                      children: [
+                        CacheImageWidget(
+                          width: 300,
+                          height: 150,
+                          isCircle: false,
+                          radius: 0,
+                          url: _getImageUrl(rentalData),
+                        ),
+                      ],
+                    ),
 
-              const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-              Text(
-                rentalData['productTitle']?.toString() ?? 'Title.......',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Status Card
-              Card(
-                color: _getStatusColor(rentalData['deliverd']?.toString()),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        _getStatusIcon(rentalData['deliverd']?.toString()),
-                        color: Colors.white,
+                    Text(
+                      rentalData['productTitle']?.toString() ?? 'Title.......',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _getStatusText(rentalData['deliverd']?.toString()),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Description - No Container
+                    if (rentalData['productDescription'] != null &&
+                        rentalData['productDescription']
+                            .toString()
+                            .isNotEmpty) ...[
+                      const Text(
+                        "Description",
+                        style: TextStyle(
                           fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        rentalData['productDescription'].toString(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                     ],
-                  ),
+
+                    // Status Card - Properly sized
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(
+                          rentalData['deliverd']?.toString(),
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _getStatusIcon(rentalData['deliverd']?.toString()),
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _getStatusText(rentalData['deliverd']?.toString()),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Rental Information - No Container
+                    const Text(
+                      "Rental Information",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildInfoRow(
+                      "Daily Rate",
+                      "\$${rentalData['dailyrate'] ?? '0'}",
+                    ),
+                    _buildInfoRow(
+                      "Weekly Rate",
+                      "\$${rentalData['weeklyrate'] ?? '0'}",
+                    ),
+                    _buildInfoRow(
+                      "Monthly Rate",
+                      "\$${rentalData['monthlyrate'] ?? '0'}",
+                    ),
+                    _buildInfoRow(
+                      "Created",
+                      _formatDate(rentalData['created_at']),
+                    ),
+                    _buildInfoRow(
+                      "Updated",
+                      _formatDate(rentalData['updated_at']),
+                    ),
+                    if (rentalData['availabilityDays'] != null)
+                      _buildInfoRow(
+                        "Availability",
+                        rentalData['availabilityDays'].toString(),
+                      ),
+                    if (rentalData['productPickupDate'] != null)
+                      _buildInfoRow(
+                        "Pickup Date",
+                        rentalData['productPickupDate'].toString(),
+                      ),
+                    if (rentalData['totalPriceByUser'] != null)
+                      _buildInfoRow(
+                        "Total Price",
+                        "\$${rentalData['totalPriceByUser']}",
+                      ),
+
+                    const SizedBox(height: 16),
+
+                    // User Information - No Container
+                    const Text(
+                      "Rented By",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ListTile(
+                      leading: CacheImageWidget(
+                        width: 50,
+                        height: 50,
+                        isCircle: true,
+                        radius: 200,
+                        url: _getUserImageUrl(rentalData),
+                      ),
+                      title: Text(_getUserName(rentalData)),
+                      subtitle: Text(_getUserEmail(rentalData)),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+
+                    //
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 16),
-
-              // Rental Information
-              _buildInfoCard("Rental Information", [
-                _buildInfoRow(
-                  "Daily Rate",
-                  "\$${rentalData['dailyrate'] ?? '0'}",
-                ),
-                _buildInfoRow(
-                  "Weekly Rate",
-                  "\$${rentalData['weeklyrate'] ?? '0'}",
-                ),
-                _buildInfoRow(
-                  "Monthly Rate",
-                  "\$${rentalData['monthlyrate'] ?? '0'}",
-                ),
-                _buildInfoRow("Created", _formatDate(rentalData['created_at'])),
-                _buildInfoRow("Updated", _formatDate(rentalData['updated_at'])),
-                if (rentalData['availabilityDays'] != null)
-                  _buildInfoRow(
-                    "Availability",
-                    rentalData['availabilityDays'].toString(),
-                  ),
-                if (rentalData['productPickupDate'] != null)
-                  _buildInfoRow(
-                    "Pickup Date",
-                    rentalData['productPickupDate'].toString(),
-                  ),
-                if (rentalData['totalPriceByUser'] != null)
-                  _buildInfoRow(
-                    "Total Price",
-                    "\$${rentalData['totalPriceByUser']}",
-                  ),
-              ]),
-
-              const SizedBox(height: 16),
-
-              // User Information
-              _buildInfoCard("Rented By", [
-                ListTile(
-                  leading: CacheImageWidget(
-                    width: 50,
-                    height: 50,
-                    isCircle: true,
-                    radius: 200,
-                    url: _getUserImageUrl(rentalData),
-                  ),
-                  title: Text(_getUserName(rentalData)),
-                  subtitle: Text(_getUserEmail(rentalData)),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ]),
-
-              //
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 

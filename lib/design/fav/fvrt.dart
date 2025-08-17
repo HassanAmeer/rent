@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/favrtapi.dart';
-import 'package:rent/apidata/user.dart';
+// import 'package:rent/apidata/favrtapi.dart';
+// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
 import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../../apidata/favrtapi.dart';
+import '../../apidata/user.dart';
 import '../../constants/data.dart';
 
 class Favourite extends ConsumerStatefulWidget {

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
-import 'package:rent/apidata/user.dart' show userDataClass;
+// import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
+// import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
@@ -12,6 +12,9 @@ import 'package:rent/design/all%20items/allitems.dart';
 import 'package:rent/design/myrentals/rentaldetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+
+import '../../apidata/myrentalapi.dart';
+import '../../apidata/user.dart';
 
 class MyRentalPage extends ConsumerStatefulWidget {
   const MyRentalPage({super.key});

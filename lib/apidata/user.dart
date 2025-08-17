@@ -10,8 +10,6 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
 
-import '../main.dart';
-
 final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 
 class UserData with ChangeNotifier {
@@ -127,36 +125,43 @@ class UserData with ChangeNotifier {
     required String email,
     required String aboutUs,
     required String address,
+    String imagePath = "",
   }) async {
     try {
+      ////
       setLoading(true);
-      final response = await http.put(
+      var req = http.MultipartRequest(
+        "POST",
         Uri.parse("https://thelocalrent.com/api/updateprofile"),
-        body: {
-          'uid': userdata['id'].toString(),
-
-          'email': email,
-          'name': name,
-          'phone': phone,
-          'aboutUs': aboutUs,
-          'address': address,
-        },
       );
-      debugPrint("😊 Response status: ${response.statusCode}");
-      debugPrint("😊 Response body: ${response.body}");
-      var result = json.decode(response.body);
-      // print("👉 Response: $result");
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // toast(result['msg'], backgroundColor: Colors.green);
+      req.headers['Content-Type'] = 'application/json';
 
-        userdata = result['user'];
-        toast(result['msg'].toString(), backgroundColor: Colors.green);
+      req.fields['uid'] = userdata['id'].toString();
+      req.fields['name'] = name;
+      req.fields['phone'] = phone.toString();
+      req.fields['email'] = email;
+      req.fields['aboutUs'] = aboutUs;
+      req.fields['address'] = address;
+
+      if (imagePath.isNotEmpty) {
+        req.files.add(await http.MultipartFile.fromPath('image', imagePath));
+      }
+
+      var sendedRequest = await req.send();
+      var response = await sendedRequest.stream.bytesToString();
+
+      debugPrint("😊 sendedRequest status: ${sendedRequest.statusCode}");
+      debugPrint("😊 response data: ${response}");
+
+      if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
+        toast("Successfully updated", backgroundColor: Colors.green);
+        getProfileData();
+
         setLoading(false);
-
         goto(const ProfileDetailsPage(), canBack: false);
       } else {
-        toast(result['msg'], backgroundColor: Colors.red);
+        toast("Failed to update", backgroundColor: Colors.red);
       }
       setLoading(false);
     } catch (e) {

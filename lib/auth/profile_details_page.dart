@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
+import 'package:rent/apidata/user.dart' show userDataClass;
 // import 'package:rent/auth/login.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/Auth/login.dart';
 import 'package:rent/widgets/casheimage.dart';
-import '../apidata/user.dart';
+import 'package:rent/widgets/dotloader.dart';
+// import '../apidata/user.dart';
 import '../widgets/btmnavbar.dart';
 // import '../apidata/user.dart';
 // import '../constants/data.dart';
@@ -44,7 +46,12 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ref.watch(userDataClass).isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: 200),
+                child: DotLoader(),
+              ),
+            )
           : ref.watch(userDataClass).userdata.isEmpty
           ? const Center(child: Text("Failed to load user data"))
           : Padding(
@@ -74,9 +81,15 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                       isCircle: true,
                       radius: 200,
                       url:
-                          Config.imgUrl +
-                              ref.watch(userDataClass).userdata['image'] ??
-                          ImgLinks.profileImage,
+                          (ref.watch(userDataClass).userdata['image'] != null &&
+                              ref
+                                  .watch(userDataClass)
+                                  .userdata['image']
+                                  .toString()
+                                  .isNotEmpty)
+                          ? Config.imgUrl +
+                                ref.watch(userDataClass).userdata['image']
+                          : ImgLinks.profileImage,
                     ),
 
                     const SizedBox(height: 20),
