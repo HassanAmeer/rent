@@ -23,12 +23,12 @@ class EditListingPage extends ConsumerStatefulWidget {
 class _EditListingPageState extends ConsumerState<EditListingPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _dailyRateController = TextEditingController();
-  TextEditingController _weeklyRateController = TextEditingController();
-  TextEditingController _monthlyRateController = TextEditingController();
-  TextEditingController _availiablityDaysController = TextEditingController();
-  List<String> _selectedImages = [];
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _dailyRateController = TextEditingController();
+  final TextEditingController _weeklyRateController = TextEditingController();
+  final TextEditingController _monthlyRateController = TextEditingController();
+  final TextEditingController _availiablityDaysController = TextEditingController();
+  final List<String> _selectedImages = [];
   String? _selectedCategory = "Electronics";
   bool _isLoading = false;
 
