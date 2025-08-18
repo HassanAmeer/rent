@@ -21,9 +21,9 @@ class ListingData with ChangeNotifier {
   var listings = [];
 
   //////
-  bool isLoading = false;
+  bool loadingfor = false;
   setLoading(bool value) {
-    isLoading = value;
+    loadingfor = value;
     notifyListeners();
   }
 
@@ -71,6 +71,29 @@ class ListingData with ChangeNotifier {
     } catch (e) {
       print("errore$e");
     }
+  }
+    Future deleteNotifications({
+    required String notificationId,
+    required String uid,
+    String loadingfor = "",
+  }) async {
+    // print("$loadingfor");
+    setLoading(true);
+    debugPrint("notificationId : $notificationId");
+    // debugPrint("uid : $uid");
+
+    final respnse = await http.delete(
+      Uri.parse("https://thelocalrent.com/api/delitem/$notificationId"),
+    );
+
+    final data = jsonDecode(respnse.body);
+    if ((respnse.statusCode== 200|| respnse.statusCode == 201)) {
+      toast(data['msg'], backgroundColor: Colors.green);
+      fetchMyItems(uid: uid);
+    } else {
+      toast(data['msg'], backgroundColor: Colors.red);
+    }
+    setLoading(false);
   }
 
   //

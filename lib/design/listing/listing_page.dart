@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:rent/apidata/listingapi.dart';
-// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
-import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/design/listing/listing_edit_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
+import 'package:rent/widgets/dotloader.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
 import '../home_page.dart';
@@ -36,6 +33,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final listingProvider = ref.watch(listingDataProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
@@ -70,6 +69,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
               ),
             ),
             const SizedBox(height: 25),
+            
 
             Expanded(
               child: GridView.builder(
@@ -79,29 +79,20 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                 ),
-                itemCount: ref.watch(listingDataProvider).listings.length,
+                itemCount: listingProvider.listings.length,
                 itemBuilder: (context, index) {
-                  final item = ref.watch(listingDataProvider).listings[index];
+                  final item = listingProvider.listings[index];
                   return GestureDetector(
                     onTap: () {
                       goto(ListingDetailPage(fullData: item));
                     },
                     child: ListingBox(
-                      id: ref
-                          .watch(listingDataProvider)
-                          .listings[index]['id']
-                          .toString(),
-                      title:
-                          ref
-                              .watch(listingDataProvider)
-                              .listings[index]['title'] ??
-                          'No Name',
+                      ref: ref, // ✅ ref pass kar diya constructor se
+                      id: item['id'].toString(),
+                      title: item['title'] ?? 'No Name',
                       imageUrl:
                           Config.imgUrl +
-                              ref
-                                  .watch(listingDataProvider)
-                                  .listings[index]['images'][0] ??
-                          ImgLinks.product,
+                          (item['images'][0] ?? ImgLinks.product),
                     ),
                   );
                 },
@@ -134,12 +125,14 @@ class ListingBox extends StatelessWidget {
   final String title;
   final String imageUrl;
   final String id;
+  final WidgetRef ref; // ✅ ref constructor me receive karenge
 
   const ListingBox({
     super.key,
     required this.title,
     required this.imageUrl,
     required this.id,
+    required this.ref, // ✅ required banaya
   });
 
   @override
@@ -162,8 +155,8 @@ class ListingBox extends StatelessWidget {
           // Image container with expanded height
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Expanded(
-              flex: 4,
+            child: SizedBox(
+              height: 120,
               child: Stack(
                 children: [
                   ClipRRect(
@@ -185,9 +178,12 @@ class ListingBox extends StatelessWidget {
                   Positioned(
                     top: 5,
                     right: 5,
+
                     child: GestureDetector(
                       onTap: () {
-                        // TODO: Add delete functionality
+                        // Show confirm
+                        //Dation dialog
+                        DotLoader();
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -202,7 +198,18 @@ class ListingBox extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  // TODO: Implement delete logic
+                                  // ✅ delete using ref
+
+                                  ref
+                                      .read(listingDataProvider.notifier)
+                                      .deleteNotifications(
+                                        notificationId: id,
+                                        uid: ref
+                                            .watch(userDataClass)
+                                            .userdata["id"]
+                                            .toString(),
+                                        loadingfor: id,
+                                      );
                                   Navigator.pop(context);
                                 },
                                 child: const Text(
