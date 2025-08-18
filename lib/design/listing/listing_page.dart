@@ -69,7 +69,6 @@ class _ListingPageState extends ConsumerState<ListingPage> {
               ),
             ),
             const SizedBox(height: 25),
-            
 
             Expanded(
               child: GridView.builder(
