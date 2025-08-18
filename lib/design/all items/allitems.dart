@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,7 @@ import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/dotloader.dart';
-
+import 'package:intl/intl.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
@@ -29,7 +30,9 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref.read(getAllItems).fetchAllItems();
+      ref
+          .read(getAllItems)
+          .fetchAllItems(loadingfor: "loadFullData", search: "asdf");
     });
     super.initState();
   }
@@ -56,7 +59,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
         child: Column(
           children: [
             const SizedBox(height: 25),
-            ref.watch(getAllItems).isLoading
+
+            ref.watch(getAllItems).loadingFor == "loadFullData"
                 ? const Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: 250),
@@ -77,6 +81,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                       itemCount: allItemsList.length,
                       itemBuilder: (context, index) {
                         final item = allItemsList[index];
+
+                        // return Text(item.toString());
                         return GestureDetector(
                           onTap: () {
                             goto(Allitemdetailspage(fullData: item));
@@ -162,9 +168,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                 Positioned(
                   top: 5,
                   right: 5,
-                  child:
-                      ref.watch(favrtdata).isLoading == false &&
-                          ref.watch(favrtdata).loadingFor == widget.id
+                  child: ref.watch(favrtdata).loadingFor == widget.id.toString()
                       ? DotLoader(showDots: 1)
                       : GestureDetector(
                           onTap: () {
@@ -175,8 +179,8 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                                       .watch(userDataClass)
                                       .userdata['id']
                                       .toString(),
-                                  itemId: widget.id,
-                                  loadingFor: widget.id,
+                                  itemId: widget.id.toString(),
+                                  loadingFor: widget.id.toString(),
                                 );
                           },
                           child: Container(
@@ -207,28 +211,88 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                           ),
                         ),
                 ),
+
                 // ✅ Order Now Button (Top Left → Goes to MyBookingPage)
                 Positioned(
                   top: 5,
                   left: 5,
                   child:
-                      ref.watch(getAllItems).isLoading == true &&
-                          ref.watch(getAllItems).orderedItems == widget.id
-                      ? DotLoader(showDots: 1)
+                      ref.watch(getAllItems).loadingFor == "${widget.id}order"
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: DotLoader(showDots: 1),
+                        )
                       : GestureDetector(
-                          onTap: () {
-                            ref
-                                .read(getAllItems)
-                                .orderitems(
-                                  userId: ref
-                                      .watch(userDataClass)
-                                      .userdata['id']
-                                      .toString(),
-                                  itemId: widget.id,
-                                  loadingFor: widget.id,
+                          onTap: () async {
+                            try {
+                              List<DateTime?> _dates = [];
 
-                                  context: context,
-                                );
+                              var results = await showCalendarDatePicker2Dialog(
+                                context: context,
+                                config:
+                                    CalendarDatePicker2WithActionButtonsConfig(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                dialogSize: const Size(325, 400),
+                                value: _dates,
+                                borderRadius: BorderRadius.circular(15),
+                              );
+
+                              if (results!.isEmpty) {
+                                toast("Plz Pickup date range");
+                              }
+
+                              // print(results.toString());
+                              var startDate = results?.first; // DateTime
+                              var endDate = results?.last; // DateTime
+
+                              // Formatter
+                              var formatter = DateFormat("d MMMM yyyy");
+
+                              // Convert to string
+                              var finalDateRange =
+                                  "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                              // print(finalDateRange.toString());
+                              var daysCount =
+                                  endDate.difference(startDate).inDays + 1;
+                              ////
+                              debugPrint(
+                                (int.parse(
+                                          widget.fullDataBytIndex['dailyrate'],
+                                        ) *
+                                        daysCount)
+                                    .toString(),
+                              );
+                              // return;
+                              ref
+                                  .read(getAllItems)
+                                  .orderitems(
+                                    userCanPickupInDateRange: finalDateRange,
+                                    productId: widget.id,
+                                    totalprice_by:
+                                        (int.parse(
+                                                  widget
+                                                      .fullDataBytIndex['dailyrate'],
+                                                ) *
+                                                daysCount)
+                                            .toString(),
+                                    product_by:
+                                        widget.fullDataBytIndex['dailyrate'],
+
+                                    userId: ref
+                                        .watch(userDataClass)
+                                        .userdata['id']
+                                        .toString(),
+
+                                    loadingFor: widget.id + "order",
+
+                                    context: context,
+                                  );
+                            } catch (e) {
+                              toast("Plz Pickup date range");
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),

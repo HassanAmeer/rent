@@ -89,6 +89,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.cyan.shade700,
+
                 borderRadius: BorderRadius.circular(30),
               ),
               width: 45,

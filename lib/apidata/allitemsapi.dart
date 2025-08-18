@@ -19,15 +19,17 @@ class GetAllItems with ChangeNotifier {
   var allItems = [];
   var order = [];
   //////
-  bool isLoading = false;
-  setLoading(bool value) {
-    isLoading = value;
+  String loadingFor = "";
+  setLoading([String value = ""]) {
+    loadingFor = value;
     notifyListeners();
   }
 
-  fetchAllItems() async {
+  fetchAllItems({required String loadingfor, String search = ""}) async {
     try {
-      setLoading(true);
+      print("👉 loadingFor: $loadingfor");
+      print("👉 search: $search");
+      setLoading(loadingfor);
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/allitems"),
       );
@@ -40,13 +42,13 @@ class GetAllItems with ChangeNotifier {
         allItems.clear();
         allItems = data['items'] ?? [];
 
-        setLoading(false);
+        setLoading("");
       } else {
         toast(data['msg']);
       }
-      setLoading(false);
+      setLoading("");
     } catch (e) {
-      setLoading(false);
+      setLoading("");
       print("Error fetching my items: $e");
     }
   }
@@ -56,48 +58,39 @@ class GetAllItems with ChangeNotifier {
   /// ✅ Place Order
   Future<void> orderitems({
     required String userId,
-    required String itemId,
-    var availablityRange,
+
+    required String userCanPickupInDateRange,
+    required String productId,
+    required String product_by,
+    required String totalprice_by,
+
     String loadingFor = "",
     required BuildContext context,
   }) async {
-    try {
-      setLoading(true);
+    setLoading(loadingFor);
 
-      final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/addorder"),
-        body: {
-          "uid": userId,
-          "productId ": itemId,
-          'userCanPickupInDateRange': true,
-        },
-      );
+    final response = await http.post(
+      Uri.parse("https://thelocalrent.com/api/addorder"),
+      body: {
+        "uid": userId,
+        'userCanPickupInDateRange': userCanPickupInDateRange,
+        'productId': productId.toString(),
+        'product_by': product_by,
+        'totalPriceByUser': totalprice_by,
+      },
+    );
 
-      final data = jsonDecode(response.body);
+    print("👉 Response status: ${response.statusCode}");
+    print("👉 data: ${response.body}");
 
-      print("👉 Response status: ${response.statusCode}");
-      print("👉 data: $data");
+    final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
-        // Add item to ordered list
-        if (!orderedItems.contains(itemId)) {
-          orderedItems.add(itemId);
-        }
-
-        toast(data['success'] ?? "Order placed successfully ✅");
-
-        // Wait a bit then navigate to MyBookingPage
-        await Future.delayed(const Duration(milliseconds: 1000));
-        goto(const MyBookingPage());
-      } else {
-        toast(data['msg'] ?? "Failed to place order ❌");
-      }
-
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
-      print("❌ Error placing order: $e");
-      toast("Something went wrong!");
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      toast(data['msg'].toString());
+      goto(const MyBookingPage());
+    } else {
+      toast(data['msg'] ?? "Failed to place order ❌");
     }
+    setLoading();
   }
 }
