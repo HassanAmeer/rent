@@ -168,7 +168,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                 Positioned(
                   top: 5,
                   right: 5,
-                  child: ref.watch(getAllItems).loadingFor == widget.id
+                  child: ref.watch(favrtdata).loadingFor == widget.id.toString()
                       ? DotLoader(showDots: 1)
                       : GestureDetector(
                           onTap: () {
@@ -217,67 +217,82 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                   top: 5,
                   left: 5,
                   child:
-                      ref.watch(getAllItems).loadingFor == widget.id.toString()
-                      ? DotLoader(showDots: 1)
+                      ref.watch(getAllItems).loadingFor == "${widget.id}order"
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: DotLoader(showDots: 1),
+                        )
                       : GestureDetector(
                           onTap: () async {
-                            List<DateTime?> _dates = [];
+                            try {
+                              List<DateTime?> _dates = [];
 
-                            var results = await showCalendarDatePicker2Dialog(
-                              context: context,
-                              config:
-                                  CalendarDatePicker2WithActionButtonsConfig(
-                                    calendarType: CalendarDatePicker2Type.range,
-                                  ),
-                              dialogSize: const Size(325, 400),
-                              value: _dates,
-                              borderRadius: BorderRadius.circular(15),
-                            );
+                              var results = await showCalendarDatePicker2Dialog(
+                                context: context,
+                                config:
+                                    CalendarDatePicker2WithActionButtonsConfig(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                dialogSize: const Size(325, 400),
+                                value: _dates,
+                                borderRadius: BorderRadius.circular(15),
+                              );
 
-                            // print(results.toString());
-                            var startDate = results!.first; // DateTime
-                            var endDate = results.last; // DateTime
+                              if (results!.isEmpty) {
+                                toast("Plz Pickup date range");
+                              }
 
-                            // Formatter
-                            var formatter = DateFormat("d MMMM yyyy");
+                              // print(results.toString());
+                              var startDate = results?.first; // DateTime
+                              var endDate = results?.last; // DateTime
 
-                            // Convert to string
-                            var finalDateRange =
-                                "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
-                            // print(finalDateRange.toString());
-                            var daysCount =
-                                endDate.difference(startDate).inDays + 1;
-                            ////
-                            debugPrint(
-                              (int.parse(widget.fullDataBytIndex['dailyrate']) *
-                                      daysCount)
-                                  .toString(),
-                            );
-                            // return;
-                            ref
-                                .read(getAllItems)
-                                .orderitems(
-                                  userCanPickupInDateRange: finalDateRange,
-                                  productId: widget.id,
-                                  totalprice_by:
-                                      (int.parse(
-                                                widget
-                                                    .fullDataBytIndex['dailyrate'],
-                                              ) *
-                                              daysCount)
-                                          .toString(),
-                                  product_by:
-                                      widget.fullDataBytIndex['dailyrate'],
+                              // Formatter
+                              var formatter = DateFormat("d MMMM yyyy");
 
-                                  userId: ref
-                                      .watch(userDataClass)
-                                      .userdata['id']
-                                      .toString(),
+                              // Convert to string
+                              var finalDateRange =
+                                  "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                              // print(finalDateRange.toString());
+                              var daysCount =
+                                  endDate.difference(startDate).inDays + 1;
+                              ////
+                              debugPrint(
+                                (int.parse(
+                                          widget.fullDataBytIndex['dailyrate'],
+                                        ) *
+                                        daysCount)
+                                    .toString(),
+                              );
+                              // return;
+                              ref
+                                  .read(getAllItems)
+                                  .orderitems(
+                                    userCanPickupInDateRange: finalDateRange,
+                                    productId: widget.id,
+                                    totalprice_by:
+                                        (int.parse(
+                                                  widget
+                                                      .fullDataBytIndex['dailyrate'],
+                                                ) *
+                                                daysCount)
+                                            .toString(),
+                                    product_by:
+                                        widget.fullDataBytIndex['dailyrate'],
 
-                                  loadingFor: widget.id.toString(),
+                                    userId: ref
+                                        .watch(userDataClass)
+                                        .userdata['id']
+                                        .toString(),
 
-                                  context: context,
-                                );
+                                    loadingFor: widget.id + "order",
+
+                                    context: context,
+                                  );
+                            } catch (e) {
+                              toast("Plz Pickup date range");
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
