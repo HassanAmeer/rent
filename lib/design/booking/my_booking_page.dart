@@ -29,11 +29,13 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
           .watch(bookingDataProvider)
           .fetchComingOrders(
             uid: ref.watch(userDataClass).userdata["id"].toString(),
+            search: "",
           );
       super.initState();
     });
   }
 
+  var searchfieldcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +57,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
             color: Colors.grey[300],
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextField(
+              controller: searchfieldcontroller,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -62,7 +65,20 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                suffixIcon: InkWell(
+                  onTap: () {
+                    ref
+                        .watch(bookingDataProvider)
+                        .fetchComingOrders(
+                          uid: ref
+                              .watch(userDataClass)
+                              .userdata["id"]
+                              .toString(),
+                          search: searchfieldcontroller.text,
+                        );
+                  },
+                  child: const Icon(Icons.search, color: Colors.black54),
+                ),
                 hintText: "Search How to & More",
                 hintStyle: const TextStyle(color: Colors.black54, fontSize: 16),
                 border: OutlineInputBorder(
