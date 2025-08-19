@@ -18,11 +18,12 @@ class BookingData with ChangeNotifier {
   }
 
   // 1. Get Coming Orders API
-  Future<void> fetchComingOrders({required String uid}) async {
+  Future<void> fetchComingOrders({required String uid, var search = ""}) async {
     setLoading(true);
     try {
-      final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/getcommingorders/$uid"),
+      final response = await http.post(
+        Uri.parse("https://thelocalrent.com/api/getcommingorders"),
+        body: {"uid": uid, "search": search},
       );
 
       final data = jsonDecode(response.body);

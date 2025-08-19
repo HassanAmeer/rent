@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/test.dart';
 // import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/constants/goto.dart';
@@ -106,6 +107,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     "Don't have an account? Sign Up",
                     style: TextStyle(color: Colors.black),
                   ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // yahan action likhein
+                    // User().rajisterUser("name");
+                  },
+                  child: const Text("Save"),
                 ),
               ],
             ),
