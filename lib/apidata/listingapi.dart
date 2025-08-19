@@ -21,19 +21,20 @@ class ListingData with ChangeNotifier {
   var listings = [];
 
   //////
-  bool loadingfor = false;
-  setLoading(bool value) {
+  String loadingfor = "";
+  setLoading([String value = ""]) {
     loadingfor = value;
+
     notifyListeners();
   }
 
-  fetchMyItems({required String uid}) async {
+  fetchMyItems({required String uid, var loadingfor = ""}) async {
     try {
+      setLoading(loadingfor);
       print("Fetching my items for user ID: $uid");
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/myitems/$uid"),
       );
-
       final data = jsonDecode(response.body);
 
       print("👉Response status: ${response.statusCode}");
@@ -41,12 +42,14 @@ class ListingData with ChangeNotifier {
       if (response.statusCode == 200) {
         listings = data['items'] ?? [];
         // listings =  [];
-
+        setLoading("");
         notifyListeners();
       } else {
         toast(data['msg']);
+        setLoading("");
       }
     } catch (e) {
+      setLoading("");
       print("Error fetching my items: $e");
     }
   }
@@ -72,28 +75,31 @@ class ListingData with ChangeNotifier {
       print("errore$e");
     }
   }
-    Future deleteNotifications({
+
+  Future deleteNotifications({
     required String notificationId,
     required String uid,
-    String loadingfor = "",
+    var loadingfor = "",
+
   }) async {
     // print("$loadingfor");
-    setLoading(true);
+    setLoading(loadingfor);
     debugPrint("notificationId : $notificationId");
     // debugPrint("uid : $uid");
 
     final respnse = await http.delete(
       Uri.parse("https://thelocalrent.com/api/delitem/$notificationId"),
     );
-
+    setLoading("");
+    // debugPrint("Response status: ${respnse.statusCode}");
     final data = jsonDecode(respnse.body);
-    if ((respnse.statusCode== 200|| respnse.statusCode == 201)) {
+    if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
       toast(data['msg'], backgroundColor: Colors.green);
       fetchMyItems(uid: uid);
     } else {
       toast(data['msg'], backgroundColor: Colors.red);
     }
-    setLoading(false);
+    setLoading("");
   }
 
   //

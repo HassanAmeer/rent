@@ -8,7 +8,7 @@ import 'package:rent/design/blogs/Blogs.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/fav/fvrt.dart';
 import 'package:rent/design/help.dart';
-import 'package:rent/design/listing/listing_page.dart';
+import 'package:rent/design/listing/listing_page.dart' hide AllItemsPage;
 import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/notify/notificationpage.dart';
 import 'package:rent/design/myrentals/myrentalpage.dart';

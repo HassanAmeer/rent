@@ -55,6 +55,9 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
         ),
       ),
       body: Padding(
+
+
+
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
@@ -67,8 +70,6 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                       child: DotLoader(),
                     ),
                   )
-                : allItemsList.isEmpty
-                ? const Center(child: Text("Items Empty"))
                 : Expanded(
                     child: GridView.builder(
                       gridDelegate:
