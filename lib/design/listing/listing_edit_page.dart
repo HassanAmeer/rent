@@ -89,7 +89,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Lisfgting")),
+      appBar: AppBar(title: const Text("Edit Listing")),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

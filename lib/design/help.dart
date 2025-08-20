@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/help&supportapi.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Help extends StatefulWidget {
+class Help extends ConsumerStatefulWidget {
   const Help({super.key});
 
   @override
-  State<Help> createState() => _HelpState();
+  ConsumerState<Help> createState() => _HelpState();
 }
 
-class _HelpState extends State<Help> {
+class _HelpState extends ConsumerState<Help> {
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((v) {
+      // ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+      ref.read(SupportProvider).contectus();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +26,7 @@ class _HelpState extends State<Help> {
         backgroundColor: Colors.cyan,
 
         title: Text(
-          "The Community Powered Rental Platform",
+          "Help and support",
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       ),
@@ -24,29 +35,6 @@ class _HelpState extends State<Help> {
         child: Column(
           children: [
             SizedBox(height: 7),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.search),
-                  labelText: 'items',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 8),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  suffixIcon: Icon(Icons.location_city),
-                  labelText: 'Location',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
 
             SizedBox(height: 20),
             Padding(
@@ -57,19 +45,11 @@ class _HelpState extends State<Help> {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
-            SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.only(right: 120),
 
-              child: Text(
-                "Contact The Local Rent",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
             SizedBox(height: 5),
 
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Text(
                 '''If you have any questions or need assistance, feel free to reach out to us. We’re here to help!
             
@@ -80,25 +60,62 @@ class _HelpState extends State<Help> {
 
             SizedBox(height: 4),
 
-            Padding(
-              padding: const EdgeInsets.only(right: 210),
-              child: Text(
+            ListTile(
+              title: Text(
                 "Contect us",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               ),
             ),
-            SizedBox(height: 5),
-
-            Text('''Email: thelocalrentllc@gmail.com
-Hours: 09:00 AM - 06:00 PM PKT (Monday to Friday)'''),
-
             SizedBox(height: 10),
 
-            Padding(
-              padding: const EdgeInsets.only(right: 210),
-              child: Text(
-                "follow us :",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ListTile(
+              title: Text(
+                "Email:",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                String? encodeQueryParameters(Map<String, String> params) {
+                  return params.entries
+                      .map(
+                        (MapEntry<String, String> e) =>
+                            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+                      )
+                      .join('&');
+                }
+
+                // ···
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'smith@example.com',
+                  query: encodeQueryParameters(<String, String>{
+                    'subject': 'Hey: welcome to the Local rent',
+                  }),
+                );
+
+                launchUrl(emailLaunchUri);
+              },
+
+              subtitle: Text(
+                ' ${ref.read(SupportProvider).settings["email"]}',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+            SizedBox(height: 10),
+            ListTile(
+              title: Text(
+                "Hours:",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              subtitle: Text(
+                '09:00 AM - 06:00 PM PKT (Monday to Friday)',
+                style: TextStyle(color: Colors.grey.shade600),
               ),
             ),
           ],

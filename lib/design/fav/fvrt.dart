@@ -21,6 +21,7 @@ class Favourite extends ConsumerStatefulWidget {
 }
 
 class _FavouriteState extends ConsumerState<Favourite> {
+  var searchcontrollers = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -33,7 +34,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
     final userId = ref.read(userDataClass).userdata["id"].toString();
     await ref
         .read(favrtdata)
-        .favoritems(loadingFor: "loadFullData", uid: userId);
+        .favoritems(loadingFor: "loadFullData", uid: userId, search: "");
   }
 
   @override
@@ -80,11 +81,28 @@ class _FavouriteState extends ConsumerState<Favourite> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.search, color: Colors.black),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          decoration: const InputDecoration(
+                          controller: searchcontrollers,
+
+                          decoration: InputDecoration(
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                ref
+                                    .read(favrtdata)
+                                    .favoritems(
+                                      loadingFor: "loadFullData",
+                                      uid: ref
+                                          .watch(userDataClass)
+                                          .userdata["id"]
+                                          .toString(),
+                                      search: searchcontrollers.text,
+                                    );
+                              },
+
+                              child: Icon(Icons.search),
+                            ),
                             hintText: 'Search How to & more',
                             hintStyle: TextStyle(color: Colors.black54),
                             border: InputBorder.none,
@@ -93,22 +111,21 @@ class _FavouriteState extends ConsumerState<Favourite> {
                           cursorColor: Colors.black,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      CircleAvatar(
-                        backgroundColor: Colors.black.withOpacity(0.8),
-                        child: const Text(
-                          'Go',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ),
 
+              // Column(
+              //   children: favrtProvider.favrt
+              //       .map(
+              //         (e) => Text("$e _____________________________________"),
+              //       )
+              //       .toList(),
+              // ),
+
               // Favorites Grid
-              if (favrtProvider.isLoading &&
-                  favrtProvider.loadingFor == "loadFullData")
+              if (favrtProvider.loadingFor == "loadFullData")
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 260),
@@ -139,7 +156,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                     itemCount: favrtProvider.favrt.length,
                     itemBuilder: (context, index) {
                       final item = favrtProvider.favrt[index];
-                      // return Text(item.toString()); // Example usage of item
+                      // return Text(item.toString());
                       return GestureDetector(
                         onTap: () {
                           goto(FavDetailsPage(fullData: item['products']));
@@ -165,17 +182,21 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                     height: 150,
                                     width: 165,
                                     url:
-                                        Config.imgUrl +
-                                        item['products']['images'][0],
+                                        item['products']['images']! != null ||
+                                            item['products']['images']! ||
+                                            item['products']['images']
+                                                .toList()
+                                                .isNotEmpty
+                                        ? Config.imgUrl +
+                                              item['products']['images'][0]
+                                        : ImgLinks.product,
                                   ),
                                   Positioned(
                                     top: 8,
                                     right: 8,
                                     child:
-                                        ref.watch(favrtdata).isLoading ==
-                                                true &&
-                                            ref.watch(favrtdata).loadingFor ==
-                                                item['id'].toString()
+                                        ref.watch(favrtdata).loadingFor ==
+                                            item['id'].toString()
                                         ? DotLoader(showDots: 1)
                                         // ? Icon(Icons.h_mobiledata_outlined)
                                         : InkWell(

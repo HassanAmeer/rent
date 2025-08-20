@@ -24,6 +24,7 @@ class MyRentalPage extends ConsumerStatefulWidget {
 }
 
 class _MyRentalPageState extends ConsumerState<MyRentalPage> {
+  var searchfeildcontroller = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -62,6 +63,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
             color: Colors.grey[300],
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: TextField(
+              controller: searchfeildcontroller,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -70,7 +72,10 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                         '1';
                     ref
                         .watch(rentalDataProvider)
-                        .fetchMyRentals(userId: userId, search: "");
+                        .fetchMyRentals(
+                          userId: userId,
+                          search: searchfeildcontroller.text,
+                        );
                   },
                   icon: Icon(Icons.search),
                 ),

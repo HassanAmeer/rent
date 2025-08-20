@@ -27,12 +27,14 @@ class AllItemsPage extends ConsumerStatefulWidget {
 }
 
 class _AllItemsPageState extends ConsumerState<AllItemsPage> {
+  var searchfeild = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
+      ref.read(userDataClass).userdata['id']?.toString() ?? '1';
       ref
           .read(getAllItems)
-          .fetchAllItems(loadingfor: "loadFullData", search: "asdf");
+          .fetchAllItems(loadingfor: "loadFullData", search: "");
     });
     super.initState();
   }
@@ -55,13 +57,34 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
         ),
       ),
       body: Padding(
-
-
-
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                controller: searchfeild,
+                decoration: InputDecoration(
+                  suffixIcon: InkWell(
+                    onTap: () {
+                      ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+                      ref
+                          .read(getAllItems)
+                          .fetchAllItems(
+                            loadingfor: "loadFullData",
+                            search: searchfeild.text,
+                          );
+                    },
+                    child: Icon(Icons.search),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  hintText: 'Search items...',
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
 
             ref.watch(getAllItems).loadingFor == "loadFullData"
                 ? const Center(

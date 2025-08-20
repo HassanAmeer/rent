@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
-import 'package:rent/constants/notificationsdetails.dart';
+import 'package:rent/design/notify/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
@@ -119,7 +119,12 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
           ),
           const SizedBox(height: 10),
           ref.watch(notifyData).loadingFor == "fetchNotifyData"
-              ? const Center(child: DotLoader())
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 250),
+                    child: DotLoader(),
+                  ),
+                )
               : ref.watch(notifyData).notify.isEmpty
               ? const Center(child: Text("Notifications Empty"))
               : Expanded(

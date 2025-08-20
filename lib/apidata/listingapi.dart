@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -37,7 +38,7 @@ class ListingData with ChangeNotifier {
       setLoading(loadingfor);
       print("Fetching my items for user ID: $uid");
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/myitems/$uid"),
+        Uri.parse("https://thelocalrent.com/api/myitems"),
         body: {'search': search, "uid": uid},
       );
       final data = jsonDecode(response.body);
@@ -104,6 +105,73 @@ class ListingData with ChangeNotifier {
       toast(data['msg'], backgroundColor: Colors.red);
     }
     setLoading("");
+  }
+
+  //
+  /// ✅ Add New Listing
+  Future<void> addNewListing({
+    required String uid,
+    required String title,
+    required String catgname,
+    required String dailyRate,
+    required String weeklyRate,
+    required String monthlyRate,
+    required String availabilityDays,
+    required String description,
+    List images = const [],
+    String loadingFor = "",
+  }) async {
+    try {
+      setLoading(loadingFor);
+      var req = http.MultipartRequest(
+        "POST",
+        Uri.parse("https://thelocalrent.com/api/additem"),
+      );
+
+      req.headers['Content-Type'] = 'application/json';
+
+      print("dailyRate:" + dailyRate);
+
+      //// for fields
+      req.fields['uid'] = uid;
+      req.fields['title'] = title;
+      req.fields['catgname'] = catgname.toString();
+      req.fields['weekly_rate'] = weeklyRate;
+      req.fields['availabilityrange'] = availabilityDays;
+      req.fields['description'] = description;
+      req.fields['monthly_rate'] = monthlyRate;
+      req.fields['daily_rate'] = dailyRate;
+
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          if (await File(images[i].path!).exists()) {
+            req.files.add(
+              await http.MultipartFile.fromPath('images[$i]', images[i].path!),
+            );
+          }
+        }
+      }
+
+      var sendedRequest = await req.send();
+      var response = await sendedRequest.stream.bytesToString();
+
+      debugPrint("😊 sendedRequest status: ${sendedRequest.statusCode}");
+      debugPrint("😊 response data: ${response}");
+
+      if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
+        toast("Successfully Added", backgroundColor: Colors.green);
+        fetchMyItems(uid: uid, loadingfor: "123");
+      } else {
+        toast("Failed to upload", backgroundColor: Colors.red);
+      }
+
+      setLoading();
+    } catch (e) {
+      debugPrint("Error adding listing: $e");
+      toast("Network error: Please check your connection");
+    } finally {
+      setLoading();
+    }
   }
 
   //

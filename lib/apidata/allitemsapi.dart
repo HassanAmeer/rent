@@ -31,7 +31,8 @@ class GetAllItems with ChangeNotifier {
       print("👉 search: $search");
       setLoading(loadingfor);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/allitems"),
+        Uri.parse("https://thelocalrent.com/api/allitems/$search"),
+        // body: {"search": search, "uid": uid},
       );
 
       final data = jsonDecode(response.body);

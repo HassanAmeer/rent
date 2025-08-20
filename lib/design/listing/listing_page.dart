@@ -18,7 +18,7 @@ class ListingPage extends ConsumerStatefulWidget {
 }
 
 class _ListingPageState extends ConsumerState<ListingPage> {
-  var textfeild = TextEditingController();
+  var searchfieldcontroller = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
@@ -27,6 +27,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           .fetchMyItems(
             uid: ref.watch(userDataClass).userdata["id"].toString(),
             search: "",
+            loadingfor: "123",
           );
     });
 
@@ -63,7 +64,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: TextField(
-                controller: TextEditingController(),
+                controller: searchfieldcontroller,
+
                 decoration: InputDecoration(
                   suffixIcon: InkWell(
                     onTap: () {
@@ -74,7 +76,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                                 .watch(userDataClass)
                                 .userdata["id"]
                                 .toString(),
-                            search: textfeild.text,
+                            search: searchfieldcontroller.text,
+                            loadingfor: "123",
                           );
                     },
 
@@ -86,34 +89,44 @@ class _ListingPageState extends ConsumerState<ListingPage> {
               ),
             ),
             const SizedBox(height: 25),
-
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                ),
-                itemCount: listingProvider.listings.length,
-                itemBuilder: (context, index) {
-                  final item = listingProvider.listings[index];
-                  return GestureDetector(
-                    onTap: () {
-                      goto(ListingDetailPage(fullData: item));
-                    },
-                    child: ListingBox(
-                      ref: ref, // ✅ ref pass kar diya constructor se
-                      id: item['id'].toString(),
-                      title: item['title'] ?? 'No Name',
-                      imageUrl:
-                          Config.imgUrl +
-                          (item['images'][0] ?? ImgLinks.product),
+            ref.watch(listingDataProvider).loadingfor == "123"
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 250),
+                      child: DotLoader(),
                     ),
-                  );
-                },
-              ),
-            ),
+                  )
+                // : ref.watch(listingDataProvider).notify.isEmpty
+                // ? const Center(child: Text("Notifications Empty"))
+                : Expanded(
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                          ),
+                      itemCount: listingProvider.listings.length,
+                      itemBuilder: (context, index) {
+                        final item = listingProvider.listings[index];
+                        return GestureDetector(
+                          onTap: () {
+                            goto(ListingDetailPage(fullData: item));
+                          },
+                          child: ListingBox(
+                            ref: ref, // ✅ ref pass kar diya constructor se
+                            id: item['id'].toString(),
+                            productBy: item["productBy"],
+                            title: item['title'] ?? 'No Name',
+                            imageUrl:
+                                Config.imgUrl +
+                                (item['images'][0] ?? ImgLinks.product),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ],
         ),
       ),
@@ -141,14 +154,16 @@ class ListingBox extends StatelessWidget {
   final String title;
   final String imageUrl;
   final String id;
-  final WidgetRef ref; // ✅ ref constructor me receive karenge
+  final WidgetRef ref;
+  var productBy; // ✅ ref constructor me receive karenge
 
-  const ListingBox({
+  ListingBox({
     super.key,
     required this.title,
     required this.imageUrl,
     required this.id,
-    required this.ref, // ✅ required banaya
+    required this.ref,
+    var productBy, // ✅ required banaya
   });
 
   @override
@@ -199,7 +214,7 @@ class ListingBox extends StatelessWidget {
                       onTap: () {
                         // Show confirm
                         //Dation dialog
-                        DotLoader();
+
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(

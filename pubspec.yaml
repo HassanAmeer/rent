@@ -42,7 +42,7 @@ dependencies:
   cached_network_image: ^3.4.1
   calendar_date_picker2: ^2.0.1
   intl:
-
+  url_launcher: ^6.3.2
 
 
 

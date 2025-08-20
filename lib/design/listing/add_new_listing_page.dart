@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/listingapi.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/apidata/addnewlistingapi.dart';
 import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -159,8 +160,16 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
           availabilityDays: "Mon-Sun",
           description: _descriptionController.text.trim(),
           images: _selectedImages,
+          loadingFor: "uploadData",
         );
 
+        ref
+            .watch(listingDataProvider)
+            .fetchMyItems(
+              uid: ref.watch(userDataClass).userdata["id"].toString(),
+              search: "",
+              loadingfor: "123",
+            );
         if (!mounted) return;
 
         _titleController.clear();
@@ -174,26 +183,13 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
           _selectedImages.clear();
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Item added successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-
         await Future.delayed(const Duration(milliseconds: 500));
         if (mounted) {
           Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          toast('Error: ${e.toString()}');
         }
       }
     }
@@ -408,7 +404,9 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: listingApi.isLoading ? null : _submitForm,
+                  onPressed: listingApi.loadingfor == "uploadData"
+                      ? null
+                      : _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.mainColor,
                     foregroundColor: Colors.white,
@@ -416,7 +414,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: listingApi.isLoading
+                  child: listingApi.loadingfor == "uploadData"
                       ? const DotLoader()
                       : const Text(
                           'Add Item',

@@ -10,17 +10,23 @@ final bookingDataProvider = ChangeNotifierProvider<BookingData>(
 
 class BookingData with ChangeNotifier {
   List comingOrders = [];
-  bool isLoading = false;
+  // bool isLoading = false;
+  String loadingfor = "";
+  setLoading([String value = ""]) {
+    loadingfor = value;
 
-  void setLoading(bool value) {
-    isLoading = value;
     notifyListeners();
   }
 
   // 1. Get Coming Orders API
-  Future<void> fetchComingOrders({required String uid, var search = ""}) async {
-    setLoading(true);
+  Future<void> fetchComingOrders({
+    required String uid,
+    var search = "",
+    var loadingfor = "",
+  }) async {
+    setLoading(loadingfor);
     try {
+      setLoading(loadingfor);
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/getcommingorders"),
         body: {"uid": uid, "search": search},
@@ -44,7 +50,7 @@ class BookingData with ChangeNotifier {
       print("Error fetching coming orders: $e");
       toast("Error fetching coming orders", backgroundColor: Colors.red);
     } finally {
-      setLoading(false);
+      setLoading("");
     }
   }
 
@@ -54,7 +60,7 @@ class BookingData with ChangeNotifier {
     required String orderId,
     required Map<String, dynamic> rejectionData,
   }) async {
-    setLoading(true);
+    setLoading("");
     try {
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/orderrejection/"),
@@ -84,7 +90,7 @@ class BookingData with ChangeNotifier {
       print("Error rejecting order: $e");
       toast("Error rejecting order", backgroundColor: Colors.red);
     } finally {
-      setLoading(false);
+      setLoading("");
     }
   }
 }

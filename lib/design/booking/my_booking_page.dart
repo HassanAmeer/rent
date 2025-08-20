@@ -10,6 +10,7 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/bookingapi.dart';
 import '../../apidata/user.dart';
@@ -30,6 +31,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
           .fetchComingOrders(
             uid: ref.watch(userDataClass).userdata["id"].toString(),
             search: "",
+            loadingfor: "3421",
           );
       super.initState();
     });
@@ -75,6 +77,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                               .userdata["id"]
                               .toString(),
                           search: searchfieldcontroller.text,
+                          loadingfor: "3421",
                         );
                   },
                   child: const Icon(Icons.search, color: Colors.black54),
@@ -89,28 +92,44 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
               style: const TextStyle(color: Colors.black87, fontSize: 16),
             ),
           ),
-
-          // Text("${ref.watch(bookingDataProvider).comingOrders}"),
-          // Text(
-          //   "${jsonDecode(ref.watch(bookingDataProvider).comingOrders[0]['productImage'])}",
-          // ),
-          // Bookings grid
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              itemCount: ref.watch(bookingDataProvider).comingOrders.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Mobile 2 columns
-                mainAxisSpacing: 18,
-                crossAxisSpacing: 18,
-                childAspectRatio: 0.85,
-              ),
-              itemBuilder: (context, index) => _bookingCard(
-                context,
-                ref.watch(bookingDataProvider).comingOrders[index],
-              ),
-            ),
-          ),
+          ref.watch(bookingDataProvider).loadingfor == "3421"
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 250),
+                    child: DotLoader(),
+                  ),
+                )
+              // : ref.watch(notifyData).notify.isEmpty
+              // ? const Center(child: Text("Notifications Empty"))
+              :
+                // Text("${ref.watch(bookingDataProvider).comingOrders}"),
+                // Text(
+                //   "${jsonDecode(ref.watch(bookingDataProvider).comingOrders[0]['productImage'])}",
+                // ),
+                // Bookings grid
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    itemCount: ref
+                        .watch(bookingDataProvider)
+                        .comingOrders
+                        .length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Mobile 2 columns
+                          mainAxisSpacing: 18,
+                          crossAxisSpacing: 18,
+                          childAspectRatio: 0.85,
+                        ),
+                    itemBuilder: (context, index) => _bookingCard(
+                      context,
+                      ref.watch(bookingDataProvider).comingOrders[index],
+                    ),
+                  ),
+                ),
         ],
       ),
 
