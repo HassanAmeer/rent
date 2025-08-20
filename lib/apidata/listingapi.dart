@@ -28,12 +28,17 @@ class ListingData with ChangeNotifier {
     notifyListeners();
   }
 
-  fetchMyItems({required String uid, var loadingfor = ""}) async {
+  fetchMyItems({
+    required String uid,
+    var loadingfor = "",
+    var search = "",
+  }) async {
     try {
       setLoading(loadingfor);
       print("Fetching my items for user ID: $uid");
-      final response = await http.get(
+      final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/myitems/$uid"),
+        body: {'search': search, "uid": uid},
       );
       final data = jsonDecode(response.body);
 
@@ -80,7 +85,6 @@ class ListingData with ChangeNotifier {
     required String notificationId,
     required String uid,
     var loadingfor = "",
-
   }) async {
     // print("$loadingfor");
     setLoading(loadingfor);

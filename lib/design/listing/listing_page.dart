@@ -18,6 +18,7 @@ class ListingPage extends ConsumerStatefulWidget {
 }
 
 class _ListingPageState extends ConsumerState<ListingPage> {
+  var textfeild = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
@@ -25,6 +26,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           .watch(listingDataProvider)
           .fetchMyItems(
             uid: ref.watch(userDataClass).userdata["id"].toString(),
+            search: "",
           );
     });
 
@@ -60,9 +62,24 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                 color: Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const TextField(
+              child: TextField(
+                controller: TextEditingController(),
                 decoration: InputDecoration(
-                  icon: Icon(Icons.search),
+                  suffixIcon: InkWell(
+                    onTap: () {
+                      ref
+                          .watch(listingDataProvider)
+                          .fetchMyItems(
+                            uid: ref
+                                .watch(userDataClass)
+                                .userdata["id"]
+                                .toString(),
+                            search: textfeild.text,
+                          );
+                    },
+
+                    child: Icon(Icons.search),
+                  ),
                   border: InputBorder.none,
                   hintText: 'Search Listings...',
                 ),
