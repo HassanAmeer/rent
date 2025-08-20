@@ -81,6 +81,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                 // : listingProvider.listings.isEmpty
                 // ? const Center(child: Text("No Listings Found"))
                 : Expanded(
+
+                  
                     child: GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(

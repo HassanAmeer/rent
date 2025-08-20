@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/data.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-import '../widgets/casheimage.dart';
+import '../../widgets/casheimage.dart';
 
 class NotificationsDetails extends StatelessWidget {
   final Map<String, dynamic> fullData;
