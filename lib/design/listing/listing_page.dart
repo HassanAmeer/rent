@@ -24,7 +24,6 @@ class _ListingPageState extends ConsumerState<ListingPage> {
       ref
           .watch(listingDataProvider)
           .fetchMyItems(
-            loadingfor: "loadFullData",
             uid: ref.watch(userDataClass).userdata["id"].toString(),
           );
     });
@@ -71,43 +70,33 @@ class _ListingPageState extends ConsumerState<ListingPage> {
             ),
             const SizedBox(height: 25),
 
-            ref.watch(listingDataProvider).loadingfor == "loadFullData"
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 250),
-                      child: DotLoader(),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                ),
+                itemCount: listingProvider.listings.length,
+                itemBuilder: (context, index) {
+                  final item = listingProvider.listings[index];
+                  return GestureDetector(
+                    onTap: () {
+                      goto(ListingDetailPage(fullData: item));
+                    },
+                    child: ListingBox(
+                      ref: ref, // ✅ ref pass kar diya constructor se
+                      id: item['id'].toString(),
+                      title: item['title'] ?? 'No Name',
+                      imageUrl:
+                          Config.imgUrl +
+                          (item['images'][0] ?? ImgLinks.product),
                     ),
-                  )
-                // : listingProvider.listings.isEmpty
-                // ? const Center(child: Text("No Listings Found"))
-                : Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                          ),
-                      itemCount: listingProvider.listings.length,
-                      itemBuilder: (context, index) {
-                        final item = listingProvider.listings[index];
-                        return GestureDetector(
-                          onTap: () {
-                            goto(ListingDetailPage(fullData: item));
-                          },
-                          child: ListingBox(
-                            ref: ref, // ✅ ref pass kar diya constructor se
-                            id: item['id'].toString(),
-                            title: item['title'] ?? 'No Name',
-                            imageUrl:
-                                Config.imgUrl +
-                                (item['images'][0] ?? ImgLinks.product),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -185,79 +174,70 @@ class ListingBox extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Positioned(
                     top: 5,
                     right: 5,
-                    child: ref.watch(listingDataProvider).loadingfor == id
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 250),
-                              child: DotLoader(),
-                            ),
-                          )
-                        // : ref.watch(listingDataProvider).loadingfor == id
-                        // ? const Center(
-                        //     child: Text("Items Empty"),
-                        //   ) //Dation dialog
-                        : GestureDetector(
-                            onTap: () {
-                              // Show confirm
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Delete Listing'),
-                                  content: const Text(
-                                    'Are you sure you want to delete this listing?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // ✅ delete using ref
 
-                                        ref
-                                            .read(listingDataProvider.notifier)
-                                            .deleteNotifications(
-                                              notificationId: id,
-                                              uid: ref
-                                                  .watch(userDataClass)
-                                                  .userdata["id"]
-                                                  .toString(),
-                                              loadingfor: id,
-                                            );
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: const Color.fromARGB(
-                                  255,
-                                  238,
-                                  236,
-                                  236,
-                                ).withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.delete,
-                                size: 18,
-                                color: Color.fromARGB(255, 193, 16, 4),
-                              ),
+                    child: GestureDetector(
+                      onTap: () {
+                        // Show confirm
+                        //Dation dialog
+                        DotLoader();
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Listing'),
+                            content: const Text(
+                              'Are you sure you want to delete this listing?',
                             ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // ✅ delete using ref
+
+                                  ref
+                                      .read(listingDataProvider.notifier)
+                                      .deleteNotifications(
+                                        notificationId: id,
+                                        uid: ref
+                                            .watch(userDataClass)
+                                            .userdata["id"]
+                                            .toString(),
+                                        loadingfor: id,
+                                      );
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
                           ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(
+                            255,
+                            238,
+                            236,
+                            236,
+                          ).withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.delete,
+                          size: 18,
+                          color: Color.fromARGB(255, 193, 16, 4),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
