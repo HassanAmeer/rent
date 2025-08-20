@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rent/constants/appColors.dart';
 import 'Auth/login.dart';
 import 'Auth/signup.dart';
@@ -8,8 +12,12 @@ import 'design/listing/listing_page.dart';
 
 GlobalKey<NavigatorState> contextKey = GlobalKey();
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Hive
+  Directory appDocumentsDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentsDir.path);
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

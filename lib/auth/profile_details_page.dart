@@ -164,12 +164,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const LoginPage(),
-                            ),
-                          );
+                          ref.watch(userDataClass).logout();
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

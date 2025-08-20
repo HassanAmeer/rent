@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
@@ -13,7 +14,27 @@ import 'package:rent/design/home_page.dart';
 final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 
 class UserData with ChangeNotifier {
-  var userdata = <String, dynamic>{};
+  var userdata = {};
+
+  getSorageData() async {
+    await Hive.openBox("userBox");
+    var box = Hive.box('userBox'); // File Name
+
+    var checkData = box.get('userData'); // save the user object (map) data
+    if (checkData != null) {
+      userdata = checkData;
+      notifyListeners();
+      print("user dtaa from hive box: $checkData");
+      goto(HomePage());
+    }
+  }
+
+  logout() async {
+    await Hive.openBox("userBox");
+    var box = Hive.box('userBox'); // File Name
+    var checkData = box.delete('userData');
+    goto(LoginPage());
+  }
 
   //////
   bool isLoading = false;
@@ -84,13 +105,17 @@ class UserData with ChangeNotifier {
         toast(result['msg'], backgroundColor: Colors.green);
 
         userdata = result['user'];
-        // ignore: use_build_context_synchronously
+
+        var box = Hive.box('userBox'); // File Name
+        box.put('userData', userdata); // save the user object (map) data
+
         goto(const HomePage(), canBack: false);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
       setLoading(false);
-    } catch (e) {
+    } catch (e, st) {
+      print(" 👉 login error: $e, st:$st");
       setLoading(false);
     }
   }
