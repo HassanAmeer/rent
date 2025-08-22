@@ -121,13 +121,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // yahan action likhein
-                    // User().rajisterUser("name");
-                  },
-                  child: const Text("Save"),
-                ),
               ],
             ),
           ),
