@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/Auth/homepagechart.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/Blogs.dart';
-// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/fav/fvrt.dart';
 import 'package:rent/design/help.dart';
@@ -16,6 +16,7 @@ import 'package:rent/constants/data.dart';
 
 import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
+import '../widgets/home_chart.dart'; // ✅ chart import
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -25,13 +26,11 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  // ignore: unused_field
   int _selectedIndex = 0;
 
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      // navigation logic add krna ho tu yahan kr skty ho
     });
   }
 
@@ -41,7 +40,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       appBar: AppBar(
         elevation: 0,
         title: Image.asset(imgAssets.logo, width: 100),
-
         actions: [
           InkWell(
             onTap: () {
@@ -62,9 +60,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Config.apiUrl + ref.watch(userDataClass).userdata['image'] ??
                     '',
                 fit: BoxFit.cover,
-                // imgLinks.profileImage,
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.person, color: Colors.white);
+                  return const Icon(Icons.person, color: Colors.white);
                 },
               ),
             ),
@@ -86,16 +83,48 @@ class _HomePageState extends ConsumerState<HomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // ✅ Chart Box
             Container(
-              height: 220,
+              padding: const EdgeInsets.all(8),
+              height: 260,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(child: Text("Chart Area")),
+              child: Column(
+                children: const [
+                  Expanded(child: HomeChart()),
+                  SizedBox(height: 8),
+                ],
+              ),
             ),
+            const SizedBox(height: 10),
+            // ✅ Legend
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Container(width: 15, height: 15, color: Colors.orange),
+                    const SizedBox(width: 5),
+                    const Text("My Bookings"),
+                  ],
+                ),
+                const SizedBox(width: 20),
+                Row(
+                  children: [
+                    Container(width: 15, height: 15, color: Colors.blue),
+                    const SizedBox(width: 5),
+                    const Text("My Rentals"),
+                  ],
+                ),
+              ],
+            ),
+
             const SizedBox(height: 20),
+
+            // ✅ Earnings & Rating Row
             Row(
               children: [
                 Expanded(
@@ -115,8 +144,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             color: AppColors.mainColor,
                           ),
                         ),
-                        SizedBox(height: 5),
-                        Text(
+                        const SizedBox(height: 5),
+                        const Text(
                           "\$1234.00",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -153,7 +182,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
+
             const SizedBox(height: 20),
+
+            // ✅ Favorities & Rentals Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -167,7 +199,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       );
                     },
                     child: Container(
-                      // height: 100,
                       width: 145,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
@@ -184,9 +215,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                               color: AppColors.mainColor,
                               size: 50,
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              " My Favorities",
+                            const SizedBox(height: 10),
+                            const Text(
+                              "My Favorities",
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -236,7 +267,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 20),
+
+            // ✅ Help & Blogs Row
             Row(
               children: [
                 Expanded(
@@ -262,13 +296,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                             color: AppColors.mainColor,
                             size: 50,
                           ),
-                          SizedBox(height: 10),
-
-                          Text(
+                          const SizedBox(height: 10),
+                          const Text(
                             "Help & support",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 12, 12, 12),
+                              color: Color.fromARGB(255, 12, 12, 12),
                             ),
                           ),
                         ],
@@ -300,8 +333,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             color: AppColors.mainColor,
                             size: 50,
                           ),
-                          SizedBox(height: 10),
-                          Text(
+                          const SizedBox(height: 10),
+                          const Text(
                             "Blogs",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -312,20 +345,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ],
             ),
+
             const SizedBox(height: 15),
+
+            // ✅ All Items Button
             InkWell(
               onTap: () {
                 goto(AllItemsPage());
               },
               child: Container(
-                // height: 30,
                 width: 300,
                 decoration: BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
+                child: const Padding(
+                  padding: EdgeInsets.all(14),
                   child: Center(
                     child: Text(
                       "All Items",
