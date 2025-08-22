@@ -27,7 +27,11 @@ class _HelpState extends ConsumerState<Help> {
 
         title: Text(
           "Help and support",
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 

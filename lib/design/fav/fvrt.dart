@@ -179,7 +179,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                 children: [
                                   CacheImageWidget(
                                     isCircle: false,
-                                    height: 150,
+                                    height: 130,
                                     width: 165,
                                     url:
                                         item['products']['images']! != null ||
