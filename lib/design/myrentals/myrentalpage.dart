@@ -77,7 +77,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                           search: searchfeildcontroller.text,
                         );
                   },
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -172,18 +172,10 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
         backgroundColor: AppColors.btnBgColor,
         child: Icon(Icons.add, color: AppColors.btnIconColor),
       ),
-
-      // Floating Action Button for Add New rental
-
-      // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );
   }
 
   Widget _buildRentalItem(BuildContext context, dynamic rental) {
-    // ✅ Fixed status: No backend/API logic now, always shows "Delivered"
-    const status = 'Delivered';
-    final statusColor = Colors.green;
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -201,20 +193,13 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left-side icons column
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 18,
-                  horizontal: 6,
-                ),
-              ),
-
+              const SizedBox(width: 6),
               // Main content (image and texts, centered)
-              InkWell(
-                onTap: () {
-                  goto(Rentaldetails(renting: rental));
-                },
-                child: Expanded(
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    goto(Rentaldetails(renting: rental));
+                  },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Column(
@@ -222,13 +207,21 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: CacheImageWidget(
-                            isCircle: false,
-                            url: _getImageUrl(rental),
-                            height: 85,
-                            width: 100,
+                          child: SizedBox(
+                            height: 90,
+                            width: 130,
+                            child: FittedBox(
+                              fit: BoxFit.cover, // ✅ hamesha container me fit
+                              child: CacheImageWidget(
+                                isCircle: false,
+                                url: _getImageUrl(rental),
+                                height: 90,
+                                width: 130,
+                              ),
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 6),
                         Text(
                           _getProductTitle(rental),
                           style: const TextStyle(
@@ -267,21 +260,6 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
             child: _statusLabel(rental["deliverd"].toString()),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _iconCircleButton(
-    IconData icon,
-    Color iconColor,
-    VoidCallback onPressed,
-  ) {
-    return InkWell(
-      onTap: onPressed,
-      child: CircleAvatar(
-        radius: 15,
-        backgroundColor: Colors.black,
-        child: Icon(icon, color: iconColor, size: 16.5),
       ),
     );
   }
@@ -335,11 +313,10 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
       if (rental['orderby'] != null && rental['orderby']['name'] != null) {
         return rental['orderby']['name'].toString();
       }
-      // Try alternative field names
       if (rental['user'] != null && rental['user']['name'] != null) {
         return rental['user']['name'].toString();
       }
-      if (rental['productby']["name"] != null) {
+      if (rental['productby']?["name"] != null) {
         return rental['productby']["name"].toString();
       }
     } catch (e) {

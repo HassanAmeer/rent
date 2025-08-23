@@ -10,6 +10,7 @@ import '../../constants/data.dart';
 import '../../widgets/casheimage.dart';
 
 class Blogs extends ConsumerStatefulWidget {
+  
   const Blogs({super.key});
 
   @override
@@ -45,7 +46,7 @@ class _BlogsState extends ConsumerState<Blogs> {
       body: blogProvider.isLoading
           ? const Center(
               child: Padding(
-                padding: EdgeInsets.only(top: 200),
+                padding: EdgeInsets.only(top: 250),
                 child: DotLoader(),
               ),
             )
@@ -103,11 +104,14 @@ class _BlogsState extends ConsumerState<Blogs> {
                       ),
 
                       const SizedBox(height: 4),
+
+
                     ],
                   ),
                 );
               },
             ),
+            
     );
   }
 }

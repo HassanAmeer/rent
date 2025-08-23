@@ -26,6 +26,16 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  // var sum1 = 0;
+  // sum(int a, int b, int c) {
+  //   sum1 = a + b + c;
+  // }
+
+  // int multiply(int nmbr) {
+  //   return nmbr * 5;
+  // }
+
+  // var total = 0;
   int _selectedIndex = 0;
 
   void _onTabTapped(int index) {
@@ -373,6 +383,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
             ),
+            // TextButton(
+            //   onPressed: () {
+            //     setState(() {
+            //       sum(3, 6, 2);
+            //       total = multiply(sum1);
+            //     });
+            //   },
+            //   child: Text("payment"),
+            // ),
+            // Text("amount: $total"),
+            // const SizedBox(height: 20),
           ],
         ),
       ),
