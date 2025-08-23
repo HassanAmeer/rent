@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/Auth/homepagechart.dart';
+import 'package:http/http.dart' as http;
+import 'package:rent/apidata/dashboardapi.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
+import 'package:rent/constants/toast.dart';
 import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/Blogs.dart';
 import 'package:rent/constants/goto.dart';
@@ -13,11 +17,104 @@ import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/notify/notificationpage.dart';
 import 'package:rent/design/myrentals/myrentalpage.dart';
 import 'package:rent/constants/data.dart';
-
 import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
-import '../widgets/home_chart.dart'; // ✅ chart import
 
+class HomeChart extends ConsumerStatefulWidget {
+  final List<double> bookingsData;
+  final List<double> rentalsData;
+  final List<String> labels;
+
+  const HomeChart({
+    super.key,
+    required this.bookingsData,
+    required this.rentalsData,
+    required this.labels,
+  });
+
+  @override
+  ConsumerState<HomeChart> createState() => _HomeChartState();
+}
+
+class _HomeChartState extends ConsumerState<HomeChart> {
+  void InitState() {
+    super.initState();
+    ref.read(dashboardProvider).fetchDashboard();
+    uid:
+    ref.watch(userDataClass).userdata['id'].toString();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 270,
+
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(show: true),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value.toInt() < widget.labels.length) {
+                    return Transform.rotate(
+                      angle: -0.5,
+                      child: Text(
+                        widget.labels[value.toInt()],
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                    );
+                  }
+                  return const Text('');
+                },
+              ),
+            ),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
+          ),
+
+          lineBarsData: [
+            // My Bookings (orange)
+            LineChartBarData(
+              spots: widget.bookingsData.asMap().entries.map((entry) {
+                return FlSpot(entry.key.toDouble(), entry.value);
+              }).toList(),
+              isCurved: false,
+              color: Colors.orange,
+              barWidth: 2,
+              belowBarData: BarAreaData(
+                show: true,
+                color: Colors.orange.withOpacity(0.2),
+              ),
+              dotData: FlDotData(show: true),
+            ),
+
+            // My Rentals (blue)
+            LineChartBarData(
+              spots: widget.rentalsData.asMap().entries.map((entry) {
+                return FlSpot(entry.key.toDouble(), entry.value);
+              }).toList(),
+              isCurved: false,
+              color: Colors.blue,
+              barWidth: 2,
+              belowBarData: BarAreaData(
+                show: true,
+                color: Colors.blue.withOpacity(0.2),
+              ),
+              dotData: FlDotData(show: true),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -26,21 +123,84 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  int _selectedIndex = 0;
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
+  @override
+  void initState() {
+    super.initState();
+    // Fetch dashboard data when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(dashboardProvider).fetchDashboard();
     });
+  }
+
+  // Helper method to parse double lists safely
+  List<double> _parseDynamicList(dynamic data, List<double> defaultValue) {
+    if (data == null || data is! List) {
+      return defaultValue;
+    }
+
+    try {
+      return data.map((e) {
+        if (e == null) return 0.0;
+        if (e is double) return e;
+        if (e is int) return e.toDouble();
+        if (e is String) return double.tryParse(e) ?? 0.0;
+        return 0.0;
+      }).toList();
+    } catch (e) {
+      print("Error parsing double list: $e");
+      return defaultValue;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final dashboardService = ref.watch(dashboardProvider);
+
+    // Extract data from dashboard
+    final dashboardData = dashboardService.dashboardData;
+    final totalEarnings =
+        dashboardData['total_earning']?.toString() ?? '\$0.00';
+    final totalRating = dashboardData['total_rating']?.toString() ?? '0.0';
+
+    // Extract chart data with safe parsing
+    List<double> bookingsData = _parseDynamicList(
+      dashboardData['bookings_data'],
+      [2, 19, 2, 0, 1, 3],
+    );
+    List<double> rentalsData = _parseDynamicList(
+      dashboardData['rentals_data'],
+      [1, 13, 0, 0, 0.5, 2],
+    );
+
+    final List<String> chartLabels = (dashboardData['chart_labels'] is List)
+        ? (dashboardData['chart_labels'] as List)
+              .map((e) => e?.toString() ?? '')
+              .toList()
+        : [
+            "Electrical Box",
+            "Violin",
+            "Type Writer",
+            "Bounce House",
+            "Kia Sole",
+            "Kayak",
+          ];
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: Image.asset(imgAssets.logo, width: 100),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => NotificationPage(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.notifications, size: 30),
+          ),
           InkWell(
             onTap: () {
               Navigator.push(
@@ -51,55 +211,46 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.cyan.shade700,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(30),
               ),
-              width: 35,
-              height: 35,
+              width: 40,
+              height: 40,
               clipBehavior: Clip.antiAlias,
               child: Image.network(
-                Config.apiUrl + ref.watch(userDataClass).userdata['image'] ??
-                    '',
+                Config.imgUrl + ref.watch(userDataClass).userdata['image'],
+                semanticLabel: ImgLinks.profileImage,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Icon(Icons.person, color: Colors.white);
-                },
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.person, color: Colors.white, size: 24),
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => NotificationPage(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.notifications),
-          ),
+          SizedBox(width: 12),
         ],
       ),
+
+      /// ✅ Body
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // ✅ Chart Box
-            Container(
-              padding: const EdgeInsets.all(8),
-              height: 260,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: const [
-                  Expanded(child: HomeChart()),
-                  SizedBox(height: 8),
-                ],
+            Text(
+              "OverAll",
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 25),
+            // ✅ Chart - Container removed, only chart remains
+            HomeChart(
+              bookingsData: bookingsData,
+              rentalsData: rentalsData,
+              labels: chartLabels,
+            ),
+            const SizedBox(height: 26),
+
             // ✅ Legend
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -131,9 +282,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Container(
                     height: 80,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -145,9 +293,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        const Text(
-                          "\$1234.00",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          totalEarnings,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -158,10 +306,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: Container(
                     height: 80,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
@@ -171,10 +316,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                             color: AppColors.mainColor,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
-                          "4.5 ⭐",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          "$totalRating ⭐",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

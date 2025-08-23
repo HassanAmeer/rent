@@ -4,10 +4,11 @@ import 'package:rent/widgets/dotloader.dart';
 
 class CacheImageWidget extends StatelessWidget {
   String url;
-  int width;
-  int height;
+  double width;
+  double height;
   bool isCircle;
   double radius;
+  BoxFit fit;
   CacheImageWidget({
     super.key,
     this.url = "http://via.placeholder.com/350x150",
@@ -15,6 +16,7 @@ class CacheImageWidget extends StatelessWidget {
     this.height = 100,
     this.radius = 100,
     this.isCircle = true,
+    this.fit = BoxFit.cover,
   });
 
   @override
@@ -29,7 +31,7 @@ class CacheImageWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(radius),
               child: CachedNetworkImage(
                 imageUrl: url,
-                fit: BoxFit.cover,
+                fit: fit,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     DotLoader(),
                 errorWidget: (context, url, error) =>
@@ -38,7 +40,7 @@ class CacheImageWidget extends StatelessWidget {
             )
           : CachedNetworkImage(
               imageUrl: url,
-              fit: BoxFit.cover,
+              fit: fit,
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   DotLoader(),
               errorWidget: (context, url, error) =>

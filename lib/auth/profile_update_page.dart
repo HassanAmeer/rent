@@ -1,17 +1,12 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
-// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
-
-// import '../widgets/casheimage.dart'
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -47,13 +42,65 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
   }
 
   void _loadData() async {
-    // Simulate loading delay
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    setState(() {
+      isPickingImage = true;
+    });
+    try {
+      var pickedFile = await ImagePicker().pickImage(source: source);
+      if (pickedFile != null && mounted) {
+        setState(() {
+          pikedImage = pickedFile.path;
+          isPickingImage = false;
+        });
+      } else {
+        setState(() {
+          isPickingImage = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isPickingImage = false;
+      });
+    }
+  }
+
+  void _showImagePickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext ctx) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -79,14 +126,12 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Top Row with Profile Image and "Pick Images"
+                  // Top Row with Profile Image and Edit button
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Profile picture with edit icon
                       Stack(
                         children: [
-                          // Show loading, picked image, or default image
                           isPickingImage
                               ? Container(
                                   width: 100,
@@ -145,37 +190,8 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                             right: 0,
                             bottom: 0,
                             child: InkWell(
-                              onTap: () async {
-                                setState(() {
-                                  isPickingImage = true;
-                                });
-
-                                try {
-                                  var pickedFile = await ImagePicker()
-                                      .pickImage(source: ImageSource.gallery);
-
-                                  if (pickedFile != null) {
-                                    // Simulate processing time
-                                    await Future.delayed(
-                                      const Duration(milliseconds: 500),
-                                    );
-
-                                    if (mounted) {
-                                      setState(() {
-                                        pikedImage = pickedFile.path;
-                                        isPickingImage = false;
-                                      });
-                                    }
-                                  } else {
-                                    setState(() {
-                                      isPickingImage = false;
-                                    });
-                                  }
-                                } catch (e) {
-                                  setState(() {
-                                    isPickingImage = false;
-                                  });
-                                }
+                              onTap: () {
+                                _showImagePickerOptions(context);
                               },
                               child: CircleAvatar(
                                 radius: 15,
@@ -190,14 +206,11 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                           ),
                         ],
                       ),
-
-                      // Pick Images text
                     ],
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Name field
                   TextField(
                     controller: nameController,
                     decoration: InputDecoration(
@@ -214,7 +227,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 10),
 
-                  // Phone field
                   TextField(
                     controller: phoneController,
                     decoration: InputDecoration(
@@ -232,7 +244,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 10),
 
-                  // Email field
                   TextField(
                     controller: emailController,
                     decoration: InputDecoration(
@@ -250,7 +261,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 10),
 
-                  // About Us multiline field
                   TextField(
                     controller: aboutController,
                     maxLines: 4,
@@ -268,7 +278,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 10),
 
-                  // Address multiline field
                   TextField(
                     controller: addressController,
                     maxLines: 3,
@@ -286,7 +295,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 20),
 
-                  // Verified By text
                   Row(
                     children: const [
                       Text(
@@ -307,7 +315,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 20),
 
-                  // Send Emails toggle
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -328,7 +335,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 10),
 
-                  // Privacy Policy and Terms checkboxes
                   Row(
                     children: [
                       Checkbox(
@@ -342,7 +348,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                       const Text("I accept the "),
                       GestureDetector(
                         onTap: () {
-                          // open privacy policy link
+                          // open privacy policy
                         },
                         child: const Text(
                           "Privacy Policy",
@@ -368,7 +374,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                   const SizedBox(height: 20),
 
-                  // Update Profile button
                   SizedBox(
                     width: double.infinity,
                     height: 45,
@@ -389,7 +394,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                                     imagePath: pikedImage,
                                   );
                             }
-                          : null, // Disable if not accepted or updating
+                          : null,
                       child: ref.watch(userDataClass).isLoading
                           ? const DotLoader()
                           : const Text(
