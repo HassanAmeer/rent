@@ -85,8 +85,8 @@ class _BlogsState extends ConsumerState<Blogs> {
                           url: imageUrl != null && imageUrl.isNotEmpty
                               ? Config.imgUrl + imageUrl
                               : ImgLinks.product,
-                          height: (ScreenSize.height * 0.24).toInt(),
-                          width: ScreenSize.width.toInt(),
+                          height: ScreenSize.height * 0.24,
+                          width: ScreenSize.width,
                         ),
                       ),
 

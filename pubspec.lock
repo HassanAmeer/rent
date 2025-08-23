@@ -813,6 +813,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.6"
+  transparent_route:
+    dependency: "direct main"
+    description:
+      name: transparent_route
+      sha256: "054447a7dcfdb894a6dda25c75c9c001693c944f25f4492acb36c621eedb3057"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   typed_data:
     dependency: transitive
     description:

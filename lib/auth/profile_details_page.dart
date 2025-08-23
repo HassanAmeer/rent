@@ -8,8 +8,11 @@ import 'package:rent/apidata/user.dart' show userDataClass;
 // import 'package:rent/auth/login.dart';
 import 'package:rent/constants/data.dart';
 import 'package:rent/Auth/login.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:transparent_route/transparent_route.dart';
 // import '../apidata/user.dart';
 import '../widgets/btmnavbar.dart';
 // import '../apidata/user.dart';
@@ -75,21 +78,43 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     //     ),
                     //   ),
                     // ),
-                    CacheImageWidget(
-                      width: 100,
-                      height: 100,
-                      isCircle: true,
-                      radius: 200,
-                      url:
-                          (ref.watch(userDataClass).userdata['image'] != null &&
-                              ref
-                                  .watch(userDataClass)
-                                  .userdata['image']
-                                  .toString()
-                                  .isNotEmpty)
-                          ? Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image']
-                          : ImgLinks.profileImage,
+                    InkWell(
+                      onTap: () {
+                        pushScreen(
+                          context,
+                          Profileview(
+                            imagelink:
+                                (ref.watch(userDataClass).userdata['image'] !=
+                                        null &&
+                                    ref
+                                        .watch(userDataClass)
+                                        .userdata['image']
+                                        .toString()
+                                        .isNotEmpty)
+                                ? Config.imgUrl +
+                                      ref.watch(userDataClass).userdata['image']
+                                : ImgLinks.profileImage,
+                          ),
+                          isTransparent: true,
+                        );
+                      },
+                      child: CacheImageWidget(
+                        width: 100,
+                        height: 100,
+                        isCircle: true,
+                        radius: 200,
+                        url:
+                            (ref.watch(userDataClass).userdata['image'] !=
+                                    null &&
+                                ref
+                                    .watch(userDataClass)
+                                    .userdata['image']
+                                    .toString()
+                                    .isNotEmpty)
+                            ? Config.imgUrl +
+                                  ref.watch(userDataClass).userdata['image']
+                            : ImgLinks.profileImage,
+                      ),
                     ),
 
                     const SizedBox(height: 20),
@@ -194,6 +219,54 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
         },
       ),
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 4),
+    );
+  }
+}
+
+///////////for profileview widget page
+class Profileview extends StatelessWidget {
+  final String imagelink;
+  const Profileview({super.key, required this.imagelink});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        // backgroundBlendMode: BlendMode.darken,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.black54,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios, color: Colors.grey),
+          ),
+        ),
+        body: InkWell(
+          onTapUp: (v) {
+            Navigator.pop(context);
+          },
+          child: Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Hero(
+                tag: "123",
+                child: CacheImageWidget(
+                  url: imagelink,
+                  isCircle: false,
+                  fit: BoxFit.contain,
+                  height: ScreenSize.height * 0.7,
+                  width: ScreenSize.width,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
