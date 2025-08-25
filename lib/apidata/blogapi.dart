@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
 
 // ✅ Provider for Blogs
@@ -27,6 +28,8 @@ class BlogData with ChangeNotifier {
     String search = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching all blogs...");
 
       setLoading(true, loadingFor);
@@ -61,6 +64,8 @@ class BlogData with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching blog details for ID: $blogId");
 
       setLoading(true, loadingFor);

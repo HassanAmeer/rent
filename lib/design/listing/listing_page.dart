@@ -96,8 +96,6 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       child: DotLoader(),
                     ),
                   )
-                // : ref.watch(listingDataProvider).notify.isEmpty
-                // ? const Center(child: Text("Notifications Empty"))
                 : Expanded(
                     child: GridView.builder(
                       gridDelegate:

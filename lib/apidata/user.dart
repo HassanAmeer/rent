@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
@@ -46,9 +47,13 @@ class UserData with ChangeNotifier {
 
   register({String? name, String? email, String? password}) async {
     try {
+      // 🔹 Step 1: Internet check
+      if (await checkInternet() == false) return;
+
       setLoading(true);
       notifyListeners();
 
+      // 🔹 Step 2: Check fields
       if (name == null || email == null || password == null) {
         toast("Please fill all fields", backgroundColor: Colors.red);
         setLoading(false);
@@ -57,18 +62,14 @@ class UserData with ChangeNotifier {
 
       final url = Uri.parse('https://thelocalrent.com/api/register');
 
-      setLoading(true);
+      // 🔹 Step 3: API call
       final response = await http.post(
         url,
         body: {'name': name, 'email': email, 'password': password},
       );
 
-      // debugPrint("👉Response status: ${response.statusCode}");
-      // debugPrint("Response body: ${response.body}");
-
       final data = json.decode(response.body);
 
-      await Future.delayed(const Duration(seconds: 3), () {});
       setLoading(false);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -80,8 +81,6 @@ class UserData with ChangeNotifier {
       } else {
         toast(data['errors'].toString(), backgroundColor: Colors.red);
       }
-
-      setLoading(false);
     } catch (e) {
       setLoading(false);
       toast("Error: $e", backgroundColor: Colors.red);
@@ -90,30 +89,37 @@ class UserData with ChangeNotifier {
 
   Future login({required String email, required String password}) async {
     try {
+      // 🔹 Step 1: Internet check karo
+      if (await checkInternet() == false) return;
+
       setLoading(true);
+
+      // 🔹 Step 2: API call
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/login"),
         body: {'email': email, 'password': password},
       );
+
       debugPrint("Response status: ${response.statusCode}");
       debugPrint("Response body: ${response.body}");
+
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
       setLoading(false);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg'], backgroundColor: Colors.green);
 
-        userdata = result['user'];
+        var userdata = result['user'];
 
-        var box = Hive.box('userBox'); // File Name
-        box.put('userData', userdata); // save the user object (map) data
+        var box = Hive.box('userBox');
+        box.put('userData', userdata);
 
         goto(const HomePage(), canBack: false);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
-      setLoading(false);
     } catch (e, st) {
       print(" 👉 login error: $e, st:$st");
       setLoading(false);
@@ -123,6 +129,8 @@ class UserData with ChangeNotifier {
 
   Future getProfileData() async {
     try {
+      if (await checkInternet() == false) return;
+
       setLoading(true);
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/getuserbyid/${userdata['id']}"),
@@ -153,6 +161,8 @@ class UserData with ChangeNotifier {
     String imagePath = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       ////
       setLoading(true);
       var req = http.MultipartRequest(

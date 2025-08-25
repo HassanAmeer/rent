@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
@@ -19,8 +20,6 @@ final Dashboardprovider = ChangeNotifierProvider<Dashboard>(
 );
 
 class Dashboard with ChangeNotifier {
-  
-
   //////
   String loadingfor = "";
   setLoading([String value = ""]) {
@@ -32,9 +31,9 @@ class Dashboard with ChangeNotifier {
   dash({
     required String uid,
     var loadingfor = "",
-    var name= "",
-    var email="",
-    var password="",
+    var name = "",
+    var email = "",
+    var password = "",
   }) async {
     try {
       setLoading(loadingfor);

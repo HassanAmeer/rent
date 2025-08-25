@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/help&supportapi.dart';
+import 'package:rent/widgets/dotloader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Help extends ConsumerStatefulWidget {
@@ -12,11 +13,11 @@ class Help extends ConsumerStatefulWidget {
 
 class _HelpState extends ConsumerState<Help> {
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((v) {
-      // ref.read(userDataClass).userdata['id']?.toString() ?? '1';
-      ref.read(SupportProvider).contectus();
-    });
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((v) {
+      ref.read(SupportProvider).contectus(loadingFor: "123");
+    });
   }
 
   @override
@@ -38,9 +39,7 @@ class _HelpState extends ConsumerState<Help> {
       body: Center(
         child: Column(
           children: [
-            SizedBox(height: 7),
-
-            SizedBox(height: 20),
+            SizedBox(height: 27),
             Padding(
               padding: const EdgeInsets.only(right: 150),
               child: Text(
@@ -71,42 +70,47 @@ class _HelpState extends ConsumerState<Help> {
               ),
             ),
             SizedBox(height: 10),
+            ref.watch(SupportProvider).loadingFor == "123"
+                ? const Center(child: DotLoader())
+                : ref.watch(SupportProvider).settings.isEmpty
+                ? Center(child: Text("Email is Empty"))
+                : ListTile(
+                    title: Text(
+                      "Email:",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () {
+                      String? encodeQueryParameters(
+                        Map<String, String> params,
+                      ) {
+                        return params.entries
+                            .map(
+                              (MapEntry<String, String> e) =>
+                                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+                            )
+                            .join('&');
+                      }
 
-            ListTile(
-              title: Text(
-                "Email:",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () {
-                String? encodeQueryParameters(Map<String, String> params) {
-                  return params.entries
-                      .map(
-                        (MapEntry<String, String> e) =>
-                            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
-                      )
-                      .join('&');
-                }
+                      // ···
+                      final Uri emailLaunchUri = Uri(
+                        scheme: 'mailto',
+                        path: 'smith@example.com',
+                        query: encodeQueryParameters(<String, String>{
+                          'subject': 'Hey: welcome to the Local rent',
+                        }),
+                      );
 
-                // ···
-                final Uri emailLaunchUri = Uri(
-                  scheme: 'mailto',
-                  path: 'smith@example.com',
-                  query: encodeQueryParameters(<String, String>{
-                    'subject': 'Hey: welcome to the Local rent',
-                  }),
-                );
+                      launchUrl(emailLaunchUri);
+                    },
 
-                launchUrl(emailLaunchUri);
-              },
-
-              subtitle: Text(
-                ' ${ref.read(SupportProvider).settings["email"]}',
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
+                    subtitle: Text(
+                      ' ${ref.read(SupportProvider).settings["email"]}',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
             SizedBox(height: 10),
             ListTile(
               title: Text(
