@@ -17,102 +17,9 @@ import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/notify/notificationpage.dart';
 import 'package:rent/design/myrentals/myrentalpage.dart';
 import 'package:rent/constants/data.dart';
+import 'package:rent/widgets/casheimage.dart';
 import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
-
-class HomeChart extends ConsumerStatefulWidget {
-  final List<double> bookingsData;
-  final List<double> rentalsData;
-  final List<String> labels;
-
-  const HomeChart({
-    super.key,
-    required this.bookingsData,
-    required this.rentalsData,
-    required this.labels,
-  });
-
-  @override
-  ConsumerState<HomeChart> createState() => _HomeChartState();
-}
-
-class _HomeChartState extends ConsumerState<HomeChart> {
-  void InitState() {
-    super.initState();
-    ref.read(dashboardProvider).fetchDashboard();
-    uid:
-    ref.watch(userDataClass).userdata['id'].toString();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 270,
-
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: true),
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() < widget.labels.length) {
-                    return Transform.rotate(
-                      angle: -0.5,
-                      child: Text(
-                        widget.labels[value.toInt()],
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    );
-                  }
-                  return const Text('');
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-          ),
-
-          lineBarsData: [
-            // My Bookings (orange)
-            LineChartBarData(
-              spots: widget.bookingsData.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), entry.value);
-              }).toList(),
-              isCurved: false,
-              color: Colors.orange,
-              barWidth: 2,
-              belowBarData: BarAreaData(
-                show: true,
-                color: Colors.orange.withOpacity(0.2),
-              ),
-              dotData: FlDotData(show: true),
-            ),
-
-            // My Rentals (blue)
-            LineChartBarData(
-              spots: widget.rentalsData.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), entry.value);
-              }).toList(),
-              isCurved: false,
-              color: Colors.blue,
-              barWidth: 2,
-              belowBarData: BarAreaData(
-                show: true,
-                color: Colors.blue.withOpacity(0.2),
-              ),
-              dotData: FlDotData(show: true),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 /// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {
@@ -128,6 +35,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     // Fetch dashboard data when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(userDataClass).getProfileData();
       ref.read(dashboardProvider).fetchDashboard();
     });
   }
@@ -162,29 +70,18 @@ class _HomePageState extends ConsumerState<HomePage> {
         dashboardData['total_earning']?.toString() ?? '\$0.00';
     final totalRating = dashboardData['total_rating']?.toString() ?? '0.0';
 
-    // Extract chart data with safe parsing
-    List<double> bookingsData = _parseDynamicList(
-      dashboardData['bookings_data'],
-      [2, 19, 2, 0, 1, 3],
-    );
-    List<double> rentalsData = _parseDynamicList(
-      dashboardData['rentals_data'],
-      [1, 13, 0, 0, 0.5, 2],
-    );
-
-    final List<String> chartLabels = (dashboardData['chart_labels'] is List)
-        ? (dashboardData['chart_labels'] as List)
-              .map((e) => e?.toString() ?? '')
-              .toList()
-        : [
-            "Electrical Box",
-            "Violin",
-            "Type Writer",
-            "Bounce House",
-            "Kia Sole",
-            "Kayak",
-          ];
-
+    final List<double> bookingsData = [2, 2, 0, 0, 2, 0, 0, 0];
+    final List<double> rentalsData = [1, 0, 0, 0, 1, 0, 0, 0];
+    final List<String> labels = [
+      "Electrical Box",
+      "Vintage Type Writer",
+      "Bounce House",
+      "Kia Sole",
+      "Kayake",
+      "Violin",
+      "Alice Costume",
+      "DevBeast",
+    ];
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -216,12 +113,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               width: 40,
               height: 40,
               clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                Config.imgUrl + ref.watch(userDataClass).userdata['image'],
-                semanticLabel: ImgLinks.profileImage,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.white, size: 24),
+              child: CacheImageWidget(
+                url: Config.imgUrl + ref.watch(userDataClass).userdata['image'],
               ),
             ),
           ),
@@ -247,7 +140,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             HomeChart(
               bookingsData: bookingsData,
               rentalsData: rentalsData,
-              labels: chartLabels,
+              labels: labels,
             ),
             const SizedBox(height: 26),
 
@@ -534,6 +427,151 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
 
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
+    );
+  }
+}
+
+class HomeChart extends ConsumerStatefulWidget {
+  final List<double> bookingsData;
+  final List<double> rentalsData;
+  final List<String> labels;
+  const HomeChart({
+    super.key,
+    required this.bookingsData,
+    required this.rentalsData,
+    required this.labels,
+  });
+
+  @override
+  ConsumerState<HomeChart> createState() => _HomeChartState();
+}
+
+class _HomeChartState extends ConsumerState<HomeChart> {
+  // 🔹 Dummy static data
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Title
+        const Text(
+          "Overall",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Legend Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Container(width: 20, height: 3, color: Colors.orange),
+                const SizedBox(width: 5),
+                const Text("My Bookings"),
+              ],
+            ),
+            const SizedBox(width: 20),
+            Row(
+              children: [
+                Container(width: 20, height: 3, color: Colors.blue),
+                const SizedBox(width: 5),
+                const Text("My Rentals"),
+              ],
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 15),
+
+        SizedBox(
+          height: 300,
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: true),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                // 🔹 Bottom side (X-axis) → Product names
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      if (value.toInt() < widget.labels.length) {
+                        return Transform.rotate(
+                          angle: -0.5, // rotate a little
+                          child: Text(
+                            widget.labels[value.toInt()],
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        );
+                      }
+                      return const Text('');
+                    },
+                  ),
+                ),
+
+                // 🔹 Hide top & right
+                topTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+
+                // 🔹 Left side (Y-axis) → fixed ratio values
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 0.5, // steps (0.0, 0.5, 1.0 …)
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        value.toStringAsFixed(1), // show 1 decimal
+                        style: const TextStyle(fontSize: 10),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              minY: 0,
+              maxY: 3, // adjust according to your needs
+
+              lineBarsData: [
+                // My Bookings (orange)
+                LineChartBarData(
+                  spots: widget.bookingsData.asMap().entries.map((entry) {
+                    return FlSpot(entry.key.toDouble(), entry.value);
+                  }).toList(),
+                  isCurved: false,
+                  color: Colors.orange,
+                  barWidth: 2,
+                  belowBarData: BarAreaData(
+                    show: true,
+                    color: Colors.orange.withOpacity(0.2),
+                  ),
+                  dotData: FlDotData(show: true),
+                ),
+
+                // My Rentals (blue)
+                LineChartBarData(
+                  spots: widget.rentalsData.asMap().entries.map((entry) {
+                    return FlSpot(entry.key.toDouble(), entry.value);
+                  }).toList(),
+                  isCurved: false,
+                  color: Colors.blue,
+                  barWidth: 2,
+                  belowBarData: BarAreaData(
+                    show: true,
+                    color: Colors.blue.withOpacity(0.2),
+                  ),
+                  dotData: FlDotData(show: true),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
