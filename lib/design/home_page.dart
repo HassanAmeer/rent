@@ -17,104 +17,10 @@ import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/notify/notificationpage.dart';
 import 'package:rent/design/myrentals/myrentalpage.dart';
 import 'package:rent/constants/data.dart';
+import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/dotloader.dart';
 import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
-
-class HomeChart extends ConsumerStatefulWidget {
-  final List<double> bookingsData;
-  final List<double> rentalsData;
-  final List<String> labels;
-
-  const HomeChart({
-    super.key,
-    required this.bookingsData,
-    required this.rentalsData,
-    required this.labels,
-  });
-
-  @override
-  ConsumerState<HomeChart> createState() => _HomeChartState();
-}
-
-class _HomeChartState extends ConsumerState<HomeChart> {
-  void InitState() {
-    super.initState();
-    ref.read(dashboardProvider).fetchDashboard();
-    uid:
-    ref.watch(userDataClass).userdata['id'].toString();
-      ref.watch(userDataClass).getProfileData();
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 270,
-
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: true),
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() < widget.labels.length) {
-                    return Transform.rotate(
-                      angle: -0.5,
-                      child: Text(
-                        widget.labels[value.toInt()],
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                    );
-                  }
-                  return const Text('');
-                },
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-          ),
-
-          lineBarsData: [
-            // My Bookings (orange)
-            LineChartBarData(
-              spots: widget.bookingsData.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), entry.value);
-              }).toList(),
-              isCurved: false,
-              color: Colors.orange,
-              barWidth: 2,
-              belowBarData: BarAreaData(
-                show: true,
-                color: Colors.orange.withOpacity(0.2),
-              ),
-              dotData: FlDotData(show: true),
-            ),
-
-            // My Rentals (blue)
-            LineChartBarData(
-              spots: widget.rentalsData.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), entry.value);
-              }).toList(),
-              isCurved: false,
-              color: Colors.blue,
-              barWidth: 2,
-              belowBarData: BarAreaData(
-                show: true,
-                color: Colors.blue.withOpacity(0.2),
-              ),
-              dotData: FlDotData(show: true),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 /// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {
@@ -130,7 +36,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     // Fetch dashboard data when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(dashboardProvider).fetchDashboard();
+      ref.watch(userDataClass).getProfileData();
+      ref
+          .read(dashboardProvider)
+          .fetchDashboard(
+            loadingfor: "dashboard",
+            uid: "${ref.watch(userDataClass).userdata['id']}",
+          );
     });
   }
 
@@ -158,35 +70,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final dashboardService = ref.watch(dashboardProvider);
 
-    // Extract data from dashboard
-    final dashboardData = dashboardService.dashboardData;
-    final totalEarnings =
-        dashboardData['total_earning']?.toString() ?? '\$0.00';
-    final totalRating = dashboardData['total_rating']?.toString() ?? '0.0';
-
-    // Extract chart data with safe parsing
-    List<double> bookingsData = _parseDynamicList(
-      dashboardData['bookings_data'],
-      [2, 19, 2, 0, 1, 3],
-    );
-    List<double> rentalsData = _parseDynamicList(
-      dashboardData['rentals_data'],
-      [1, 13, 0, 0, 0.5, 2],
-    );
-
-    final List<String> chartLabels = (dashboardData['chart_labels'] is List)
-        ? (dashboardData['chart_labels'] as List)
-              .map((e) => e?.toString() ?? '')
-              .toList()
-        : [
-            "Electrical Box",
-            "Violin",
-            "Type Writer",
-            "Bounce House",
-            "Kia Sole",
-            "Kayak",
-          ];
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -213,17 +96,13 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.cyan.shade700,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(25),
               ),
-              width: 40,
-              height: 40,
+              width: 47,
+              height: 47,
               clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                Config.imgUrl + ref.watch(userDataClass).userdata['image'],
-                semanticLabel: ImgLinks.profileImage,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.white, size: 24),
+              child: CacheImageWidget(
+                url: Config.imgUrl + ref.watch(userDataClass).userdata['image'],
               ),
             ),
           ),
@@ -236,46 +115,36 @@ class _HomePageState extends ConsumerState<HomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              "OverAll",
-              style: TextStyle(
-                color: Colors.black54,
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             SizedBox(height: 25),
-            // ✅ Chart - Container removed, only chart remains
+
+            // ✅ Sirf API wala chart
             HomeChart(
-              bookingsData: bookingsData,
-              rentalsData: rentalsData,
-              labels: chartLabels,
+              bookingsData:
+                  ref.watch(dashboardProvider).loadingfor == "dashboard "
+                  ? [0, 0, 0, 0, 0, 0, 0, 0]
+                  : _parseDynamicList(
+                      dashboardService.dashboardData['orderCountsListForChart'],
+                      [0, 0, 0, 0, 0, 0, 0, 0],
+                    ),
+              rentalsData:
+                  ref.watch(dashboardProvider).loadingfor == "dashboard "
+                  ? [0, 0, 0, 0, 0, 0, 0, 0]
+                  : _parseDynamicList(
+                      dashboardService
+                          .dashboardData["rentalCountsListForChart"],
+                      [],
+                    ),
+              labels: ref.watch(dashboardProvider).loadingfor == "dashboard "
+                  ? []
+                  : List<String>.from(
+                      dashboardService
+                              .dashboardData["productTitelsListForChart"] ??
+                          [],
+                    ),
             ),
             const SizedBox(height: 26),
 
-            // ✅ Legend
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    Container(width: 15, height: 15, color: Colors.orange),
-                    const SizedBox(width: 5),
-                    const Text("My Bookings"),
-                  ],
-                ),
-                const SizedBox(width: 20),
-                Row(
-                  children: [
-                    Container(width: 15, height: 15, color: Colors.blue),
-                    const SizedBox(width: 5),
-                    const Text("My Rentals"),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // ✅ Earnings & Rating Row
             Row(
@@ -296,7 +165,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          totalEarnings,
+                          ref.watch(dashboardProvider).loadingfor ==
+                                  "dashboard "
+                              ? "\$0.00"
+                              : dashboardService.dashboardData['totalEarning']
+                                        ?.toString() ??
+                                    '\$0.00',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -320,7 +194,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "$totalRating ⭐",
+                          ref.watch(dashboardProvider).loadingfor ==
+                                  "dashboard "
+                              ? "0.0"
+                              : dashboardService
+                                        .dashboardData['totalReviewsRatio']
+                                        ?.toString() ??
+                                    '0.0',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -330,7 +210,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // ✅ Favorities & Rentals Row
             Row(
@@ -520,23 +400,145 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
               ),
             ),
-            // TextButton(
-            //   onPressed: () {
-            //     setState(() {
-            //       sum(3, 6, 2);
-            //       total = multiply(sum1);
-            //     });
-            //   },
-            //   child: Text("payment"),
-            // ),
-            // Text("amount: $total"),
-            // const SizedBox(height: 20),
           ],
-        
         ),
       ),
 
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
+    );
+  }
+}
+
+class HomeChart extends ConsumerStatefulWidget {
+  final List<double> bookingsData;
+  final List<double> rentalsData;
+  final List<String> labels;
+  const HomeChart({
+    super.key,
+    required this.bookingsData,
+    required this.rentalsData,
+    required this.labels,
+  });
+
+  @override
+  ConsumerState<HomeChart> createState() => _HomeChartState();
+}
+
+class _HomeChartState extends ConsumerState<HomeChart> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text(
+          "Overall",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Legend Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Container(width: 20, height: 3, color: Colors.orange),
+                const SizedBox(width: 5),
+                const Text("My Bookings"),
+              ],
+            ),
+            const SizedBox(width: 20),
+            Row(
+              children: [
+                Container(width: 20, height: 3, color: Colors.blue),
+                const SizedBox(width: 5),
+                const Text("My Rentals"),
+              ],
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 18),
+
+        SizedBox(
+          height: 300,
+          child: ref.watch(dashboardProvider).loadingfor == "dashboard"
+              ? const Center(child: DotLoader())
+              : LineChart(
+                  LineChartData(
+                    gridData: FlGridData(show: true),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            if (value.toInt() < widget.labels.length) {
+                              return Transform.rotate(
+                                angle: -0.5,
+                                child: Text(
+                                  widget.labels[value.toInt()],
+                                  style: const TextStyle(fontSize: 10),
+                                ),
+                              );
+                            }
+                            return const Text('');
+                          },
+                        ),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 0.5,
+                          getTitlesWidget: (value, meta) {
+                            return Text(
+                              value.toStringAsFixed(1),
+                              style: const TextStyle(fontSize: 10),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    minY: 0,
+                    maxY: 3,
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: widget.bookingsData.asMap().entries.map((entry) {
+                          return FlSpot(entry.key.toDouble(), entry.value);
+                        }).toList(),
+                        isCurved: false,
+                        color: Colors.orange,
+                        barWidth: 2,
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: Colors.orange.withOpacity(0.2),
+                        ),
+                        dotData: FlDotData(show: true),
+                      ),
+                      LineChartBarData(
+                        spots: widget.rentalsData.asMap().entries.map((entry) {
+                          return FlSpot(entry.key.toDouble(), entry.value);
+                        }).toList(),
+                        isCurved: false,
+                        color: Colors.blue,
+                        barWidth: 2,
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: Colors.blue.withOpacity(0.2),
+                        ),
+                        dotData: FlDotData(show: true),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }

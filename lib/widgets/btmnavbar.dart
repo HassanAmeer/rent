@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rent/main.dart';
+import 'package:rent/messege.dart';
 
 import '../constants/goto.dart';
 import '../design/home_page.dart';
@@ -27,6 +29,8 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
           goto(ListingPage());
         } else if (index == 2) {
           goto(MyBookingPage());
+        } else if (index == 3) {
+          goto((MessagesHome()));
         } else if (index == 4) {
           print("fdij");
           goto(ProfileDetailsPage());

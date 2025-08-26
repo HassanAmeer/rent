@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/booking/my_booking_page.dart';
@@ -27,6 +28,8 @@ class GetAllItems with ChangeNotifier {
 
   fetchAllItems({required String loadingfor, String search = ""}) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("👉 loadingFor: $loadingfor");
       print("👉 search: $search");
       setLoading(loadingfor);
@@ -68,6 +71,8 @@ class GetAllItems with ChangeNotifier {
     String loadingFor = "",
     required BuildContext context,
   }) async {
+    if (await checkInternet() == false) return;
+
     setLoading(loadingFor);
 
     final response = await http.post(

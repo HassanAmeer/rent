@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/toast.dart';
 
 // ✅ Provider for Blogs
@@ -11,24 +12,24 @@ final SupportProvider = ChangeNotifierProvider<supportData>(
 
 class supportData with ChangeNotifier {
   // Loading state
-  var settings;
-  String loadingFor = "";
-  bool isLoading = false;
+  Map settings = {};
 
   var widget;
 
-  void setLoading(bool value, [String loadingName = ""]) {
+  String loadingFor = "";
+  setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
-    isLoading = value;
     notifyListeners();
   }
 
   /// ✅ Fetch All Blogs
-  Future<void> contectus() async {
+  Future<void> contectus({var loadingFor = ""}) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching all blogs...");
 
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/settings"),
       );
@@ -39,16 +40,16 @@ class supportData with ChangeNotifier {
       print("👉 Data: $data");
 
       if (response.statusCode == 200) {
-        settings = data['settings'] ?? []; // ✅ API ke response ke hisaab se
+        settings = data['settings'] ?? {}; // ✅ API ke response ke hisaab se
         print("👉 Blogs loaded: ${settings.length} items");
-        setLoading(false);
+        setLoading();
         notifyListeners();
       } else {
         toast(data['message'] ?? data['msg'] ?? 'Failed to fetch blogs');
-        setLoading(false);
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
+      setLoading();
       debugPrint("Error fetching blogs: $e");
     }
   }

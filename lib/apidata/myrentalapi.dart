@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
 
 // Provider for rentals
@@ -30,6 +31,8 @@ class RentalData with ChangeNotifier {
     required String search,
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching my rentals for user ID: $userId");
 
       setLoading(true, loadingFor);
@@ -66,6 +69,8 @@ class RentalData with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching rental details for ID: $rentalId");
 
       setLoading(true, loadingFor);
@@ -104,6 +109,8 @@ class RentalData with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Updating rental status for ID: $rentalId to $status");
 
       setLoading(true, loadingFor);

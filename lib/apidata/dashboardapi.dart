@@ -4,6 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/toast.dart';
 
+import '../constants/checkInternet.dart';
+
 // ✅ Provider create karte hain
 final dashboardProvider = ChangeNotifierProvider<DashboardService>(
   (ref) => DashboardService(),
@@ -11,7 +13,7 @@ final dashboardProvider = ChangeNotifierProvider<DashboardService>(
 
 class DashboardService with ChangeNotifier {
   Map<String, dynamic> dashboardData = {};
-  String loadingFor = "";
+  String loadingfor = "";
 
   // ✅ Direct keys for quick access
   String name = "";
@@ -20,23 +22,23 @@ class DashboardService with ChangeNotifier {
 
   // ✅ Loader set karne ka function
   setLoading([String value = ""]) {
-    loadingFor = value;
+    loadingfor = value;
     notifyListeners();
   }
 
   // ✅ Loader set karne ka function
 
   Loading([String value = ""]) {
-    loadingFor = value;
+    loadingfor = value;
     notifyListeners();
   }
 
-  fetchDashboard({String loadingfor = "dashboard", var uid = ""}) async {
+  fetchDashboard({String loadingfor = "", required uid}) async {
     try {
       setLoading(loadingfor);
 
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/dashboard$uid"),
+        Uri.parse("https://thelocalrent.com/api/dashboard/$uid"),
       );
 
       final data = jsonDecode(response.body);
@@ -46,21 +48,15 @@ class DashboardService with ChangeNotifier {
       if (response.statusCode == 200) {
         dashboardData.clear();
         dashboardData = data;
-
-        // ✅ Specific keys assign karein
-        name = data['name'] ?? "";
-        email = data['email'] ?? "";
-        password = data['password'] ?? "";
-
-        notifyListeners();
       } else {
         toast(data['msg'] ?? "Something went wrong");
       }
-
       setLoading("");
     } catch (e) {
-      setLoading("");
       print("❌ Error fetching dashboard: $e");
+      setLoading("");
+    } finally {
+      setLoading("");
     }
   }
 }

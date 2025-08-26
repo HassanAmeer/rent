@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
@@ -35,6 +36,8 @@ class ListingData with ChangeNotifier {
     var search = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       setLoading(loadingfor);
       print("Fetching my items for user ID: $uid");
       final response = await http.post(
@@ -66,6 +69,8 @@ class ListingData with ChangeNotifier {
     Map? newItemData,
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       final response = await http.put(
         Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
         body: newItemData,
@@ -87,6 +92,8 @@ class ListingData with ChangeNotifier {
     required String uid,
     var loadingfor = "",
   }) async {
+    if (await checkInternet() == false) return;
+
     // print("$loadingfor");
     setLoading(loadingfor);
     debugPrint("notificationId : $notificationId");
@@ -122,6 +129,8 @@ class ListingData with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       setLoading(loadingFor);
       var req = http.MultipartRequest(
         "POST",

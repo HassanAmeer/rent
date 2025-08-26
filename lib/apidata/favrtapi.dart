@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
@@ -26,6 +27,8 @@ class Favrt with ChangeNotifier {
 
   favoritems({var uid, String loadingFor = "", var search = ""}) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching my items for user ID: $uid");
 
       setLoading(loadingFor);
@@ -58,6 +61,8 @@ class Favrt with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       setLoading(loadingFor);
       final response = await http.delete(
         Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
@@ -113,6 +118,8 @@ class Favrt with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("👉 loadingFor: $loadingFor");
       setLoading(loadingFor);
       // print("Fetching my items for user ID: $uid");
@@ -140,6 +147,8 @@ class Favrt with ChangeNotifier {
   //////
   showallaitems({required String uid}) async {
     try {
+      if (await checkInternet() == false) return;
+
       print("Fetching my items for user ID: $uid");
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/allitems$uid"),
