@@ -42,6 +42,8 @@ class _HomeChartState extends ConsumerState<HomeChart> {
     ref.read(dashboardProvider).fetchDashboard();
     uid:
     ref.watch(userDataClass).userdata['id'].toString();
+      ref.watch(userDataClass).getProfileData();
+
   }
 
   @override
@@ -530,6 +532,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             // Text("amount: $total"),
             // const SizedBox(height: 20),
           ],
+        
         ),
       ),
 
