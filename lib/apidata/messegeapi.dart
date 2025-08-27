@@ -12,7 +12,6 @@ class ChatApi with ChangeNotifier {
   List chatedUsersList = []; // ✅ API se aaya list store hoga
   List messagesList = [];
   String loadingFor = "";
-  var sender = {};
 
   setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
@@ -20,7 +19,7 @@ class ChatApi with ChangeNotifier {
   }
 
   /// ✅ Fetch All Chats
-  Future<void> chatmsg({var loadingFor = "", required String uid}) async {
+  Future<void> chatedUsers({var loadingFor = "", required String uid}) async {
     try {
       if (await checkInternet() == false) return;
 
@@ -46,7 +45,7 @@ class ChatApi with ChangeNotifier {
   }
 
   //////
-  sndmsgs({
+  Future getUserMsgs({
     required String senderId,
     required String recieverId,
     String loadingfor = "",
@@ -54,9 +53,7 @@ class ChatApi with ChangeNotifier {
     try {
       // 🔹 Step 1: Internet check karo
       if (await checkInternet() == false) return;
-
       setLoading(loadingfor);
-
       // 🔹 Step 2: API call
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/getchats"),
@@ -68,17 +65,20 @@ class ChatApi with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-      messagesList = result['chats'];
+      List reverseList = result['chats'];
+      messagesList = reverseList.toList().reversed.toList();
+      print("messagesList.length: ${messagesList.length}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        toast(result['msg'], backgroundColor: Colors.green);
+        // toast(result['msg'], backgroundColor: Colors.green);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
+
       setLoading();
     } catch (e, st) {
       setLoading();
-      debugPrint(" 👉 login error: $e, st:$st");
+      debugPrint(" 💥 get msgs error: $e, st:$st");
     } finally {
       setLoading();
     }
@@ -103,7 +103,7 @@ class ChatApi with ChangeNotifier {
         body: {
           "recieverId": recieverId,
           "senderId": senderId,
-          " msg": msg,
+          "msg": msg,
           "time": time,
         },
       );
@@ -113,14 +113,16 @@ class ChatApi with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-      sender = result['"message": "how can help you"'];
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-      } else {}
+        setLoading();
+        await getUserMsgs(recieverId: recieverId, senderId: senderId);
+      } else {
+        toast("msg not sent!");
+      }
       setLoading();
     } catch (e, st) {
       setLoading();
-      debugPrint(" 👉 login error: $e, st:$st");
+      debugPrint(" 💥 sendMsg function error: $e, st:$st");
     } finally {
       setLoading();
     }

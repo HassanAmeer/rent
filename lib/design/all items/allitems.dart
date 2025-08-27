@@ -250,7 +250,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                       : GestureDetector(
                           onTap: () async {
                             try {
-                              List<DateTime?> _dates = [];
+                              List<DateTime?> dates = [];
 
                               var results = await showCalendarDatePicker2Dialog(
                                 context: context,
@@ -260,7 +260,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                                           CalendarDatePicker2Type.range,
                                     ),
                                 dialogSize: const Size(325, 400),
-                                value: _dates,
+                                value: dates,
                                 borderRadius: BorderRadius.circular(15),
                               );
 
@@ -269,8 +269,8 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                               }
 
                               // print(results.toString());
-                              var startDate = results?.first; // DateTime
-                              var endDate = results?.last; // DateTime
+                              var startDate = results.first; // DateTime
+                              var endDate = results.last; // DateTime
 
                               // Formatter
                               var formatter = DateFormat("d MMMM yyyy");
@@ -310,7 +310,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                                         .userdata['id']
                                         .toString(),
 
-                                    loadingFor: widget.id + "order",
+                                    loadingFor: "${widget.id}order",
 
                                     context: context,
                                   );

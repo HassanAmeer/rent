@@ -24,7 +24,7 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref
           .watch(chatClass)
-          .chatmsg(
+          .chatedUsers(
             loadingFor: "abc",
             uid: ref.watch(userDataClass).userdata['id'].toString(),
           );
@@ -96,16 +96,18 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
                             ),
                           ),
                           subtitle: Text(msg['msg'].toString()),
-                         onTap: () async {
-  var result = await goto(Chats(msgdata: msg));
+                          onTap: () async {
+                            var result = await goto(Chats(msgdata: msg));
 
-  if (result != null && result is String && result.isNotEmpty) {
-    setState(() {
-      msg['lastMsg'] = result; // last message update hoga
-    });
-  }
-},
-
+                            if (result != null &&
+                                result is String &&
+                                result.isNotEmpty) {
+                              setState(() {
+                                msg['lastMsg'] =
+                                    result; // last message update hoga
+                              });
+                            }
+                          },
                         );
                       },
                     ),

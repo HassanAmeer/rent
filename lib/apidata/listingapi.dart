@@ -139,7 +139,7 @@ class ListingData with ChangeNotifier {
 
       req.headers['Content-Type'] = 'application/json';
 
-      print("dailyRate:" + dailyRate);
+      print("dailyRate:$dailyRate");
 
       //// for fields
       req.fields['uid'] = uid;
@@ -165,7 +165,7 @@ class ListingData with ChangeNotifier {
       var response = await sendedRequest.stream.bytesToString();
 
       debugPrint("😊 sendedRequest status: ${sendedRequest.statusCode}");
-      debugPrint("😊 response data: ${response}");
+      debugPrint("😊 response data: $response");
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Added", backgroundColor: Colors.green);

@@ -187,7 +187,7 @@ class UserData with ChangeNotifier {
       var response = await sendedRequest.stream.bytesToString();
 
       debugPrint("😊 sendedRequest status: ${sendedRequest.statusCode}");
-      debugPrint("😊 response data: ${response}");
+      debugPrint("😊 response data: $response");
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully updated", backgroundColor: Colors.green);
