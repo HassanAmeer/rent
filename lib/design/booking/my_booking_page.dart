@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/bookingapi.dart';
@@ -99,15 +98,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                     child: DotLoader(),
                   ),
                 )
-              // : ref.watch(notifyData).notify.isEmpty
-              // ? const Center(child: Text("Notifications Empty"))
-              :
-                // Text("${ref.watch(bookingDataProvider).comingOrders}"),
-                // Text(
-                //   "${jsonDecode(ref.watch(bookingDataProvider).comingOrders[0]['productImage'])}",
-                // ),
-                // Bookings grid
-                Expanded(
+              : Expanded(
                   child: GridView.builder(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -134,7 +125,6 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       ),
 
       // Floating Action Button for Add New Booking
-
       // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );
   }
@@ -158,11 +148,8 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Left-side icons column
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 18,
-                  horizontal: 6,
-                ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 18, horizontal: 6),
               ),
 
               // Main content (image and texts, centered)
@@ -176,46 +163,59 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: CacheImageWidget(
-                            isCircle: false,
-                            url:
-                                Config.imgUrl +
-                                    jsonDecode(booking['productImage'])[0] ??
-                                ImgLinks.product,
-
-                            height: 85,
-                            width: 100,
+                          child: Container(
+                            height: 86,
+                            width: 115,
+                            color: Colors.grey.shade200,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: CacheImageWidget(
+                                isCircle: false,
+                                url:
+                                    Config.imgUrl +
+                                    (jsonDecode(booking['productImage'])[0] ??
+                                        ImgLinks.product),
+                              ),
+                            ),
                           ),
                         ),
-                        Text(
-                          booking["productTitle"].toString(),
-
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(height: 6),
+                        // title text inside fixed width
+                        SizedBox(
+                          width: 110, // same as image width for alignment
+                          child: Text(
+                            booking["productTitle"].toString(),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          ref
-                              .watch(bookingDataProvider)
-                              .comingOrders[0]["orderby"]['name']
-                              .toString(),
-
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(height: 8),
+                        // orderby name inside fixed width
+                        SizedBox(
+                          width: 110,
+                          child: Text(
+                            ref
+                                .watch(bookingDataProvider)
+                                .comingOrders[0]["orderby"]['name']
+                                .toString(),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 2),
                       ],

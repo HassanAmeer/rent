@@ -12,6 +12,7 @@ class ChatApi with ChangeNotifier {
   List chatedUsersList = []; // ✅ API se aaya list store hoga
   List messagesList = [];
   String loadingFor = "";
+  var sender = {};
 
   setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
@@ -82,4 +83,48 @@ class ChatApi with ChangeNotifier {
       setLoading();
     }
   }
+
+  sndingmsgs({
+    required String senderId,
+    required String recieverId,
+    String loadingfor = "",
+    required String msg,
+    required String time,
+  }) async {
+    try {
+      // 🔹 Step 1: Internet check karo
+      if (await checkInternet() == false) return;
+
+      setLoading(loadingfor);
+
+      // 🔹 Step 2: API call
+      final response = await http.post(
+        Uri.parse("https://thelocalrent.com/api/sendmsg"),
+        body: {
+          "recieverId": recieverId,
+          "senderId": senderId,
+          " msg": msg,
+          "time": time,
+        },
+      );
+
+      debugPrint("Response status: ${response.statusCode}");
+
+      var result = json.decode(response.body);
+      print("👉 Response: $result");
+
+      sender = result['"message": "how can help you"'];
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+      } else {}
+      setLoading();
+    } catch (e, st) {
+      setLoading();
+      debugPrint(" 👉 login error: $e, st:$st");
+    } finally {
+      setLoading();
+    }
+  }
+
+  void addLocalMessage(Map<String, String> map) {}
 }

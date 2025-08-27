@@ -6,6 +6,7 @@ import 'package:rent/constants/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rent/message/chat.dart';
 import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/dotloader.dart';
 
 import 'constants/goto.dart';
 
@@ -60,41 +61,55 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
         child: Column(
           children: [
             SizedBox(height: 20),
+            ref.watch(chatClass).loadingFor == "abc"
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 250),
+                      child: DotLoader(),
+                    ),
+                  )
+                :
+                  // ✅ ListView.builder yahan lagaya h
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: ref.watch(chatClass).chatedUsersList.length,
+                      itemBuilder: (context, index) {
+                        final msg = ref.watch(chatClass).chatedUsersList[index];
+                        return ListTile(
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.cyan.shade700,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            width: 41,
+                            height: 41,
+                            clipBehavior: Clip.antiAlias,
+                            child: CacheImageWidget(
+                              url: Config.imgUrl + msg['fromuid']["image"],
+                            ),
+                          ),
+                          title: Text(
+                            msg['fromuid']['name'].toString(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(msg['msg'].toString()),
+                         onTap: () async {
+  var result = await goto(Chats(msgdata: msg));
 
-            // ✅ ListView.builder yahan lagaya h
-            Expanded(
-              child: ListView.builder(
-                itemCount: ref.watch(chatClass).chatedUsersList.length,
-                itemBuilder: (context, index) {
-                  final msg = ref.watch(chatClass).chatedUsersList[index];
-                  return ListTile(
-                    leading: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.cyan.shade700,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      width: 41,
-                      height: 41,
-                      clipBehavior: Clip.antiAlias,
-                      child: CacheImageWidget(
-                        url: Config.imgUrl + msg['fromuid']["image"],
-                      ),
+  if (result != null && result is String && result.isNotEmpty) {
+    setState(() {
+      msg['lastMsg'] = result; // last message update hoga
+    });
+  }
+},
+
+                        );
+                      },
                     ),
-                    title: Text(
-                      msg['fromuid']['name'].toString(),
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(msg['msg'].toString()),
-                    onTap: () {
-                      goto(Chats(msgdata: msg));
-                    },
-                  );
-                },
-              ),
-            ),
+                  ),
 
             // Text("${ref.watch(chatClass).messege}"),
           ],
