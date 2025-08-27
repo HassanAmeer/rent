@@ -37,14 +37,9 @@ class _ChatsState extends ConsumerState<Chats> {
             loadingfor: "getallchats",
             senderId: senderId.toString(),
             recieverId: recieverId.toString(),
+            scrollController: scrollController,
           )
-          .then((v) {
-            if (scrollController.hasClients) {
-              scrollController.jumpTo(
-                scrollController.position.maxScrollExtent,
-              );
-            }
-          });
+          .then((v) {});
     });
   }
 
@@ -71,8 +66,8 @@ class _ChatsState extends ConsumerState<Chats> {
             msg: message,
             time: DateTime.now().toString(),
             loadingfor: "sendmsg",
+            scrollController: scrollController,
           );
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
       // ✅ Clear input field
       _controller.clear();
     } else {

@@ -49,6 +49,7 @@ class ChatApi with ChangeNotifier {
     required String senderId,
     required String recieverId,
     String loadingfor = "",
+    required ScrollController scrollController,
   }) async {
     try {
       // 🔹 Step 1: Internet check karo
@@ -71,6 +72,7 @@ class ChatApi with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // toast(result['msg'], backgroundColor: Colors.green);
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
@@ -90,6 +92,7 @@ class ChatApi with ChangeNotifier {
     String loadingfor = "",
     required String msg,
     required String time,
+    required ScrollController scrollController,
   }) async {
     try {
       // 🔹 Step 1: Internet check karo
@@ -115,7 +118,11 @@ class ChatApi with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         setLoading();
-        await getUserMsgs(recieverId: recieverId, senderId: senderId);
+        await getUserMsgs(
+          recieverId: recieverId,
+          senderId: senderId,
+          scrollController: scrollController,
+        );
       } else {
         toast("msg not sent!");
       }
