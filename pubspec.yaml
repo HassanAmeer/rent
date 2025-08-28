@@ -51,6 +51,9 @@ dependencies:
   fl_chart: ^0.69.0   # latest version use karein
   google_fonts: ^6.3.1
   flutter_animate: ^4.5.2
+  
+  ## for app icon by package
+  icons_launcher: ^3.0.2
 
 
 
@@ -69,6 +72,16 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+icons_launcher:
+  image_path: "assets/logo2.jpg"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+
+
 
 # The following section is specific to Flutter packages.
 flutter:
