@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
+import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
@@ -96,8 +99,8 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                            mainAxisSpacing: 10,
+                            childAspectRatio:1.1,
+                            mainAxisSpacing: 15,
                             crossAxisSpacing: 10,
                           ),
                       itemCount: listingProvider.listings.length,
@@ -162,12 +165,13 @@ class ListingBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // height: ScreenSize.height*0.1,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: Colors.grey.withOpacity(0.25),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -177,118 +181,110 @@ class ListingBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Image container with expanded height
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 120,
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(10),
-                    ),
-                    child: Image.network(
-                      imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.broken_image, size: 40),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 5,
-                    right: 5,
-
-                    child: GestureDetector(
-                      onTap: () {
-                        // Show confirm
-                        //Dation dialog
-
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete Listing'),
-                            content: const Text(
-                              'Are you sure you want to delete this listing?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // ✅ delete using ref
-
-                                  ref
-                                      .read(listingDataProvider.notifier)
-                                      .deleteNotifications(
-                                        notificationId: id,
-                                        uid: ref
-                                            .watch(userDataClass)
-                                            .userdata["id"]
-                                            .toString(),
-                                        loadingfor: id,
-                                      );
-                                  Navigator.pop(context);
-                                },
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(
-                            255,
-                            238,
-                            236,
-                            236,
-                          ).withOpacity(0.5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.delete,
-                          size: 18,
-                          color: Color.fromARGB(255, 193, 16, 4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
+                child: CacheImageWidget(url:      imageUrl,
+                isCircle: false,
+                width: ScreenSize.width* 0.46,
+                height: ScreenSize.height * 0.16,
+                )
               ),
-            ),
+              Positioned(
+                top: 5,
+                right: 5,
+                    
+                child: GestureDetector(
+                  onTap: () {
+                    // Show confirm
+                    //Dation dialog
+                    
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Colors.black,
+                        title: const Text('Delete Listing', 
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        content: const Text(
+                          'Are you sure you want to delete this listing?',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel', 
+                            
+                          style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // ✅ delete using ref
+                    
+                              ref
+                                  .read(listingDataProvider.notifier)
+                                  .deleteNotifications(
+                                    notificationId: id,
+                                    uid: ref
+                                        .watch(userDataClass)
+                                        .userdata["id"]
+                                        .toString(),
+                                    loadingfor: id,
+                                  );
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.grey),
+                            ).animate(
+                              onPlay: (controller) => controller.repeat(
+                                reverse: true,
+                              ),
+                            ).shimmer(color: Colors.red.shade200),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(
+                        255,
+                        238,
+                        236,
+                        236,
+                      ).withOpacity(0.7),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.delete,
+                      size: 18,
+                      color: Color.fromARGB(255, 193, 16, 4),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
 
           // Text container with reduced height
-          Expanded(
-            flex: 1,
+          Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 4.0,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              padding: const EdgeInsets.only(top:10),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
                 ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),

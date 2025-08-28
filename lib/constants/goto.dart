@@ -5,21 +5,24 @@ import 'package:rent/message/chat.dart';
 goto(pageName, {bool canBack = true, int delayInMilliSeconds = 300}) {
   //// new with animation
   if (canBack) {
-    Navigator.of(contextKey.currentState!.context).pushReplacement(
-        PageRouteBuilder(
-            transitionDuration: Duration(milliseconds: delayInMilliSeconds),
-            pageBuilder: (context, animation, secondaryAnimation) => pageName,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(opacity: animation, child: child)));
-  } else {
-    Navigator.of(contextKey.currentState!.context).push(PageRouteBuilder(
+    Navigator.of(contextKey.currentState!.context).push(
+      PageRouteBuilder(
         transitionDuration: Duration(milliseconds: delayInMilliSeconds),
         pageBuilder: (context, animation, secondaryAnimation) => pageName,
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-            FadeTransition(opacity: animation, child: child)));
+            FadeTransition(opacity: animation, child: child),
+      ),
+    );
+  } else {
+    Navigator.of(contextKey.currentState!.context).pushReplacement(
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: delayInMilliSeconds),
+        pageBuilder: (context, animation, secondaryAnimation) => pageName,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(opacity: animation, child: child),
+      ),
+    );
   }
-
 
   //// old
   // if (canBack) {
@@ -33,5 +36,4 @@ goto(pageName, {bool canBack = true, int delayInMilliSeconds = 300}) {
   //     MaterialPageRoute(builder: (BuildContext context) => pageName),
   //   );
   // }
-
 }

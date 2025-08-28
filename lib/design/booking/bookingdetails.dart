@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/scrensizes.dart';
 
 import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
@@ -32,8 +33,8 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
               Stack(
                 children: [
                   CacheImageWidget(
-                    width: 300,
-                    height: 150,
+                    width: double.infinity,
+                    height: ScreenSize.height* 0.4,
                     isCircle: false,
                     radius: 0,
                     url:

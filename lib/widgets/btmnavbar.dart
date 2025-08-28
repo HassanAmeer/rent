@@ -25,7 +25,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
         if(widget.currentIndex >0){
             goto(HomePage());
         }
-        return Future.value(false);
+        return Future.value(true);
       },
       child: BottomNavigationBar(
         currentIndex: widget.currentIndex,
@@ -37,7 +37,7 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
           } else if (index == 2) {
             goto(MyBookingPage(), canBack: false);
           } else if (index == 3) {
-            goto((ChatedUsersPage()));
+            goto((ChatedUsersPage()), canBack: false);
           } else if (index == 4) {
             goto(ProfileDetailsPage(), canBack: false);
           }

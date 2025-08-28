@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:rent/constants/scrensizes.dart';
 
 import '../../widgets/casheimage.dart';
 import 'listing_edit_page.dart'; // ✅ Edit page import
@@ -24,9 +25,10 @@ class ListingDetailPage extends StatelessWidget {
               Stack(
                 children: [
                   CacheImageWidget(
-                    width: 300,
-                    height: 150,
+                    width: double.infinity,
+                    height: ScreenSize.height*0.4,
                     isCircle: false,
+                    fit: BoxFit.contain,
                     radius: 0,
                     url:
                         Config.imgUrl + fullData['images'][0] ??
@@ -35,7 +37,7 @@ class ListingDetailPage extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 25),
 
               Text(
                 "${fullData['title'] ?? 'Title.......'}",
