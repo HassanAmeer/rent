@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../widgets/casheimage.dart';

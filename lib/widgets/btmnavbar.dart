@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rent/main.dart';
-import 'package:rent/messege.dart';
+import 'package:rent/message/chatedUsersPage.dart';
 
 import '../constants/goto.dart';
 import '../design/home_page.dart';
@@ -20,36 +20,43 @@ class BottomNavBarWidget extends StatefulWidget {
 class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: widget.currentIndex,
-      onTap: (index) {
-        if (index == 0) {
-          goto(HomePage());
-        } else if (index == 1) {
-          goto(ListingPage());
-        } else if (index == 2) {
-          goto(MyBookingPage());
-        } else if (index == 3) {
-          goto((MessagesHome()));
-        } else if (index == 4) {
-          print("fdij");
-          goto(ProfileDetailsPage());
+    return WillPopScope(
+      onWillPop: () {
+        if(widget.currentIndex >0){
+            goto(HomePage());
         }
+        return Future.value(false);
       },
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.grey,
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My Listings'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
-          label: 'My Bookings',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-      ],
+      child: BottomNavigationBar(
+        currentIndex: widget.currentIndex,
+        onTap: (index) {
+          if (index == 0) {
+            goto(HomePage(), canBack: false);
+          } else if (index == 1) {
+            goto(ListingPage(), canBack: false);
+          } else if (index == 2) {
+            goto(MyBookingPage(), canBack: false);
+          } else if (index == 3) {
+            goto((ChatedUsersPage()));
+          } else if (index == 4) {
+            goto(ProfileDetailsPage(), canBack: false);
+          }
+        },
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My Listings'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'My Bookings',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
     );
   }
 }

@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
 import 'package:rent/apidata/user.dart' show userDataClass;
 // import 'package:rent/auth/login.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/Auth/login.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
@@ -42,179 +43,197 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text("My Profile", style: TextStyle(color: Colors.black)),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: ref.watch(userDataClass).isLoading
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 200),
-                child: DotLoader(),
-              ),
-            )
-          : ref.watch(userDataClass).userdata.isEmpty
-          ? const Center(child: Text("Failed to load user data"))
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: SingleChildScrollView(
-                controller: ScrollController(),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 15),
-
-                    // ClipRRect(
-                    //   borderRadius: const BorderRadius.all(
-                    //     Radius.circular(100),
-                    //   ),
-                    //   child: CircleAvatar(
-                    //     radius: 50,
-                    //     backgroundImage: NetworkImage(
-                    //       Config.imgUrl +
-                    //               ref.watch(userDataClass).userdata['image'] ??
-                    //           imgLinks.profileImage,
-                    //     ),
-                    //   ),
-                    // ),
-                    InkWell(
-                      onTap: () {
-                        pushScreen(
-                          context,
-                          Profileview(
-                            imagelink:
-                                (ref.watch(userDataClass).userdata['image'] !=
-                                        null &&
-                                    ref
-                                        .watch(userDataClass)
-                                        .userdata['image']
-                                        .toString()
-                                        .isNotEmpty)
-                                ? Config.imgUrl +
-                                      ref.watch(userDataClass).userdata['image']
-                                : ImgLinks.profileImage,
-                          ),
-                          isTransparent: true,
-                        );
-                      },
-                      child: CacheImageWidget(
-                        width: 100,
-                        height: 100,
-                        isCircle: true,
-                        radius: 200,
-                        url:
-                            (ref.watch(userDataClass).userdata['image'] !=
-                                    null &&
-                                ref
-                                    .watch(userDataClass)
-                                    .userdata['image']
-                                    .toString()
-                                    .isNotEmpty)
-                            ? Config.imgUrl +
-                                  ref.watch(userDataClass).userdata['image']
-                            : ImgLinks.profileImage,
-                      ),
+      // appBar: AppBar(
+      //   title: const Text("My Profile", style: TextStyle(color: Colors.black)),
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: Colors.white,
+      //   iconTheme: const IconThemeData(color: Colors.black),
+      // ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+            children: [
+              const SizedBox(height: 70),
+              InkWell(
+                borderRadius: BorderRadius.circular(100),
+                onTap: () {
+                  pushScreen(
+                    context,
+                    Profileview(
+                      imagelink:
+                          (ref.watch(userDataClass).userdata['image'] != null &&
+                              ref
+                                  .watch(userDataClass)
+                                  .userdata['image']
+                                  .toString()
+                                  .isNotEmpty)
+                          ? Config.imgUrl +
+                                ref.watch(userDataClass).userdata['image']
+                          : ImgLinks.profileImage,
                     ),
-
-                    const SizedBox(height: 20),
-                    ListTile(
-                      title: Text(
-                        ref.watch(userDataClass).userdata['name'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    CupertinoListTile(
-                      title: const Text(
-                        "Email",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      subtitle: Text(
-                        ref.watch(userDataClass).userdata['email'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    CupertinoListTile(
-                      title: const Text(
-                        "Phone Number",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      subtitle: Text(
-                        ref.watch(userDataClass).userdata['phone'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    CupertinoListTile(
-                      title: const Text(
-                        "Address",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      subtitle: Text(
-                        ref.watch(userDataClass).userdata['address'] ?? '',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    CupertinoListTile(
-                      title: const Text(
-                        "About Us",
-                        style: TextStyle(color: Colors.grey, fontSize: 11),
-                      ),
-                      subtitle: Text(
-                        ref.watch(userDataClass).userdata['aboutUs'] ?? 'empty',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    Divider(),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          ref.watch(userDataClass).logout();
-                        },
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Logout",
-                              style: TextStyle(color: Colors.deepOrange),
-                            ),
-                            SizedBox(width: 10),
-                            Icon(Icons.exit_to_app, color: Colors.deepOrange),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    isTransparent: true,
+                  );
+                },
+                child: CacheImageWidget(
+                  width: 100,
+                  height: 100,
+                  isCircle: true,
+                  radius: 200,
+                  url:
+                      (ref.watch(userDataClass).userdata['image'] != null &&
+                          ref
+                              .watch(userDataClass)
+                              .userdata['image']
+                              .toString()
+                              .isNotEmpty)
+                      ? Config.imgUrl +
+                            ref.watch(userDataClass).userdata['image']
+                      : ImgLinks.profileImage,
                 ),
               ),
-            ),
+
+              const SizedBox(height: 20),
+              ref.watch(userDataClass).isLoading
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 200),
+                        child: DotLoader(),
+                      ),
+                    )
+                  : ref.watch(userDataClass).userdata.isEmpty
+                  ? const Center(child: Text("Failed to load user data"))
+                  : Column(
+                      children: [
+                        ListTile(
+                          title: Text(
+                            ref.watch(userDataClass).userdata['name'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        const Divider(),
+                        CupertinoListTile(
+                          title: const Text(
+                            "Email",
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                          subtitle: Text(
+                            ref.watch(userDataClass).userdata['email'] ?? '',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        const Divider(),
+                        CupertinoListTile(
+                          title: const Text(
+                            "Phone Number",
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                          subtitle: Text(
+                            ref.watch(userDataClass).userdata['phone'] ?? '',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        const Divider(),
+                        CupertinoListTile(
+                          title: const Text(
+                            "Address",
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                          subtitle: Text(
+                            ref.watch(userDataClass).userdata['address'] ?? '',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        const Divider(),
+                        CupertinoListTile(
+                          title: const Text(
+                            "About Us",
+                            style: TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                          subtitle: Text(
+                            ref.watch(userDataClass).userdata['aboutUs'] ??
+                                'empty',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        Divider(),
+                      ],
+                    ),
+              SizedBox(
+                height: ref.watch(userDataClass).isLoading
+                    ? ScreenSize.height * 0.2
+                    : ScreenSize.height * 0.05,
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    goto(ProfileUpdatePage());
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Edit", style: TextStyle(color: Colors.black)),
+                      SizedBox(width: 10),
+                      Icon(Icons.edit, color: Colors.black),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton.small(
         backgroundColor: Colors.black,
-        child: const Icon(Icons.edit, color: Colors.white),
+        child: const Icon(Icons.exit_to_app, color: Colors.white),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProfileUpdatePage()),
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Logout", style: TextStyle(color: Colors.white),),
+                content: const Text("Are you sure you want to logout?", style: TextStyle(color: Colors.grey),),
+                backgroundColor: Colors.black,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ref.watch(userDataClass).logout();
+                    },
+                    child: Text("Logout", style: TextStyle(color: Colors.grey),),
+                  ).animate(
+                    onPlay: (controller) => controller.repeat(
+                      reverse: true,
+                      period: const Duration(milliseconds: 1500),
+                    )
+                  ).shimmer(color: Colors.red.shade200),
+                ],
+              );
+            },
           );
         },
       ),

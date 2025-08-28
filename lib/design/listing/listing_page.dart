@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
@@ -41,12 +41,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(Icons.arrow_back, size: 20, color: Colors.black),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text(
           "My Listings",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),

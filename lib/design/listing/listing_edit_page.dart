@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 
 // import '../../apidata/listingapi.dart';

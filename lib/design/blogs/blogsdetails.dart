@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';

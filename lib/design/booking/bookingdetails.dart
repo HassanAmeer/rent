@@ -5,7 +5,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/goto.dart';
 
-import '../../constants/data.dart';
+import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
 class Bookindetails extends ConsumerStatefulWidget {

@@ -21,17 +21,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    runFirst();
-  }
-
-  runFirst() async {
-    WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref.watch(userDataClass).getSorageData();
-    });
-  }
+ 
 
   @override
   Widget build(BuildContext context) {

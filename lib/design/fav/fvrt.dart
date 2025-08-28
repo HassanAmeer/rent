@@ -10,7 +10,7 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
-import '../../constants/data.dart';
+import '../../constants/images.dart';
 
 class Favourite extends ConsumerStatefulWidget {
   var fvrt;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -17,24 +18,37 @@ final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 class UserData with ChangeNotifier {
   var userdata = {};
 
-  getSorageData() async {
+  getStorageData() async {
     await Hive.openBox("userBox");
     var box = Hive.box('userBox'); // File Name
-
     var checkData = box.get('userData'); // save the user object (map) data
     if (checkData != null) {
       userdata = checkData;
       notifyListeners();
-      print("user dtaa from hive box: $checkData");
-      goto(HomePage());
+      // print("user dtaa from hive box: $checkData");
+    }
+  }
+  
+  checkAlreadyhaveLogin() async{
+    await Hive.openBox("userBox");
+    var box = Hive.box('userBox'); // File Name
+    var checkData = box.get('userData'); // save the user object (map) data
+    if (checkData != null) {
+      userdata = checkData;
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 1000));
+      goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
+    }else{
+      await Future.delayed(Duration(milliseconds: 1000));
+      goto(LoginPage(), delayInMilliSeconds: 2000, canBack: false);
     }
   }
 
   logout() async {
     await Hive.openBox("userBox");
     var box = Hive.box('userBox'); // File Name
-    var checkData = box.delete('userData');
-    goto(LoginPage());
+    box.delete('userData');
+    goto(LoginPage(), canBack: false, delayInMilliSeconds: 500);
   }
 
   //////

@@ -4,9 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/bookingapi.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/design/booking/bookingdetails.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/widgets/btmnavbar.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
@@ -43,6 +44,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
         titleSpacing: 0,
+        automaticallyImplyLeading: false,
         title: const Text(
           "My Bookings",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -50,6 +52,9 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
         backgroundColor: Colors.cyan,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
+      ),
+      bottomNavigationBar: BottomNavBarWidget(
+        currentIndex: 2,
       ),
       body: Column(
         children: [

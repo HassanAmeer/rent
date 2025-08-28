@@ -33,7 +33,7 @@ class CacheImageWidget extends StatelessWidget {
                 imageUrl: url,
                 fit: fit,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    DotLoader(),
+                    DotLoader(showDots: 1),
                 errorWidget: (context, url, error) =>
                     Icon(Icons.image_not_supported),
               ),

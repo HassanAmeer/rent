@@ -5,10 +5,15 @@ import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rent/constants/appColors.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/images.dart';
 import 'Auth/login.dart';
 import 'Auth/signup.dart';
+import 'apidata/user.dart';
 import 'design/home_page.dart';
 import 'design/listing/listing_page.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 GlobalKey<NavigatorState> contextKey = GlobalKey();
 
@@ -39,7 +44,115 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(backgroundColor: AppColors.mainColor),
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: SplashPage(),
+    );
+  }
+}
+
+
+
+class SplashPage extends ConsumerStatefulWidget {
+  const SplashPage({super.key});
+
+  @override
+  ConsumerState<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends ConsumerState<SplashPage> {
+
+  @override
+  void initState() {
+    super.initState();
+      syncFirstF();
+  }
+
+  syncFirstF() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(userDataClass).checkAlreadyhaveLogin();
+        // goto(LoginPage(), canBack: false, delay: 3000);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var w = MediaQuery.of(context).size.width;
+    var h = MediaQuery.of(context).size.height;
+    return DecoratedBox(
+      decoration: BoxDecoration(color: AppColors.mainColor),
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            var isPhone = constraints.maxWidth <= 424;
+            var isTablet =
+                // var desktop = constraints.maxWidth >= 1024;
+                (constraints.maxWidth >= 424 && constraints.maxWidth <= 1024);
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child:
+                      SizedBox(
+                            width: isPhone
+                                ? w * 0.7
+                                : isTablet
+                                ? w * 0.4
+                                : w * 0.2,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                ImgAssets.logo,
+                                // color: AppColor.primary.withOpacity(0.1),
+                              ),
+                            ),
+                          )
+                          .animate(
+                            // onPlay: (controller) => controller.repeat()
+                          )
+                          .scale(
+                            begin: Offset(0, -1),
+                            duration: const Duration(milliseconds: 100),
+                            // delay: const Duration(milliseconds: 2700)
+                          )
+                          .shimmer(
+                            color: Colors.cyan, 
+                            duration: 1000.milliseconds
+                          ),
+                ),
+
+                // Text("hjkl")
+                // SizedBox(height: h * 0.03),
+                // Text(
+                //       'Rhe Local Rent!'.toUpperCase(),
+                //       textAlign: TextAlign.center,
+                //       style: GoogleFonts.orbitron(
+                //         textStyle: Theme.of(context).textTheme.headlineLarge!
+                //             .copyWith(
+                //               color: AppColors.mainColor,
+                //               letterSpacing: 1,
+                //               shadows: [
+                //                 BoxShadow(
+                //                   color: AppColors.mainColor,
+                //                   offset: const Offset(1, 1),
+                //                   blurRadius: 1,
+                //                 ),
+                //               ],
+                //             ),
+                //       ),
+                //     )
+                //     .animate(onPlay: (controller) => controller.repeat())
+                //     .shimmer(
+                //       color: AppColors.mainColor,
+                //       duration: const Duration(milliseconds: 1500),
+                //       delay: const Duration(milliseconds: 500),
+                //     ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

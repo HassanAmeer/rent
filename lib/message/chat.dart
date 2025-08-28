@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/messegeapi.dart';
 import 'package:rent/apidata/user.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
@@ -141,7 +141,7 @@ class _ChatsState extends ConsumerState<Chats> {
           chatProvider.loadingFor == "getallchats"
           ? const Center(
               child: Padding(
-                padding: EdgeInsets.only(top: 250),
+                padding: EdgeInsets.only(top: 2),
                 child: DotLoader(),
               ),
             )

@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:rent/apidata/messegeapi.dart';
 import 'package:rent/apidata/user.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/images.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rent/message/chat.dart';
+import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import 'constants/goto.dart';
+import '../constants/goto.dart';
 
-class MessagesHome extends ConsumerStatefulWidget {
-  const MessagesHome({super.key});
+class ChatedUsersPage extends ConsumerStatefulWidget {
+  const ChatedUsersPage({super.key});
 
   @override
-  ConsumerState<MessagesHome> createState() => _MessagesHomeState();
+  ConsumerState<ChatedUsersPage> createState() => _ChatedUsersPageState();
 }
 
-class _MessagesHomeState extends ConsumerState<MessagesHome> {
+class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
   @override
   void initState() {
     super.initState();
@@ -39,6 +40,7 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
           "Chats",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
+        automaticallyImplyLeading: false,
         actions: [
           SizedBox(width: 5),
           Container(
@@ -56,6 +58,7 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
           SizedBox(width: 10),
         ],
       ),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 3,),
 
       body: Center(
         child: Column(
@@ -71,11 +74,14 @@ class _MessagesHomeState extends ConsumerState<MessagesHome> {
                 :
                   // ✅ ListView.builder yahan lagaya h
                   Expanded(
-                    child: ListView.builder(
+                    child: ListView.separated(
                       itemCount: ref.watch(chatClass).chatedUsersList.length,
+                      separatorBuilder: (context, index) => Divider(),
                       itemBuilder: (context, index) {
                         final msg = ref.watch(chatClass).chatedUsersList[index];
                         return ListTile(
+                          minVerticalPadding:1,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           leading: Container(
                             decoration: BoxDecoration(
                               color: Colors.cyan.shade700,

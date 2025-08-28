@@ -4,9 +4,8 @@ class Config {
   static const String apiUrl = "https://thelocalrent.com/api/";
 }
 
-class imgAssets {
+class ImgAssets {
   static String logo = "assets/logorent.png";
-
   static String listingImage = 'assets/images/listing1.png';
   static String liswtingImage = 'assets/images/listing2.png';
   static String liswtryingImage = 'assets/images/listing1.png';

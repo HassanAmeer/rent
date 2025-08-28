@@ -6,7 +6,7 @@ import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/blogs/blogsdetails.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../constants/data.dart';
+import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
 class Blogs extends ConsumerStatefulWidget {

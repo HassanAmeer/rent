@@ -7,7 +7,7 @@ import 'package:rent/design/notify/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
-import '../../constants/data.dart';
+import '../../constants/images.dart';
 import '../../apidata/notifyData.dart';
 import '../../apidata/user.dart';
 
@@ -77,7 +77,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Image.asset(imgAssets.logo, width: 100),
+        title: Image.asset(ImgAssets.logo, width: 100),
         actions: [
           InkWell(
             onTap: () {

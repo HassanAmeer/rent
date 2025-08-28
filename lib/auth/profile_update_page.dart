@@ -1,12 +1,18 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
+import 'package:rent/auth/termsPage.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/constants/data.dart';
+import 'package:rent/constants/goto.dart';
+import 'package:rent/constants/images.dart';
+import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+
+import 'privacyPolicyPage.dart';
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -118,7 +124,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
       body: isLoading
           ? const Center(
               child: Padding(
-                padding: EdgeInsets.only(top: 200),
+                padding: EdgeInsets.only(top: 0),
                 child: DotLoader(),
               ),
             )
@@ -186,6 +192,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                                                 .userdata['image']
                                       : ImgLinks.profileImage,
                                 ),
+
                           Positioned(
                             right: 0,
                             bottom: 0,
@@ -193,6 +200,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                               onTap: () {
                                 _showImagePickerOptions(context);
                               },
+                              borderRadius: BorderRadius.circular(100),
                               child: CircleAvatar(
                                 radius: 15,
                                 backgroundColor: Colors.black,
@@ -225,7 +233,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   TextField(
                     controller: phoneController,
@@ -242,7 +250,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     keyboardType: TextInputType.phone,
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   TextField(
                     controller: emailController,
@@ -259,7 +267,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     keyboardType: TextInputType.emailAddress,
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   TextField(
                     controller: aboutController,
@@ -276,7 +284,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
 
                   TextField(
                     controller: addressController,
@@ -293,119 +301,144 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 5),
 
-                  Row(
-                    children: const [
-                      Text(
-                        "Verified By",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                  // Row(
+                  //   children: const [
+                  //     Text(
+                  //       "Verified By",
+                  //       style: TextStyle(fontWeight: FontWeight.bold),
+                  //     ),
+                  //     SizedBox(width: 10),
+                  //     Text(
+                  //       "google",
+                  //       style: TextStyle(
+                  //         fontFamily: 'monospace',
+                  //         fontWeight: FontWeight.normal,
+                  //         color: Colors.grey,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+
+                  // const SizedBox(height: 20),
+
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     const Text(
+                  //       "Send Emails",
+                  //       style: TextStyle(fontWeight: FontWeight.bold),
+                  //     ),
+                  //     Switch(
+                  //       value: sendEmails,
+                  //       onChanged: (value) {
+                  //         setState(() {
+                  //           sendEmails = value;
+                  //         });
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+
+                  // const SizedBox(height: 20),
+                  CupertinoListTile(
+                    onTap: () {
+                      goto(PrivacyPolicyPage());
+                    },
+                    padding: EdgeInsets.symmetric(vertical: 0),
+                    leading: Checkbox(
+                      value: acceptPrivacy,
+                      onChanged: (val) {
+                        setState(() {
+                          acceptPrivacy = val ?? false;
+                        });
+                      },
+                    ),
+                    title: RichText(
+                      text: TextSpan(
+                        text: "I accept the ",
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: "Privacy Policy",
+                            style: TextStyle(color: AppColors.mainColor),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        "google",
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
 
-                  const SizedBox(height: 20),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Send Emails",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Switch(
-                        value: sendEmails,
-                        onChanged: (value) {
-                          setState(() {
-                            sendEmails = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: acceptPrivacy,
-                        onChanged: (val) {
-                          setState(() {
-                            acceptPrivacy = val ?? false;
-                          });
-                        },
-                      ),
-                      const Text("I accept the "),
-                      GestureDetector(
-                        onTap: () {
-                          // open privacy policy
-                        },
-                        child: const Text(
-                          "Privacy Policy",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: acceptTerms,
+                  CupertinoListTile(
+                    padding: EdgeInsets.symmetric(vertical: 0),
+                    onTap: () {
+                      goto(TermsConditionPage());
+                    },
+                    leading: Checkbox(
+                       value: acceptTerms,
                         onChanged: (val) {
                           setState(() {
                             acceptTerms = val ?? false;
                           });
                         },
+                    ),
+                    title: RichText(
+                      text: TextSpan(
+                        text: "I accept the ",
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: "Terms and Conditions",
+                            style: TextStyle(color: AppColors.mainColor),
+                          ),
+                        ],
                       ),
-                      const Text("Terms and Conditions"),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 45,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                      ),
-                      onPressed: (acceptPrivacy && acceptTerms && !isUpdating)
-                          ? () {
-                              ref
-                                  .watch(userDataClass)
-                                  .updateProfile(
-                                    name: nameController.text,
-                                    phone: phoneController.text,
-                                    email: emailController.text,
-                                    aboutUs: aboutController.text,
-                                    address: addressController.text,
-                                    imagePath: pikedImage,
-                                  );
-                            }
-                          : null,
-                      child: ref.watch(userDataClass).isLoading
-                          ? const DotLoader()
-                          : const Text(
-                              "Update Profile",
-                              style: TextStyle(color: Colors.white),
-                            ),
                     ),
                   ),
+
+
+                  const SizedBox(height: 100),
+
+                  
                 ],
               ),
             ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: SizedBox(
+                    width: double.infinity,
+                    height: 65,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: (acceptPrivacy && acceptTerms)?  Colors.black: Colors.grey,
+                        ),
+                        onPressed:  () {
+                          if(acceptPrivacy && acceptTerms){
+
+                                ref
+                                    .watch(userDataClass)
+                                    .updateProfile(
+                                      name: nameController.text,
+                                      phone: phoneController.text,
+                                      email: emailController.text,
+                                      aboutUs: aboutController.text,
+                                      address: addressController.text,
+                                      imagePath: pikedImage,
+                                    );
+                          }else{
+                            toast("please accept our policies !");
+                          }
+                              },
+                        child: ref.watch(userDataClass).isLoading
+                            ? const DotLoader()
+                            : const Text(
+                                "Update Profile",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                      ),
+                    ),
+                  ),
     );
   }
 }

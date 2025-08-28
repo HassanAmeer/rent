@@ -49,6 +49,8 @@ dependencies:
   transparent_route: ^0.0.2
   
   fl_chart: ^0.69.0   # latest version use karein
+  google_fonts: ^6.3.1
+  flutter_animate: ^4.5.2
 
 
 
