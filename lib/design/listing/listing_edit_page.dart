@@ -29,7 +29,8 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   final TextEditingController _dailyRateController = TextEditingController();
   final TextEditingController _weeklyRateController = TextEditingController();
   final TextEditingController _monthlyRateController = TextEditingController();
-  final TextEditingController _availiablityDaysController = TextEditingController();
+  final TextEditingController _availiablityDaysController =
+      TextEditingController();
   final List<String> _selectedImages = [];
   String? _selectedCategory = "Electronics";
   bool _isLoading = false;
@@ -101,7 +102,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   children: [
                     // Category
                     DropdownButtonFormField<String>(
-                      initialValue: _selectedCategory,
+                      value: _selectedCategory,
                       decoration: InputDecoration(
                         labelText: 'Category',
                         border: OutlineInputBorder(

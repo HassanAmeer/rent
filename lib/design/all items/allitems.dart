@@ -113,12 +113,11 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                           },
                           child: ItemsBox(
                             fullDataBytIndex: item,
-                            id: item['id'].toString(),
-                            title: item['title'] ?? 'No Name',
-                            imageUrl: item['images'].toList().isEmpty
+                            id: item.id.toString(),
+                            title: item.title,
+                            imageUrl: item.images.isEmpty
                                 ? ImgLinks.product
-                                : (Config.imgUrl + item['images'][0]) ??
-                                      ImgLinks.product,
+                                : (Config.imgUrl + item.images[0]),
                           ),
                         );
                       },

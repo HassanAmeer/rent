@@ -10,7 +10,6 @@ import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
 class Blogs extends ConsumerStatefulWidget {
-  
   const Blogs({super.key});
 
   @override
@@ -22,13 +21,13 @@ class _BlogsState extends ConsumerState<Blogs> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      ref.read(blogDataProvider).fetchAllBlogs();
+      ref.read(blogDataProvider).fetchAllBlogs(loadingFor: "blogs");
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final blogProvider = ref.watch(blogDataProvider);
+    var blogProvider = ref.watch(blogDataProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -43,14 +42,14 @@ class _BlogsState extends ConsumerState<Blogs> {
           ),
         ),
       ),
-      body: blogProvider.isLoading
+      body: blogProvider.loadingFor == "blogs"
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.only(top: 250),
                 child: DotLoader(),
               ),
             )
-          : blogProvider.blogs.isEmpty
+          : blogProvider.blogsData.isEmpty
           ? const Center(child: Text("No blogs found"))
           : GridView.builder(
               padding: const EdgeInsets.all(16),
@@ -60,14 +59,14 @@ class _BlogsState extends ConsumerState<Blogs> {
                 mainAxisSpacing: 15,
                 childAspectRatio: 0.65, // ✅ thoda lamba card
               ),
-              itemCount: blogProvider.blogs.length,
+              itemCount: blogProvider.blogsData.length,
               itemBuilder: (context, index) {
-                final blog = blogProvider.blogs[index];
-                final imageUrl = blog['image'];
+                final blog = blogProvider.blogsData[index];
+                final imageUrl = blog;
 
                 return InkWell(
                   onTap: () {
-                    goto(Blogsdetails(blog: blogProvider.blogs[index]));
+                    goto(Blogsdetails(blog: blogProvider.blogsData[index]));
                     // ✅ Yahan aap apna next page call karo
                     // Example:
                     // Navigator.push(context, MaterialPageRoute(
@@ -82,9 +81,7 @@ class _BlogsState extends ConsumerState<Blogs> {
                         borderRadius: BorderRadius.circular(12),
                         child: CacheImageWidget(
                           isCircle: false,
-                          url: imageUrl != null && imageUrl.isNotEmpty
-                              ? Config.imgUrl + imageUrl
-                              : ImgLinks.product,
+                          url: Config.imgUrl + blog.image,
                           height: ScreenSize.height * 0.24,
                           width: ScreenSize.width,
                         ),
@@ -94,7 +91,7 @@ class _BlogsState extends ConsumerState<Blogs> {
 
                       // ✅ Title
                       Text(
-                        blog['title'] ?? "No Title",
+                        blog.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -104,14 +101,11 @@ class _BlogsState extends ConsumerState<Blogs> {
                       ),
 
                       const SizedBox(height: 4),
-
-
                     ],
                   ),
                 );
               },
             ),
-            
     );
   }
 }

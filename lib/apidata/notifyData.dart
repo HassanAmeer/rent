@@ -10,6 +10,7 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/notificationmodel.dart';
 
 // import '../main.dart';
 
@@ -23,7 +24,7 @@ class NotifyData with ChangeNotifier {
     notifyListeners();
   }
 
-  List notify = [];
+  List<Notificationmodel> notify = [];
   Future getNotifyData({required String uid, String loadingFor = ""}) async {
     try {
       if (await checkInternet() == false) return;
@@ -38,8 +39,10 @@ class NotifyData with ChangeNotifier {
       print("👉 Response: $result");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        for (var item in result['notifications'] ?? []) {
+          notify.add(Notificationmodel.fromJson(item));
+        }
         toast(result['msg']);
-        notify = result['notifications'];
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
@@ -69,7 +72,7 @@ class NotifyData with ChangeNotifier {
       Uri.parse("https://thelocalrent.com/api/delnotification/$notificationId"),
     );
 
-    final data = jsonDecode(respnse.body);
+    var data = jsonDecode(respnse.body);
     if (statusCode(respnse)) {
       toast(data['msg'], backgroundColor: Colors.green);
       getNotifyData(uid: uid);

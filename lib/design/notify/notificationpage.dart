@@ -135,8 +135,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                 CacheImageWidget(
                                   width: 48,
                                   height: 48,
-                                  url: Config.imgUrl +
-                                      (item['fromuid']['image'] ?? ''),
+                                  url: Config.imgUrl + (item.fromUser.image),
                                 ),
                                 Positioned(
                                   top: 0,
@@ -156,23 +155,21 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                 ),
                               ],
                             ),
-                            title: Text(item['title'] ?? "Empty"),
+                            title: Text(item.title),
                             subtitle: Text(
-                              item['created_at'] ?? "Empty",
+                              item.createdAt,
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
                           Positioned(
                             top: 5,
                             right: 5,
-                            child:
-                                ref.watch(notifyData).loadingFor ==
-                                    item['id'].toString()
+                            child: ref.watch(notifyData).loadingFor == item.id
                                 ? DotLoader(showDots: 1)
                                 : GestureDetector(
                                     onTap: () => _deleteNotification(
                                       context,
-                                      item['id'].toString(),
+                                      item.id.toString(),
                                     ),
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
