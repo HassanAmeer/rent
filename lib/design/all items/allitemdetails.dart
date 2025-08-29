@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:rent/constants/scrensizes.dart';
 
 import '../../widgets/casheimage.dart';
 // ✅ Edit page import
@@ -24,10 +25,10 @@ class Allitemdetailspage extends StatelessWidget {
               Stack(
                 children: [
                   CacheImageWidget(
-                    width: 300,
-                    height: 150,
+                    width: double.infinity,
+                    height: ScreenSize.height* 0.4,
                     isCircle: false,
-                    radius: 0,
+                    fit: BoxFit.contain,
                     url:
                         Config.imgUrl + fullData['images'][0] ??
                         ImgLinks.profileImage,

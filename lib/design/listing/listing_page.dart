@@ -4,11 +4,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/toast.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/searchfield.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
 import '../home_page.dart';
@@ -52,22 +54,19 @@ class _ListingPageState extends ConsumerState<ListingPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            /// Search Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                controller: searchfieldcontroller,
-
-                decoration: InputDecoration(
-                  suffixIcon: InkWell(
-                    onTap: () {
-                      ref
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+            children: [
+              /// Search Bar
+              SearchFeildWidget(searchFieldController: searchfieldcontroller, 
+              hint: "Search Listings...",
+              onSearchIconTap: (){
+                if(searchfieldcontroller.text.isEmpty){
+                  toast("Write Someting");
+                  return;
+                }
+                  ref
                           .watch(listingDataProvider)
                           .fetchMyItems(
                             uid: ref
@@ -77,53 +76,46 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                             search: searchfieldcontroller.text,
                             loadingfor: "123",
                           );
+              },),
+              SizedBox(height: 10),
+              ref.watch(listingDataProvider).loadingfor == "123"
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 250),
+                        child: DotLoader(),
+                      ),
+                    )
+                  : GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.1,
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 10,
+                        ),
+                        shrinkWrap: true,
+                        controller: ScrollController(),
+                    itemCount: listingProvider.listings.length,
+                    itemBuilder: (context, index) {
+                      final item = listingProvider.listings[index];
+                      return GestureDetector(
+                        onTap: () {
+                          goto(ListingDetailPage(fullData: item));
+                        },
+                        child: ListingBox(
+                          ref: ref, // ✅ ref pass kar diya constructor se
+                          id: item['id'].toString(),
+                          productBy: item["productBy"],
+                          title: item['title'] ?? 'No Name',
+                          imageUrl:
+                              Config.imgUrl +
+                              (item['images'][0] ?? ImgLinks.product),
+                        ),
+                      );
                     },
-
-                    child: Icon(Icons.search),
                   ),
-                  border: InputBorder.none,
-                  hintText: 'Search Listings...',
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
-            ref.watch(listingDataProvider).loadingfor == "123"
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 250),
-                      child: DotLoader(),
-                    ),
-                  )
-                : Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio:1.1,
-                            mainAxisSpacing: 15,
-                            crossAxisSpacing: 10,
-                          ),
-                      itemCount: listingProvider.listings.length,
-                      itemBuilder: (context, index) {
-                        final item = listingProvider.listings[index];
-                        return GestureDetector(
-                          onTap: () {
-                            goto(ListingDetailPage(fullData: item));
-                          },
-                          child: ListingBox(
-                            ref: ref, // ✅ ref pass kar diya constructor se
-                            id: item['id'].toString(),
-                            productBy: item["productBy"],
-                            title: item['title'] ?? 'No Name',
-                            imageUrl:
-                                Config.imgUrl +
-                                (item['images'][0] ?? ImgLinks.product),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
 
@@ -187,26 +179,32 @@ class ListingBox extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(10),
                 ),
-                child: CacheImageWidget(url:      imageUrl,
-                isCircle: false,
-                width: ScreenSize.width* 0.46,
-                height: ScreenSize.height * 0.16,
-                )
+                child: CacheImageWidget(
+                  url: imageUrl,
+                  isCircle: false,
+                  width: ScreenSize.width * 0.46,
+                  height: ScreenSize.height * 0.16,
+                ),
               ),
               Positioned(
                 top: 5,
                 right: 5,
-                    
-                child: GestureDetector(
+
+                child: ref
+                                  .read(listingDataProvider).loadingfor.toString() == id.toString()  ? CircleAvatar(
+                        radius: 10,
+                        backgroundColor: Colors.black,
+                        child: DotLoader(showDots: 1)) : GestureDetector(
                   onTap: () {
                     // Show confirm
                     //Dation dialog
-                    
+
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         backgroundColor: Colors.black,
-                        title: const Text('Delete Listing', 
+                        title: const Text(
+                          'Delete Listing',
                           style: TextStyle(color: Colors.white),
                         ),
                         content: const Text(
@@ -216,17 +214,18 @@ class ListingBox extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel', 
-                            
-                          style: TextStyle(color: Colors.grey),
+                            child: const Text(
+                              'Cancel',
+
+                              style: TextStyle(color: Colors.grey),
                             ),
                           ),
                           TextButton(
                             onPressed: () {
                               // ✅ delete using ref
-                    
+
                               ref
-                                  .read(listingDataProvider.notifier)
+                                  .read(listingDataProvider)
                                   .deleteNotifications(
                                     notificationId: id,
                                     uid: ref
@@ -237,14 +236,16 @@ class ListingBox extends StatelessWidget {
                                   );
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.grey),
-                            ).animate(
-                              onPlay: (controller) => controller.repeat(
-                                reverse: true,
-                              ),
-                            ).shimmer(color: Colors.red.shade200),
+                            child:
+                                const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.grey),
+                                    )
+                                    .animate(
+                                      onPlay: (controller) =>
+                                          controller.repeat(reverse: true),
+                                    )
+                                    .shimmer(color: Colors.red.shade200),
                           ),
                         ],
                       ),
@@ -275,7 +276,7 @@ class ListingBox extends StatelessWidget {
           // Text container with reduced height
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(top:10),
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
                 title,
                 style: const TextStyle(

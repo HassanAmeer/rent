@@ -5,6 +5,7 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/design/notify/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
 import '../../constants/images.dart';
@@ -86,22 +87,10 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                 MaterialPageRoute(builder: (context) => ProfileDetailsPage()),
               );
             },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.cyan.shade700,
-
-                borderRadius: BorderRadius.circular(30),
-              ),
+            child: CacheImageWidget(
               width: 45,
               height: 45,
-              clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                Config.imgUrl + userData['image'],
-                semanticLabel: ImgLinks.profileImage,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.person, color: Colors.white, size: 24),
-              ),
+              url: Config.imgUrl + userData['image'],
             ),
           ),
           const SizedBox(width: 16),
@@ -143,15 +132,11 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                             },
                             leading: Stack(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(24),
-                                  child: Image.network(
-                                    Config.imgUrl +
-                                        (item['fromuid']['image'] ?? ''),
-                                    width: 48,
-                                    height: 48,
-                                    fit: BoxFit.cover,
-                                  ),
+                                CacheImageWidget(
+                                  width: 48,
+                                  height: 48,
+                                  url: Config.imgUrl +
+                                      (item['fromuid']['image'] ?? ''),
                                 ),
                                 Positioned(
                                   top: 0,

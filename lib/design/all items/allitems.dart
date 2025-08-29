@@ -11,12 +11,14 @@ import 'package:rent/design/fav/fvrt.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
+import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:intl/intl.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
 // import '../../design/orders/mybooking.dart';
+import '../../widgets/searchfield.dart';
 import '../booking/my_booking_page.dart'; // ✅ Import MyBooking page
 
 class AllItemsPage extends ConsumerStatefulWidget {
@@ -27,7 +29,7 @@ class AllItemsPage extends ConsumerStatefulWidget {
 }
 
 class _AllItemsPageState extends ConsumerState<AllItemsPage> {
-  var searchfeild = TextEditingController();
+  var searchfieldcontroller = TextEditingController();
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
@@ -57,34 +59,30 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
-              child: TextField(
-                controller: searchfeild,
-                decoration: InputDecoration(
-                  suffixIcon: InkWell(
-                    onTap: () {
-                      ref.read(userDataClass).userdata['id']?.toString() ?? '1';
-                      ref
-                          .read(getAllItems)
-                          .fetchAllItems(
-                            loadingfor: "loadFullData",
-                            search: searchfeild.text,
-                          );
-                    },
-                    child: Icon(Icons.search),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  hintText: 'Search items...',
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+              child: SearchFeildWidget(
+                searchFieldController: searchfieldcontroller,
+                hint: "Search items...",
+                onSearchIconTap: () {
+                  if (searchfieldcontroller.text.isEmpty) {
+                    toast("Write Someting");
+                    return;
+                  }
+                  ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+                  ref
+                      .read(getAllItems)
+                      .fetchAllItems(
+                        loadingfor: "loadFullData",
+                        search: searchfieldcontroller.text,
+                      );
+                },
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 7),
 
             ref.watch(getAllItems).loadingFor == "loadFullData"
                 ? const Center(
@@ -98,10 +96,12 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.75,
+                            childAspectRatio: 1.1,
                             mainAxisSpacing: 10,
                             crossAxisSpacing: 10,
                           ),
+                      shrinkWrap: true,
+                      controller: ScrollController(),
                       itemCount: allItemsList.length,
                       itemBuilder: (context, index) {
                         final item = allItemsList[index];
@@ -111,7 +111,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                           onTap: () {
                             goto(Allitemdetailspage(fullData: item));
                           },
-                          child: ListingBox(
+                          child: ItemsBox(
                             fullDataBytIndex: item,
                             id: item['id'].toString(),
                             title: item['title'] ?? 'No Name',
@@ -127,18 +127,18 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
     );
   }
 }
 
-class ListingBox extends ConsumerStatefulWidget {
+class ItemsBox extends ConsumerStatefulWidget {
   final fullDataBytIndex;
   final String title;
   final String imageUrl;
   final String id;
 
-  const ListingBox({
+  const ItemsBox({
     super.key,
     this.fullDataBytIndex,
     required this.title,
@@ -147,10 +147,10 @@ class ListingBox extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ListingBox> createState() => _ListingBoxState();
+  ConsumerState<ItemsBox> createState() => _ItemsBoxState();
 }
 
-class _ListingBoxState extends ConsumerState<ListingBox> {
+class _ItemsBoxState extends ConsumerState<ItemsBox> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -172,28 +172,23 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
             flex: 4,
             child: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(10),
-                  ),
-                  child: Image.network(
-                    widget.imageUrl,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.broken_image, size: 40),
-                      ),
-                    ),
-                  ),
+                CacheImageWidget(
+                  isCircle: false,
+                  url: widget.imageUrl,
+                  width: ScreenSize.width * 0.46,
+                  height: ScreenSize.height * 0.3,
                 ),
+
                 // ✅ Favourite Button (Top Right)
                 Positioned(
                   top: 5,
                   right: 5,
                   child: ref.watch(favrtdata).loadingFor == widget.id.toString()
-                      ? DotLoader(showDots: 1)
+                      ? CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.black87,
+                          child: DotLoader(showDots: 1),
+                        )
                       : GestureDetector(
                           onTap: () {
                             ref
@@ -245,7 +240,11 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                       ? SizedBox(
                           width: 20,
                           height: 20,
-                          child: DotLoader(showDots: 1),
+                          child: CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.black87,
+                            child: DotLoader(showDots: 1),
+                          ),
                         )
                       : GestureDetector(
                           onTap: () async {
@@ -265,7 +264,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                               );
 
                               if (results!.isEmpty) {
-                                toast("Plz Pickup date range");
+                                toast("Please Pickup date range");
                               }
 
                               // print(results.toString());
@@ -315,7 +314,7 @@ class _ListingBoxState extends ConsumerState<ListingBox> {
                                     context: context,
                                   );
                             } catch (e) {
-                              toast("Plz Pickup date range");
+                              toast("Please Pickup date range!");
                             }
                           },
                           child: Container(

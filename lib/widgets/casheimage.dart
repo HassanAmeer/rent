@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 class CacheImageWidget extends StatelessWidget {
@@ -21,7 +22,7 @@ class CacheImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(url);
+    // print(url);
     // return Text("${url}");
     return SizedBox(
       width: width.toDouble(),
@@ -35,7 +36,7 @@ class CacheImageWidget extends StatelessWidget {
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     DotLoader(showDots: 1),
                 errorWidget: (context, url, error) =>
-                    Icon(Icons.image_not_supported),
+                    Image.asset(ImgAssets.noimg),
               ),
             )
           : CachedNetworkImage(
@@ -44,7 +45,7 @@ class CacheImageWidget extends StatelessWidget {
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   DotLoader(),
               errorWidget: (context, url, error) =>
-                  Icon(Icons.image_not_supported),
+              Image.asset(ImgAssets.noimg)
             ),
     );
   }

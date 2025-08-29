@@ -120,7 +120,6 @@ class UserData with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-      setLoading(false);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg'], backgroundColor: Colors.green);
@@ -129,11 +128,14 @@ class UserData with ChangeNotifier {
 
         var box = Hive.box('userBox');
         box.put('userData', userdata);
+        setLoading(false);
 
         goto(const HomePage(), canBack: false);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
+      
+      setLoading(false);
     } catch (e, st) {
       print(" 👉 login error: $e, st:$st");
       setLoading(false);

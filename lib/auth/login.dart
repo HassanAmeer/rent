@@ -86,11 +86,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     backgroundColor: const Color.fromARGB(255, 13, 14, 14),
                   ),
                   child: ref.watch(userDataClass).isLoading == true
-                      ? const SizedBox(
-                          width: 25,
-                          height: 25,
-                          child: DotLoader(size: 12),
-                        )
+                      ? DotLoader()
                       : const Text(
                           "Login",
                           style: TextStyle(

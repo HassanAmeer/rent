@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../widgets/casheimage.dart';
+
 class EditListingPage extends ConsumerStatefulWidget {
   final String? title;
   final String? price;
@@ -130,7 +132,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  initialValue: _selectedCategory,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
@@ -620,16 +622,11 @@ class ListingBox extends StatelessWidget {
           children: [
             Stack(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: Image.network(
-                    image,
-                    height: 130,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                CacheImageWidget(
+                  url:image,
+                  height: 130,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
                 Positioned(
                   top: 6,

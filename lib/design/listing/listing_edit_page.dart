@@ -101,7 +101,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   children: [
                     // Category
                     DropdownButtonFormField<String>(
-                      value: _selectedCategory,
+                      initialValue: _selectedCategory,
                       decoration: InputDecoration(
                         labelText: 'Category',
                         border: OutlineInputBorder(

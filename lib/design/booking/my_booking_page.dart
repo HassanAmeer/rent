@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/toast.dart';
 // import 'package:rent/apidata/bookingapi.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/design/booking/bookingdetails.dart';
@@ -14,6 +15,7 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/bookingapi.dart';
 import '../../apidata/user.dart';
+import '../../widgets/searchfield.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {
   const MyBookingPage({super.key});
@@ -60,43 +62,30 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Search bar just below AppBar (with grey background)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: TextField(
-                controller: searchfieldcontroller,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: InkWell(
-                    onTap: () {
-                      ref
-                          .watch(bookingDataProvider)
-                          .fetchComingOrders(
-                            uid: ref
-                                .watch(userDataClass)
-                                .userdata["id"]
-                                .toString(),
-                            search: searchfieldcontroller.text,
-                            loadingfor: "3421",
-                          );
-                    },
-                    child: const Icon(Icons.search, color: Colors.black54),
-                  ),
-                  hintText: "Search How to & More",
-                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                style: const TextStyle(color: Colors.black87, fontSize: 16),
-              ),
+            // Search bar just below AppBar (with grey background) 
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SearchFeildWidget(searchFieldController: searchfieldcontroller, 
+              hint: "Search How to & More",
+              onSearchIconTap: (){
+                 if(searchfieldcontroller.text.isEmpty){
+                  toast("Write Someting");
+                  return;
+                }
+                  ref
+                            .watch(bookingDataProvider)
+                            .fetchComingOrders(
+                              uid: ref
+                                  .watch(userDataClass)
+                                  .userdata["id"]
+                                  .toString(),
+                              search: searchfieldcontroller.text,
+                              loadingfor: "3421",
+                            );
+              },),
             ),
+            
+            
             ref.watch(bookingDataProvider).loadingfor == "3421"
                 ? const Center(
                     child: Padding(

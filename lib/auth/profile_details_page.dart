@@ -76,21 +76,24 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     isTransparent: true,
                   );
                 },
-                child: CacheImageWidget(
-                  width: 100,
-                  height: 100,
-                  isCircle: true,
-                  radius: 200,
-                  url:
-                      (ref.watch(userDataClass).userdata['image'] != null &&
-                          ref
-                              .watch(userDataClass)
-                              .userdata['image']
-                              .toString()
-                              .isNotEmpty)
-                      ? Config.imgUrl +
-                            ref.watch(userDataClass).userdata['image']
-                      : ImgLinks.profileImage,
+                child: Hero(
+                  tag: "123",
+                  child: CacheImageWidget(
+                    width: 100,
+                    height: 100,
+                    isCircle: true,
+                    radius: 200,
+                    url:
+                        (ref.watch(userDataClass).userdata['image'] != null &&
+                            ref
+                                .watch(userDataClass)
+                                .userdata['image']
+                                .toString()
+                                .isNotEmpty)
+                        ? Config.imgUrl +
+                              ref.watch(userDataClass).userdata['image']
+                        : ImgLinks.profileImage,
+                  ),
                 ),
               ),
 
@@ -207,6 +210,11 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
         onPressed: () {
           showDialog(
             context: context,
+            animationStyle: AnimationStyle(
+              curve:ElasticOutCurve(),
+              // curve: ElasticInOutCurve(), 
+              duration: Duration(milliseconds: 1000)
+            ),
             builder: (context) {
               return AlertDialog(
                 title: const Text("Logout", style: TextStyle(color: Colors.white),),
@@ -249,39 +257,31 @@ class Profileview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        // backgroundBlendMode: BlendMode.darken,
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.black54,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_ios, color: Colors.grey),
-          ),
-        ),
-        body: InkWell(
-          onTapUp: (v) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(200, 0, 0, 0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          onPressed: () {
             Navigator.pop(context);
           },
-          child: Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Hero(
-                tag: "123",
-                child: CacheImageWidget(
-                  url: imagelink,
-                  isCircle: false,
-                  fit: BoxFit.contain,
-                  height: ScreenSize.height * 0.7,
-                  width: ScreenSize.width,
-                ),
-              ),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.grey),
+        ),
+      ),
+      body: InkWell(
+        onTapUp: (v) {
+          Navigator.pop(context);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(0),
+          child: Hero(
+            tag: "123",
+            child: CacheImageWidget(
+              url: imagelink,
+              isCircle: false,
+              fit: BoxFit.contain,
+              height: ScreenSize.height * 0.7,
+              width: ScreenSize.width,
             ),
           ),
         ),

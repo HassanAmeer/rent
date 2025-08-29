@@ -226,7 +226,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                   border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: DropdownButtonFormField<String>(
-                  value: _selectedCategory,
+                  initialValue: _selectedCategory,
                   hint: const Text('Select a category'),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
