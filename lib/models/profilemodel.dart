@@ -1,4 +1,4 @@
-class UserModel {
+class ProfileModel {
   final int id;
   final String image;
   final int activeUser;
@@ -11,31 +11,32 @@ class UserModel {
   final String verifiedBy;
   final int sendEmail;
   final String password;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
   final String? deletedAt;
 
-  UserModel({
-    required this.id,
-    required this.image,
-    required this.activeUser,
-    required this.name,
-    required this.phone,
-    required this.email,
-    required this.lastOnlineTime,
-    required this.address,
+  ProfileModel({
+    this.id = 00,
+    this.image =
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQi50zTLuADwdCHUNWNkOxgIh05Uo3ma8euw&s",
+    this.activeUser = 1,
+    this.name = "",
+    this.phone = "",
+    this.email = "",
+    this.lastOnlineTime = "",
+    this.address = "",
     this.aboutUs,
-    required this.verifiedBy,
-    required this.sendEmail,
-    required this.password,
-    required this.createdAt,
-    required this.updatedAt,
+    this.verifiedBy = "",
+    this.sendEmail = 0,
+    this.password = "",
+    this.createdAt = "",
+    this.updatedAt = "",
     this.deletedAt,
   });
 
   // ✅ JSON → Model
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
+  factory ProfileModel.fromJson(Map<String, dynamic> json) {
+    return ProfileModel(
       id: json['id'],
       image: json['image'],
       activeUser: json['activeUser'],
@@ -48,8 +49,8 @@ class UserModel {
       verifiedBy: json['verifiedBy'],
       sendEmail: json['sendEmail'],
       password: json['password'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
       deletedAt: json['deleted_at'],
     );
   }
@@ -69,8 +70,8 @@ class UserModel {
       'verifiedBy': verifiedBy,
       'sendEmail': sendEmail,
       'password': password,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt,
+      'updated_at': updatedAt,
       'deleted_at': deletedAt,
     };
   }

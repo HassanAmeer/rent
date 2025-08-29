@@ -142,7 +142,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
       try {
         final listingApi = ref.read(listingDataProvider);
         final userId =
-            ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+            ref.read(userDataClass).userdata.id.toString();
 
         await listingApi.addNewListing(
           uid: userId,
@@ -166,7 +166,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         ref
             .watch(listingDataProvider)
             .fetchMyItems(
-              uid: ref.watch(userDataClass).userdata["id"].toString(),
+              uid: ref.watch(userDataClass).userdata.id.toString(),
               search: "",
               loadingfor: "123",
             );

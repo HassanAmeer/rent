@@ -31,7 +31,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       ref
           .watch(bookingDataProvider)
           .fetchComingOrders(
-            uid: ref.watch(userDataClass).userdata["id"].toString(),
+            uid: ref.watch(userDataClass).userdata.id.toString(),
             search: "",
             loadingfor: "3421",
           );
@@ -77,7 +77,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                             .fetchComingOrders(
                               uid: ref
                                   .watch(userDataClass)
-                                  .userdata["id"]
+                                  .userdata.id
                                   .toString(),
                               search: searchfieldcontroller.text,
                               loadingfor: "3421",

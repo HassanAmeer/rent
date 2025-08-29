@@ -7,6 +7,7 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+// ignore: must_be_immutable
 class Chats extends ConsumerStatefulWidget {
   var msgdata;
   Chats({super.key, required this.msgdata});
@@ -24,10 +25,10 @@ class _ChatsState extends ConsumerState<Chats> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var senderId = ref.watch(userDataClass).userdata['id'].toString();
+      var senderId = ref.watch(userDataClass).userdata.id.toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata['id'].toString() ==
+          ref.watch(userDataClass).userdata.id.toString() ==
               widget.msgdata['sid'].toString()
           ? widget.msgdata['rid']
           : widget.msgdata['sid'];
@@ -47,10 +48,10 @@ class _ChatsState extends ConsumerState<Chats> {
     if (_controller.text.trim().isNotEmpty) {
       String message = _controller.text.trim();
 
-      var senderId = ref.watch(userDataClass).userdata['id'].toString();
+      var senderId = ref.watch(userDataClass).userdata.id.toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata['id'].toString() ==
+          ref.watch(userDataClass).userdata.id.toString() ==
               widget.msgdata['sid'].toString()
           ? widget.msgdata['rid']
           : widget.msgdata['sid'];
@@ -90,7 +91,7 @@ class _ChatsState extends ConsumerState<Chats> {
             ref
                 .read(chatClass)
                 .chatedUsers(
-                  uid: ref.read(userDataClass).userdata['id'].toString(),
+                  uid: ref.read(userDataClass).userdata.id.toString(),
                 );
 
             Navigator.pop(context);
@@ -157,7 +158,7 @@ class _ChatsState extends ConsumerState<Chats> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 var chat = chatProvider.messagesList[index];
-                bool isMe = userProvider.userdata['id'] == chat['sid'];
+                bool isMe = userProvider.userdata.id == chat['sid'];
 
                 return Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 4),

@@ -27,7 +27,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
           .watch(notifyData)
           .getNotifyData(
             loadingFor: "fetchNotifyData",
-            uid: ref.watch(userDataClass).userdata['id'].toString(),
+            uid: ref.watch(userDataClass).userdata.id.toString(),
           );
     });
     super.initState();
@@ -66,7 +66,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         .deleteNotification(
           loadingfor: notifyId,
           notificationId: notifyId,
-          uid: ref.read(userDataClass).userdata['id'].toString(),
+          uid: ref.read(userDataClass).userdata.id.toString(),
         );
     Navigator.pop(context);
   }
@@ -90,7 +90,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
             child: CacheImageWidget(
               width: 45,
               height: 45,
-              url: Config.imgUrl + userData['image'],
+              url: Config.imgUrl + userData.image,
             ),
           ),
           const SizedBox(width: 16),

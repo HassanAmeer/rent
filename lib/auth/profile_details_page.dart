@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
@@ -62,15 +63,8 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     context,
                     Profileview(
                       imagelink:
-                          (ref.watch(userDataClass).userdata['image'] != null &&
-                              ref
-                                  .watch(userDataClass)
-                                  .userdata['image']
-                                  .toString()
-                                  .isNotEmpty)
-                          ? Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image']
-                          : ImgLinks.profileImage,
+                          Config.imgUrl +
+                          ref.watch(userDataClass).userdata.image,
                     ),
                     isTransparent: true,
                   );
@@ -83,15 +77,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     isCircle: true,
                     radius: 200,
                     url:
-                        (ref.watch(userDataClass).userdata['image'] != null &&
-                            ref
-                                .watch(userDataClass)
-                                .userdata['image']
-                                .toString()
-                                .isNotEmpty)
-                        ? Config.imgUrl +
-                              ref.watch(userDataClass).userdata['image']
-                        : ImgLinks.profileImage,
+                        Config.imgUrl + ref.watch(userDataClass).userdata.image,
                   ),
                 ),
               ),
@@ -104,13 +90,11 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                         child: DotLoader(),
                       ),
                     )
-                  : ref.watch(userDataClass).userdata.isEmpty
-                  ? const Center(child: Text("Failed to load user data"))
                   : Column(
                       children: [
                         ListTile(
                           title: Text(
-                            ref.watch(userDataClass).userdata['name'] ?? '',
+                            ref.watch(userDataClass).userdata.name,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -125,7 +109,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['email'] ?? '',
+                            ref.watch(userDataClass).userdata.email,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -139,7 +123,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['phone'] ?? '',
+                            ref.watch(userDataClass).userdata.phone,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -153,7 +137,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['address'] ?? '',
+                            ref.watch(userDataClass).userdata.address,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -167,8 +151,8 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['aboutUs'] ??
-                                'empty',
+                            ref.watch(userDataClass).userdata.aboutUs ??
+                                "No information available",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,

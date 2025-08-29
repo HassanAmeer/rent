@@ -11,6 +11,7 @@ import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/mylisting%20Model.dart';
 
 // import '../main.dart';
 
@@ -20,7 +21,7 @@ final listingDataProvider = ChangeNotifierProvider<ListingData>(
 );
 
 class ListingData with ChangeNotifier {
-  var listings = [];
+  List<ListingModel> listings = [];
 
   //////
   String loadingfor = "";
@@ -49,7 +50,10 @@ class ListingData with ChangeNotifier {
       print("👉Response status: ${response.statusCode}");
       print("👉 data: $data");
       if (response.statusCode == 200) {
-        listings = data['items'] ?? [];
+        for (var item in data['items'] ?? []) {
+          listings.add(ListingModel.fromJson(item));
+        }
+        listings = data['items'];
         // listings =  [];
         setLoading("");
         notifyListeners();

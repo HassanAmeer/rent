@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/models/mylisting%20Model.dart';
 
 // import '../../apidata/listingapi.dart';
 // import '../../apidata/user.dart';
@@ -14,7 +15,7 @@ import '../../apidata/user.dart';
 import '../../constants/toast.dart';
 
 class EditListingPage extends ConsumerStatefulWidget {
-  final Map<String, dynamic> itemData;
+  final ListingModel itemData;
 
   const EditListingPage({super.key, required this.itemData});
 
@@ -51,9 +52,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(
-      text: widget.itemData['title'] ?? '',
-    );
+    _titleController = TextEditingController(text: widget.itemData.title);
     // _descriptionController = TextEditingController(
     //   text: widget.itemData['description'] ?? '',
     // );
@@ -330,10 +329,11 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                             ref
                                 .read(listingDataProvider)
                                 .editsmyitems(
-                                  itemId: widget.itemData['id'].toString(),
+                                  itemId: widget.itemData.id.toString(),
                                   uid: ref
                                       .watch(userDataClass)
-                                      .userdata['id']
+                                      .userdata
+                                      .id
                                       .toString(),
                                   newItemData: updatedData,
                                 )
