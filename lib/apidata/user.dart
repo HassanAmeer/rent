@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -28,8 +27,8 @@ class UserData with ChangeNotifier {
       // print("user dtaa from hive box: $checkData");
     }
   }
-  
-  checkAlreadyhaveLogin() async{
+
+  checkAlreadyhaveLogin() async {
     await Hive.openBox("userBox");
     var box = Hive.box('userBox'); // File Name
     var checkData = box.get('userData'); // save the user object (map) data
@@ -38,7 +37,7 @@ class UserData with ChangeNotifier {
       notifyListeners();
       await Future.delayed(Duration(milliseconds: 1000));
       goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
-    }else{
+    } else {
       await Future.delayed(Duration(milliseconds: 1000));
       goto(LoginPage(), delayInMilliSeconds: 2000, canBack: false);
     }
@@ -120,7 +119,6 @@ class UserData with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg'], backgroundColor: Colors.green);
 
@@ -134,7 +132,7 @@ class UserData with ChangeNotifier {
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
-      
+
       setLoading(false);
     } catch (e, st) {
       print(" 👉 login error: $e, st:$st");

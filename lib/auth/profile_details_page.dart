@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
@@ -211,34 +210,48 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
           showDialog(
             context: context,
             animationStyle: AnimationStyle(
-              curve:ElasticOutCurve(),
-              // curve: ElasticInOutCurve(), 
-              duration: Duration(milliseconds: 1000)
+              curve: ElasticOutCurve(),
+              // curve: ElasticInOutCurve(),
+              duration: Duration(milliseconds: 1000),
             ),
             builder: (context) {
               return AlertDialog(
-                title: const Text("Logout", style: TextStyle(color: Colors.white),),
-                content: const Text("Are you sure you want to logout?", style: TextStyle(color: Colors.grey),),
+                title: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  "Are you sure you want to logout?",
+                  style: TextStyle(color: Colors.grey),
+                ),
                 backgroundColor: Colors.black,
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ref.watch(userDataClass).logout();
-                    },
-                    child: Text("Logout", style: TextStyle(color: Colors.grey),),
-                  ).animate(
-                    onPlay: (controller) => controller.repeat(
-                      reverse: true,
-                      period: const Duration(milliseconds: 1500),
-                    )
-                  ).shimmer(color: Colors.red.shade200),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ref.watch(userDataClass).logout();
+                        },
+                        child: Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                      .animate(
+                        onPlay: (controller) => controller.repeat(
+                          reverse: true,
+                          period: const Duration(milliseconds: 1500),
+                        ),
+                      )
+                      .shimmer(color: Colors.red.shade200),
                 ],
               );
             },
