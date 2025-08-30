@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/models/mylisting%20Model.dart';
 
 import '../../widgets/casheimage.dart';
 import 'listing_edit_page.dart'; // ✅ Edit page import
 
 class ListingDetailPage extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+  final ListingModel fullData;
 
   const ListingDetailPage({super.key, required this.fullData});
 
@@ -31,8 +32,8 @@ class ListingDetailPage extends StatelessWidget {
                     fit: BoxFit.contain,
                     radius: 0,
                     url:
-                        Config.imgUrl + fullData['images'][0] ??
-                        ImgLinks.profileImage,
+                        Config.imgUrl + fullData.images.toString()
+                        
                   ),
                 ],
               ),
@@ -40,7 +41,7 @@ class ListingDetailPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               Text(
-                "${fullData['title'] ?? 'Title.......'}",
+                "${fullData.title}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -48,33 +49,33 @@ class ListingDetailPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(fullData['description'] ?? 'Description.......'),
+              HtmlWidget(fullData.description),
 
               Divider(),
 
               ListTile(
-                title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
+                title: Text("dailyrate: ${fullData.dailyrate}"),
               ),
               Divider(),
               ListTile(
-                title: Text("weeklyrate: ${fullData['weeklyrate'] ?? '0'}"),
+                title: Text("weeklyrate: ${fullData.weeklyrate}"),
               ),
               Divider(),
               ListTile(
-                title: Text(" monthlyrate: ${fullData['monthlyrate'] ?? '0'}"),
+                title: Text(" monthlyrate: ${fullData.monthlyrate}"),
               ),
               Divider(),
               ListTile(
-                title: Text("created_at: ${fullData['created_at'] ?? '0'}"),
+                title: Text("created_at: ${fullData.createdAt}"),
               ),
               Divider(),
               ListTile(
-                title: Text(" updated_at: ${fullData[' updated_at'] ?? '0'}"),
+                title: Text(" updated_at: ${fullData.updatedAt}"),
               ),
               Divider(),
               ListTile(
                 title: Text(
-                  " availabilityDays: ${fullData['availabilityDays'] ?? '0'}",
+                  " availabilityDays: ${fullData.availabilityDays}",
                 ),
               ),
               Divider(),
@@ -87,8 +88,7 @@ class ListingDetailPage extends StatelessWidget {
                   isCircle: true,
                   radius: 200,
                   url:
-                      Config.imgUrl + fullData["rentalusers"]['image'] ??
-                      ImgLinks.profileImage,
+                      Config.imgUrl + fullData.rentalUser.image
                 ),
               ),
             ],

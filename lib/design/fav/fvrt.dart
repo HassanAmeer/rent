@@ -31,7 +31,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
   }
 
   Future<void> _loadFavorites() async {
-    final userId = ref.read(userDataClass).userdata["id"].toString();
+    final userId = ref.read(userDataClass).userdata.id.toString();
     await ref
         .read(favrtdata)
         .favoritems(loadingFor: "loadFullData", uid: userId, search: "");
@@ -95,7 +95,8 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                       loadingFor: "loadFullData",
                                       uid: ref
                                           .watch(userDataClass)
-                                          .userdata["id"]
+                                          .userdata
+                                          .id
                                           .toString(),
                                       search: searchcontrollers.text,
                                     );
@@ -206,7 +207,8 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                                   .addfavrt(
                                                     uid: ref
                                                         .watch(userDataClass)
-                                                        .userdata['id']
+                                                        .userdata
+                                                        .id
                                                         .toString(),
                                                     itemId:
                                                         item['products']["id"]
