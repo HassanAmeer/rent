@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/dashboardmodel.dart';
 
 import '../constants/checkInternet.dart';
 
@@ -12,7 +13,7 @@ final dashboardProvider = ChangeNotifierProvider<DashboardService>(
 );
 
 class DashboardService with ChangeNotifier {
-  Map<String, dynamic> dashboardData = {};
+  DashboardModel? DashboardData;
   String loadingfor = "";
 
   // ✅ Direct keys for quick access
@@ -46,8 +47,8 @@ class DashboardService with ChangeNotifier {
       print("👉 data: $data");
 
       if (response.statusCode == 200) {
-        dashboardData.clear();
-        dashboardData = data;
+        // DashboardData.clear();
+        DashboardData = DashboardModel.fromJson(data);
       } else {
         toast(data['msg'] ?? "Something went wrong");
       }

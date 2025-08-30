@@ -83,7 +83,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final dashboardService = ref.watch(dashboardProvider);
+    var dashboardService = ref.watch(dashboardProvider);
 
     return WillPopScope(
       onWillPop: () {
@@ -143,15 +143,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                   : HomeChart(
                           bookingsData: _parseDoubleList(
                             dashboardService
-                                .dashboardData['orderCountsListForChart'],
+                                .DashboardData!
+                                .orderCountsListForChart,
                           ),
                           rentalsData: _parseDoubleList(
                             dashboardService
-                                .dashboardData["rentalCountsListForChart"],
+                                .DashboardData!
+                                .rentalCountsListForChart,
                           ),
                           labels: _parseStringList(
                             dashboardService
-                                .dashboardData["productTitelsListForChart"]
+                                .DashboardData!
+                                .productTitelsListForChart
                                 .map((e) => e.toString()),
                           ),
                         )
@@ -170,16 +173,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: [
                       homeTextWidget(
                         title: "Total Earning",
-                        value:
-                            "\$${dashboardService.dashboardData['totalEarning']?.toString() ?? '0.00'}",
+                        value: "\$${dashboardService.DashboardData}",
                       ),
                       // const SizedBox(width: 12),
                       homeTextWidget(
                         title: " Total Rating",
                         value:
-                            dashboardService.dashboardData['totalRating']
-                                ?.toString() ??
-                            "0.0",
+                            dashboardService.DashboardData?.toString() ?? "0.0",
                       ),
                     ],
                   )
