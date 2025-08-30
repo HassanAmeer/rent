@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/models/blogmodel.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 class Blogsdetails extends StatefulWidget {
-  final Map<String, dynamic> blog;
+  final Blogmodel blog;
   const Blogsdetails({super.key, required this.blog});
 
   @override
@@ -75,11 +76,8 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                           // Background Image - Full size
                           Positioned.fill(
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  blog['image'] != null &&
-                                      blog['image'].isNotEmpty
-                                  ? Config.imgUrl + blog['image']
-                                  : ImgLinks.product,
+                              imageUrl: Config.imgUrl + blog.image,
+
                               fit: BoxFit.cover,
                               width: double.infinity,
                               height: double.infinity,
@@ -123,7 +121,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                             right: 16,
                             child: SafeArea(
                               child: Text(
-                                blog['title'] ?? "No Title",
+                                blog.title,
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -176,7 +174,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                         const SizedBox(height: 12),
                         // ✅ HTML Widget for rich text content
                         HtmlWidget(
-                          blog['description'] ?? "No description available",
+                          blog.description,
                           textStyle: const TextStyle(
                             fontSize: 16,
                             color: Colors.black54,

@@ -11,13 +11,15 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/home_page.dart';
 
+import '../models/allItemsModel.dart';
+
 // import '../main.dart';
 
 // Use the correct class name in the provider
 final getAllItems = ChangeNotifierProvider<GetAllItems>((ref) => GetAllItems());
 
 class GetAllItems with ChangeNotifier {
-  var allItems = [];
+  List<AllItemsModel> allItems = [];
   var order = [];
   //////
   String loadingFor = "";
@@ -44,7 +46,9 @@ class GetAllItems with ChangeNotifier {
       print("👉 data: $data");
       if (response.statusCode == 200) {
         allItems.clear();
-        allItems = data['items'] ?? [];
+        for (var item in data['items'] ?? []) {
+          allItems.add(AllItemsModel.fromJson(item));
+        }
 
         setLoading("");
       } else {

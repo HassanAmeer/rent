@@ -43,7 +43,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           .read(dashboardProvider)
           .fetchDashboard(
             loadingfor: "dashboard",
-            uid: "${ref.watch(userDataClass).userdata['id']}",
+            uid: "${ref.watch(userDataClass).userdata.id}",
           );
     });
   }
@@ -122,9 +122,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 height: 47,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url:
-                      Config.imgUrl +
-                      ref.watch(userDataClass).userdata['image'],
+                  url: Config.imgUrl + ref.watch(userDataClass).userdata.image,
                 ),
               ),
             ),
@@ -244,7 +242,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     },
                     child:
                         Container(
-                              width: ScreenSize.width* 0.9,
+                              width: ScreenSize.width * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10),

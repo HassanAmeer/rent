@@ -63,15 +63,8 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     context,
                     Profileview(
                       imagelink:
-                          (ref.watch(userDataClass).userdata['image'] != null &&
-                              ref
-                                  .watch(userDataClass)
-                                  .userdata['image']
-                                  .toString()
-                                  .isNotEmpty)
-                          ? Config.imgUrl +
-                                ref.watch(userDataClass).userdata['image']
-                          : ImgLinks.profileImage,
+                          Config.imgUrl +
+                          ref.watch(userDataClass).userdata.image,
                     ),
                     isTransparent: true,
                   );
@@ -84,15 +77,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                     isCircle: true,
                     radius: 200,
                     url:
-                        (ref.watch(userDataClass).userdata['image'] != null &&
-                            ref
-                                .watch(userDataClass)
-                                .userdata['image']
-                                .toString()
-                                .isNotEmpty)
-                        ? Config.imgUrl +
-                              ref.watch(userDataClass).userdata['image']
-                        : ImgLinks.profileImage,
+                        Config.imgUrl + ref.watch(userDataClass).userdata.image,
                   ),
                 ),
               ),
@@ -105,13 +90,11 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                         child: DotLoader(),
                       ),
                     )
-                  : ref.watch(userDataClass).userdata.isEmpty
-                  ? const Center(child: Text("Failed to load user data"))
                   : Column(
                       children: [
                         ListTile(
                           title: Text(
-                            ref.watch(userDataClass).userdata['name'] ?? '',
+                            ref.watch(userDataClass).userdata.name,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -126,7 +109,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['email'] ?? '',
+                            ref.watch(userDataClass).userdata.email,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -140,7 +123,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['phone'] ?? '',
+                            ref.watch(userDataClass).userdata.phone,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -154,7 +137,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['address'] ?? '',
+                            ref.watch(userDataClass).userdata.address,
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -168,8 +151,8 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                             style: TextStyle(color: Colors.grey, fontSize: 11),
                           ),
                           subtitle: Text(
-                            ref.watch(userDataClass).userdata['aboutUs'] ??
-                                'empty',
+                            ref.watch(userDataClass).userdata.aboutUs ??
+                                "No information available",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 15,
@@ -211,34 +194,48 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
           showDialog(
             context: context,
             animationStyle: AnimationStyle(
-              curve:ElasticOutCurve(),
-              // curve: ElasticInOutCurve(), 
-              duration: Duration(milliseconds: 1000)
+              curve: ElasticOutCurve(),
+              // curve: ElasticInOutCurve(),
+              duration: Duration(milliseconds: 1000),
             ),
             builder: (context) {
               return AlertDialog(
-                title: const Text("Logout", style: TextStyle(color: Colors.white),),
-                content: const Text("Are you sure you want to logout?", style: TextStyle(color: Colors.grey),),
+                title: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  "Are you sure you want to logout?",
+                  style: TextStyle(color: Colors.grey),
+                ),
                 backgroundColor: Colors.black,
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Cancel", style: TextStyle(color: Colors.grey.shade700),),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ref.watch(userDataClass).logout();
-                    },
-                    child: Text("Logout", style: TextStyle(color: Colors.grey),),
-                  ).animate(
-                    onPlay: (controller) => controller.repeat(
-                      reverse: true,
-                      period: const Duration(milliseconds: 1500),
-                    )
-                  ).shimmer(color: Colors.red.shade200),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ref.watch(userDataClass).logout();
+                        },
+                        child: Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                      .animate(
+                        onPlay: (controller) => controller.repeat(
+                          reverse: true,
+                          period: const Duration(milliseconds: 1500),
+                        ),
+                      )
+                      .shimmer(color: Colors.red.shade200),
                 ],
               );
             },

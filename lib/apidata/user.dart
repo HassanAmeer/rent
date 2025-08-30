@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -12,11 +11,12 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/profilemodel.dart';
 
 final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 
 class UserData with ChangeNotifier {
-  var userdata = {};
+  ProfileModel userdata = ProfileModel();
 
   getStorageData() async {
     await Hive.openBox("userBox");
@@ -28,8 +28,8 @@ class UserData with ChangeNotifier {
       // print("user dtaa from hive box: $checkData");
     }
   }
-  
-  checkAlreadyhaveLogin() async{
+
+  checkAlreadyhaveLogin() async {
     await Hive.openBox("userBox");
     var box = Hive.box('userBox'); // File Name
     var checkData = box.get('userData'); // save the user object (map) data
@@ -38,7 +38,7 @@ class UserData with ChangeNotifier {
       notifyListeners();
       await Future.delayed(Duration(milliseconds: 1000));
       goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
-    }else{
+    } else {
       await Future.delayed(Duration(milliseconds: 1000));
       goto(LoginPage(), delayInMilliSeconds: 2000, canBack: false);
     }
@@ -120,7 +120,6 @@ class UserData with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg'], backgroundColor: Colors.green);
 
@@ -134,7 +133,7 @@ class UserData with ChangeNotifier {
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
-      
+
       setLoading(false);
     } catch (e, st) {
       print(" 👉 login error: $e, st:$st");
@@ -149,7 +148,7 @@ class UserData with ChangeNotifier {
 
       setLoading(true);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/getuserbyid/${userdata['id']}"),
+        Uri.parse("https://thelocalrent.com/api/getuserbyid/${userdata.id}"),
       );
       debugPrint("👉 Response status: ${response.statusCode}");
       debugPrint(" 👉 Response body: ${response.body}");
@@ -158,7 +157,7 @@ class UserData with ChangeNotifier {
 
       setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        userdata = result['user'];
+        userdata = ProfileModel.fromJson(result['user']);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }
@@ -188,7 +187,7 @@ class UserData with ChangeNotifier {
 
       req.headers['Content-Type'] = 'application/json';
 
-      req.fields['uid'] = userdata['id'].toString();
+      req.fields['uid'] = userdata.id.toString();
       req.fields['name'] = name;
       req.fields['phone'] = phone.toString();
       req.fields['email'] = email;

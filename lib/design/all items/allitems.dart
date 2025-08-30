@@ -33,7 +33,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+      ref.read(userDataClass).userdata.id.toString();
       ref
           .read(getAllItems)
           .fetchAllItems(loadingfor: "loadFullData", search: "");
@@ -72,7 +72,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                     toast("Write Someting");
                     return;
                   }
-                  ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+                  ref.read(userDataClass).userdata.id.toString();
                   ref
                       .read(getAllItems)
                       .fetchAllItems(
@@ -113,12 +113,11 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                           },
                           child: ItemsBox(
                             fullDataBytIndex: item,
-                            id: item['id'].toString(),
-                            title: item['title'] ?? 'No Name',
-                            imageUrl: item['images'].toList().isEmpty
+                            id: item.id.toString(),
+                            title: item.title,
+                            imageUrl: item.images.isEmpty
                                 ? ImgLinks.product
-                                : (Config.imgUrl + item['images'][0]) ??
-                                      ImgLinks.product,
+                                : (Config.imgUrl + item.images[0]),
                           ),
                         );
                       },
@@ -196,7 +195,8 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                 .addfavrt(
                                   uid: ref
                                       .watch(userDataClass)
-                                      .userdata['id']
+                                      .userdata
+                                      .id
                                       .toString(),
                                   itemId: widget.id.toString(),
                                   loadingFor: widget.id.toString(),
@@ -306,7 +306,8 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
 
                                     userId: ref
                                         .watch(userDataClass)
-                                        .userdata['id']
+                                        .userdata
+                                        .id
                                         .toString(),
 
                                     loadingFor: "${widget.id}order",

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:rent/models/notificationmodel.dart';
 
 import '../../widgets/casheimage.dart';
 
 class NotificationsDetails extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+  final Notificationmodel fullData;
 
   const NotificationsDetails({super.key, required this.fullData});
 
@@ -19,7 +20,7 @@ class NotificationsDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${fullData['title'] ?? 'Title.......'}",
+              "${fullData.title}",
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
@@ -28,7 +29,7 @@ class NotificationsDetails extends StatelessWidget {
             //   "${fullData['desc'] ?? 'Description.......'}",
             //   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
             // ),
-            HtmlWidget(fullData['desc'] ?? 'Description.......'),
+            HtmlWidget(fullData.desc),
 
             Divider(),
             ListTile(title: Text("From User")),
@@ -38,12 +39,10 @@ class NotificationsDetails extends StatelessWidget {
                 height: 50,
                 isCircle: true,
                 radius: 200,
-                url:
-                    Config.imgUrl + fullData['fromuid']['image'] ??
-                    ImgLinks.profileImage,
+                url: Config.imgUrl + fullData.fromUser.image,
               ),
-              title: Text(fullData['fromuid']['name'] ?? 'Unknown'),
-              subtitle: Text(fullData['fromuid']['email'] ?? 'Unknown'),
+              title: Text(fullData.fromUser.name),
+              subtitle: Text(fullData.fromUser.email),
             ),
           ],
         ),

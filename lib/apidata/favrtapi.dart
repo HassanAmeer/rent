@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -10,51 +9,53 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
 
-// import '../design/fav/fvrt.dart';
-// import '../main.dart';
-
-// Use the correct class name in the provider
+// Provider
 final favrtdata = ChangeNotifierProvider<Favrt>((ref) => Favrt());
 
 class Favrt with ChangeNotifier {
   var favrt = [];
-  //////
   String loadingFor = "";
+
   setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
     notifyListeners();
   }
 
+  /// 🔥 Fetch favorite items
   favoritems({var uid, String loadingFor = "", var search = ""}) async {
     try {
       if (await checkInternet() == false) return;
 
-      print("Fetching my items for user ID: $uid");
-
+      print("🔍 Fetching favorite items for UID: $uid");
       setLoading(loadingFor);
+
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/getfav"),
         body: {"uid": uid, "search": search},
       );
 
-      final data = jsonDecode(response.body);
+      print("👉 API URL: ${response.request?.url}");
+      print("👉 Response Status: ${response.statusCode}");
+      print("👉 Raw Response: ${response.body}");
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      final data = jsonDecode(response.body);
+      print("👉 Parsed Data: $data");
+
       if (response.statusCode == 200) {
         favrt.clear();
         favrt = data['favItems'] ?? [];
-        // listings =  []
+        print("✅ Total Favorites: ${favrt.length}");
       } else {
         toast(data['msg']);
       }
       setLoading();
     } catch (e) {
       setLoading();
-      print("Error fetching my items: $e");
+      print("❌ Error fetching favorite items: $e");
     }
   }
 
+  /// 🔥 Remove from favorites
   removefromfav({
     required String itemId,
     required String uid,
@@ -63,15 +64,20 @@ class Favrt with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
+      print("🗑 Removing item $itemId from favorites for UID: $uid");
       setLoading(loadingFor);
+
       final response = await http.delete(
         Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
       );
 
-      final data = jsonDecode(response.body);
+      print("👉 API URL: ${response.request?.url}");
+      print("👉 Response Status: ${response.statusCode}");
+      print("👉 Raw Response: ${response.body}");
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      final data = jsonDecode(response.body);
+      print("👉 Parsed Data: $data");
+
       if (response.statusCode == 200) {
         toast(data['msg']);
         favoritems(uid: uid);
@@ -80,38 +86,11 @@ class Favrt with ChangeNotifier {
         setLoading();
       }
     } catch (e) {
-      print("Error removing from favorites: $e");
+      print("❌ Error removing from favorites: $e");
     }
   }
 
-  // addfav({
-  //   required String itemId,
-  //   required String uid,
-  //   String loadingFor = "",
-  // }) async {
-  //   setLoading(loadingFor);
-  //   try {
-  //     final response = await http.delete(
-  //       Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     print("👉Response status: ${response.statusCode}");
-  //     print("👉 data: $data");
-  //     if (response.statusCode == 200) {
-  //       toast(data['msg']);
-  //       favoritems(uid: uid);
-  //     } else {
-  //       toast(data['msg'], backgroundColor: Colors.red);
-  //     }
-  //     setLoading();
-  //   } catch (e) {
-  //     setLoading();
-  //     print("Error removing from favorites: $e");
-  //   }
-  // }
-
+  /// 🔥 Add to favorites
   addfavrt({
     required String uid,
     required itemId,
@@ -120,56 +99,56 @@ class Favrt with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
-      print("👉 loadingFor: $loadingFor");
+      print("➕ Adding item $itemId to favorites for UID: $uid");
       setLoading(loadingFor);
-      // print("Fetching my items for user ID: $uid");
+
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/addfav/"),
         body: {"uid": uid, "itemid": itemId},
       );
 
-      final data = jsonDecode(response.body);
+      print("👉 API URL: ${response.request?.url}");
+      print("👉 Response Status: ${response.statusCode}");
+      print("👉 Raw Response: ${response.body}");
 
-      // print("👉Response status: ${response.statusCode}");
-      // print("👉 data: $data");
-      if (response.statusCode == 200) {
-      } else {}
-      //
+      final data = jsonDecode(response.body);
+      print("👉 Parsed Data: $data");
+
       toast(data['msg']);
       await favoritems(uid: uid);
       setLoading();
     } catch (e) {
-      debugPrint("Error fetching my items: $e");
+      debugPrint("❌ Error adding to favorites: $e");
       setLoading();
     }
   }
 
-  //////
+  /// 🔥 Show all items
   showallaitems({required String uid}) async {
     try {
       if (await checkInternet() == false) return;
 
-      print("Fetching my items for user ID: $uid");
+      print("🔍 Fetching all items for UID: $uid");
       final response = await http.get(
         Uri.parse("https://thelocalrent.com/api/allitems$uid"),
       );
 
-      final data = jsonDecode(response.body);
+      print("👉 API URL: ${response.request?.url}");
+      print("👉 Response Status: ${response.statusCode}");
+      print("👉 Raw Response: ${response.body}");
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      final data = jsonDecode(response.body);
+      print("👉 Parsed Data: $data");
+
       if (response.statusCode == 200) {
         favrt = data['items'] ?? [];
-        // listings =  [];
-
+        print("✅ Total All Items: ${favrt.length}");
         notifyListeners();
       } else {
         toast(data['msg']);
       }
     } catch (e) {
-      print("Error fetching my items: $e");
+      print("❌ Error fetching all items: $e");
     }
   }
-
-  //
 }
