@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:rent/models/favrmodels.dart';
 
 import '../../widgets/casheimage.dart';
 
 class FavDetailsPage extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+  final Product fullData;
 
   const FavDetailsPage({super.key, required this.fullData});
 
@@ -35,24 +36,18 @@ class FavDetailsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  CacheImageWidget(
-                    width: 300,
-                    height: 150,
-                    isCircle: false,
-                    radius: 0,
-                    url:
-                        Config.imgUrl + fullData['images'][0] ??
-                        ImgLinks.profileImage,
-                  ),
-                ],
+              CacheImageWidget(
+                width: 300,
+                height: 150,
+                isCircle: false,
+                radius: 0,
+                url: Config.imgUrl + fullData.images!.first ?? "",
               ),
 
               const SizedBox(height: 10),
 
               Text(
-                "${fullData['title'] ?? 'Title.......'}",
+                "${fullData.title ?? 'Title'}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -60,33 +55,29 @@ class FavDetailsPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(fullData['description'] ?? 'Description.......'),
+              HtmlWidget(fullData.description ?? 'Description.......'),
 
               Divider(),
 
+              ListTile(title: Text("dailyrate: ${fullData.dailyRate ?? '0'}")),
+              Divider(),
               ListTile(
-                title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
+                title: Text("weeklyrate: ${fullData.weeklyRate ?? '0'}"),
               ),
               Divider(),
               ListTile(
-                title: Text("weeklyrate: ${fullData['weeklyrate'] ?? '0'}"),
+                title: Text(" monthlyrate: ${fullData.monthlyRate ?? '0'}"),
               ),
               Divider(),
-              ListTile(
-                title: Text(" monthlyrate: ${fullData['monthlyrate'] ?? '0'}"),
-              ),
+              ListTile(title: Text("created_at: ${fullData.createdAt ?? '0'}")),
               Divider(),
               ListTile(
-                title: Text("created_at: ${fullData['created_at'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(" updated_at: ${fullData[' updated_at'] ?? '0'}"),
+                title: Text(" updated_at: ${fullData.updatedAt ?? '0'}"),
               ),
               Divider(),
               ListTile(
                 title: Text(
-                  " availabilityDays: ${fullData['availabilityDays'] ?? '0'}",
+                  " availabilityDays: ${fullData.availabilityDays ?? '0'}",
                 ),
               ),
               Divider(),
@@ -98,9 +89,7 @@ class FavDetailsPage extends StatelessWidget {
                   height: 50,
                   isCircle: true,
                   radius: 200,
-                  url:
-                      Config.imgUrl + fullData['images'][0] ??
-                      ImgLinks.profileImage,
+                  url: Config.imgUrl + fullData.images!.first,
                 ),
               ),
             ],

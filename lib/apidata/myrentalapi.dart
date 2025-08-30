@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/rentalmodel.dart';
 
 // Provider for rentals
 final rentalDataProvider = ChangeNotifierProvider<RentalData>(
@@ -12,7 +13,8 @@ final rentalDataProvider = ChangeNotifierProvider<RentalData>(
 );
 
 class RentalData with ChangeNotifier {
-  List<dynamic> rentals = [];
+  List<Rentalmodel> rentalData = [];
+
   Map<String, dynamic> rentalDetails = {};
 
   // Loading state management
@@ -47,10 +49,11 @@ class RentalData with ChangeNotifier {
       print("👉 data: $data");
 
       if (response.statusCode == 200) {
-        rentals.clear();
+        rentalData.clear();
+        for (var item in data['blogs'] ?? []) {
+          rentalData.add(Rentalmodel.fromJson(item));
+        }
         // Try different possible field names for rental data
-        rentals = data['rentals'] ?? [];
-        print("👉 Rentals loaded: ${rentals.length} items");
         setLoading(false);
         notifyListeners();
       } else {

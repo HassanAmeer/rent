@@ -35,7 +35,7 @@ class ProfileModel {
   });
 
   // ✅ JSON → Model
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
+  factory ProfileModel.fromJson(Map json) {
     return ProfileModel(
       id: json['id'],
       image: json['image'],

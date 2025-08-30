@@ -14,7 +14,6 @@ import 'design/home_page.dart';
 import 'design/listing/listing_page.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 GlobalKey<NavigatorState> contextKey = GlobalKey();
 
 void main() async {

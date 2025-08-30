@@ -160,7 +160,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                       // return Text(item.toString());
                       return GestureDetector(
                         onTap: () {
-                          goto(FavDetailsPage(fullData: item['products']));
+                          goto(FavDetailsPage(fullData: item.product!));
                         },
                         child: Column(
                           children: [
@@ -183,21 +183,15 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                     height: 130,
                                     width: 165,
                                     url:
-                                        item['products']['images']! != null ||
-                                            item['products']['images']! ||
-                                            item['products']['images']
-                                                .toList()
-                                                .isNotEmpty
-                                        ? Config.imgUrl +
-                                              item['products']['images'][0]
-                                        : ImgLinks.product,
+                                        Config.imgUrl +
+                                        (item.product?.images?[0] ?? ''),
                                   ),
                                   Positioned(
                                     top: 8,
                                     right: 8,
                                     child:
                                         ref.watch(favrtdata).loadingFor ==
-                                            item['id'].toString()
+                                            item.id.toString()
                                         ? DotLoader(showDots: 1)
                                         // ? Icon(Icons.h_mobiledata_outlined)
                                         : InkWell(
@@ -211,9 +205,10 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                                         .id
                                                         .toString(),
                                                     itemId:
-                                                        item['products']["id"]
-                                                            .toString(),
-                                                    loadingFor: item["id"]
+                                                        item.product?.id
+                                                            ?.toString() ??
+                                                        '',
+                                                    loadingFor: item.id
                                                         .toString(),
                                                   );
                                             },
@@ -249,7 +244,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
 
                             const SizedBox(height: 8),
                             Text(
-                              item['products']['title'],
+                              item.product?.title?.toString() ?? '',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

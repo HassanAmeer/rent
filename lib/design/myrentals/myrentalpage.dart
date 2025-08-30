@@ -107,7 +107,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                       child: DotLoader(),
                     ),
                   )
-                : rentalData.rentals.isEmpty
+                : rentalData.toString().isEmpty
                 ? const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +155,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                         horizontal: 16,
                         vertical: 16,
                       ),
-                      itemCount: rentalData.rentals.length,
+                      itemCount: rentalData.rentalData.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2, // Mobile 2 columns
@@ -163,8 +163,10 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                             crossAxisSpacing: 18,
                             childAspectRatio: 0.85,
                           ),
-                      itemBuilder: (context, index) =>
-                          _buildRentalItem(context, rentalData.rentals[index]),
+                      itemBuilder: (context, index) => _buildRentalItem(
+                        context,
+                        rentalData.rentalData[index],
+                      ),
                     ),
                   ),
           ),
