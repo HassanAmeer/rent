@@ -8,6 +8,7 @@ import 'package:rent/design/booking/bookingdetails.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/models/bookingmodel.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
@@ -54,38 +55,34 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
-      bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: 2,
-      ),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
       body: SingleChildScrollView(
         controller: ScrollController(),
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Search bar just below AppBar (with grey background) 
+            // Search bar just below AppBar (with grey background)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SearchFeildWidget(searchFieldController: searchfieldcontroller, 
-              hint: "Search How to & More",
-              onSearchIconTap: (){
-                 if(searchfieldcontroller.text.isEmpty){
-                  toast("Write Someting");
-                  return;
-                }
+              child: SearchFeildWidget(
+                searchFieldController: searchfieldcontroller,
+                hint: "Search How to & More",
+                onSearchIconTap: () {
+                  if (searchfieldcontroller.text.isEmpty) {
+                    toast("Write Someting");
+                    return;
+                  }
                   ref
-                            .watch(bookingDataProvider)
-                            .fetchComingOrders(
-                              uid: ref
-                                  .watch(userDataClass)
-                                  .userdata["id"]
-                                  .toString(),
-                              search: searchfieldcontroller.text,
-                              loadingfor: "3421",
-                            );
-              },),
+                      .watch(bookingDataProvider)
+                      .fetchComingOrders(
+                        uid: ref.watch(userDataClass).userdata["id"].toString(),
+                        search: searchfieldcontroller.text,
+                        loadingfor: "3421",
+                      );
+                },
+              ),
             ),
-            
-            
+
             ref.watch(bookingDataProvider).loadingfor == "3421"
                 ? const Center(
                     child: Padding(
@@ -94,28 +91,27 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                     ),
                   )
                 : GridView.builder(
-                  shrinkWrap: true,
-                  controller: ScrollController(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
+                    shrinkWrap: true,
+                    controller: ScrollController(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
+                    itemCount: ref.watch(bookingDataProvider).orderData.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Mobile 2 columns
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                          childAspectRatio: 0.85,
+                        ),
+                    itemBuilder: (context, index) {
+                      OrderModel booking = ref
+                          .watch(bookingDataProvider)
+                          .orderData[index];
+                      return _bookingCard(context, booking);
+                    },
                   ),
-                  itemCount: ref
-                      .watch(bookingDataProvider)
-                      .comingOrders
-                      .length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Mobile 2 columns
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        childAspectRatio: 0.85,
-                      ),
-                  itemBuilder: (context, index) => _bookingCard(
-                    context,
-                    ref.watch(bookingDataProvider).comingOrders[index],
-                  ),
-                ),
           ],
         ),
       ),
@@ -125,7 +121,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
     );
   }
 
-  Widget _bookingCard(BuildContext context, Map<String, dynamic> booking) {
+  Widget _bookingCard(BuildContext context, OrderModel booking) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -162,11 +158,8 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                           fit: BoxFit.cover,
                           width: ScreenSize.width * 0.45,
                           // width: double.infinity,
-                          height: ScreenSize.height* 0.2,
-                          url:
-                              Config.imgUrl +
-                              (jsonDecode(booking['productImage'])[0] ??
-                                  ImgLinks.product),
+                          height: ScreenSize.height * 0.2,
+                          url: Config.imgUrl + booking.productImage[0],
                         ),
                       ),
                     ),
@@ -174,7 +167,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                   const SizedBox(height: 2),
                   // title text inside fixed width
                   Text(
-                    booking["productTitle"].toString(),
+                    booking.productTitle.toString(),
                     style: const TextStyle(
                       fontSize: 13,
                       color: Colors.blue,
@@ -187,10 +180,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                   // const SizedBox(height: 1),
                   // orderby name inside fixed width
                   Text(
-                    ref
-                        .watch(bookingDataProvider)
-                        .comingOrders[0]["orderby"]['name']
-                        .toString(),
+                    ref.watch(bookingDataProvider).orderData.first.toString(),
                     style: const TextStyle(
                       fontSize: 11,
                       color: Colors.grey,
@@ -209,7 +199,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
           Positioned(
             right: 8,
             top: 8,
-            child: _statusLabel(booking["deliverd"].toString()),
+            child: _statusLabel(booking.deliverd.toString()),
           ),
         ],
       ),

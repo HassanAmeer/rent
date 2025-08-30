@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/checkInternet.dart';
-import 'package:rent/constants/toast.dart'; // Apne toast function ke liye import
+import 'package:rent/constants/toast.dart';
+import 'package:rent/models/bookingmodel.dart'; // Apne toast function ke liye import
 
 final bookingDataProvider = ChangeNotifierProvider<BookingData>(
   (ref) => BookingData(),
 );
 
 class BookingData with ChangeNotifier {
-  List comingOrders = [];
+  List<OrderModel> orderData = [];
   // bool isLoading = false;
   String loadingfor = "";
   setLoading([String value = ""]) {
@@ -40,10 +41,10 @@ class BookingData with ChangeNotifier {
       print("👉 Coming Orders Data: $data");
 
       if (response.statusCode == 200 && data['success'] == true) {
-        comingOrders = data['commingOrders'] ?? [];
-        notifyListeners();
-      } else {
-        comingOrders = [];
+        orderData.clear();
+        for (var item in data['blogs'] ?? []) {
+          orderData.add(OrderModel.fromJson(item));
+        }
         toast(
           data['msg'] ?? "Failed to fetch coming orders",
           backgroundColor: Colors.red,
