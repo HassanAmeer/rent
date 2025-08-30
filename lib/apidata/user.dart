@@ -18,28 +18,49 @@ final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 class UserData with ChangeNotifier {
   ProfileModel userdata = ProfileModel();
 
-  getStorageData() async {
-    await Hive.openBox("userBox");
-    var box = Hive.box('userBox'); // File Name
-    var checkData = box.get('userData'); // save the user object (map) data
-    if (checkData != null) {
-      userdata = checkData;
+  storeUserDataToStorage(Map userData) async {
+    try {
+      await Hive.openBox("userBox");
+      var box = Hive.box('userBox'); // File Name
+      box.put("userData", userData); // save the user object (map) data
       notifyListeners();
-      // print("user dtaa from hive box: $checkData");
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  getStorageData() async {
+    try {
+      await Hive.openBox("userBox");
+      var box = Hive.box('userBox'); // File Name
+      var checkData = box.get('userData'); // save the user object (map) data
+      if (checkData != null) {
+        userdata = ProfileModel.fromJson(Map<String, dynamic>.from(checkData));
+        notifyListeners();
+        // print("user dtaa from hive box: $checkData");
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
   checkAlreadyhaveLogin() async {
-    await Hive.openBox("userBox");
-    var box = Hive.box('userBox'); // File Name
-    var checkData = box.get('userData'); // save the user object (map) data
-    if (checkData != null) {
-      userdata = checkData;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 1000));
-      goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
-    } else {
-      await Future.delayed(Duration(milliseconds: 1000));
+    try {
+      await Hive.openBox("userBox");
+      var box = Hive.box('userBox'); // File Name
+      var checkData = box.get('userData'); // save the user object (map) data
+
+      // debugPrint("checkData: $checkData");
+      if (checkData != null) {
+        userdata = ProfileModel.fromJson(Map<String, dynamic>.from(checkData));
+        notifyListeners();
+        goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
+      } else {
+        // await Future.delayed(Duration(milliseconds: 1000));
+        goto(LoginPage(), delayInMilliSeconds: 2000, canBack: false);
+      }
+    } catch (e) {
+      print(e);
       goto(LoginPage(), delayInMilliSeconds: 2000, canBack: false);
     }
   }
@@ -123,10 +144,9 @@ class UserData with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg'], backgroundColor: Colors.green);
 
-        var userdata = result['user'];
+        storeUserDataToStorage(result['user']);
+        userdata = ProfileModel.fromJson(result['user']);
 
-        var box = Hive.box('userBox');
-        box.put('userData', userdata);
         setLoading(false);
 
         goto(const HomePage(), canBack: false);
@@ -157,6 +177,7 @@ class UserData with ChangeNotifier {
 
       setLoading(false);
       if (response.statusCode == 200 || response.statusCode == 201) {
+        storeUserDataToStorage(result['user']);
         userdata = ProfileModel.fromJson(result['user']);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);

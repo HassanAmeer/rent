@@ -21,8 +21,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
- 
-
   @override
   Widget build(BuildContext context) {
     // final userProvider = ref.watch(userDataClass);

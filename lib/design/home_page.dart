@@ -5,7 +5,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/apidata/dashboardapi.dart';
-import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/constants/toast.dart';
@@ -22,6 +21,7 @@ import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import '../Auth/profile_details_page.dart';
+import '../apidata/user.dart';
 import '../widgets/btmnavbar.dart';
 
 /// ✅ HomePage
