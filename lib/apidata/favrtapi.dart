@@ -9,6 +9,7 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/favrmodels.dart';
 
 // import '../design/fav/fvrt.dart';
 // import '../main.dart';
@@ -17,7 +18,7 @@ import 'package:rent/design/home_page.dart';
 final favrtdata = ChangeNotifierProvider<Favrt>((ref) => Favrt());
 
 class Favrt with ChangeNotifier {
-  var favrt = [];
+  List<FavoriteItemModel> favrt = [];
   //////
   String loadingFor = "";
   setLoading([String loadingName = ""]) {
@@ -43,7 +44,9 @@ class Favrt with ChangeNotifier {
       print("👉 data: $data");
       if (response.statusCode == 200) {
         favrt.clear();
-        favrt = data['favItems'] ?? [];
+        for (var item in data['favItems']) {
+          favrt.add(FavoriteItemModel.fromJson(item));
+        }
         // listings =  []
       } else {
         toast(data['msg']);
