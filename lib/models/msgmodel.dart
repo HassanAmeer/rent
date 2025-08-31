@@ -1,4 +1,4 @@
-class Msgmodel {
+class User {
   final int id;
   final String? image;
   final int activeUser;
@@ -15,7 +15,7 @@ class Msgmodel {
   final String updatedAt;
   final String? deletedAt;
 
-  Msgmodel({
+  User({
     required this.id,
     this.image,
     required this.activeUser,
@@ -33,8 +33,8 @@ class Msgmodel {
     this.deletedAt,
   });
 
-  factory Msgmodel.fromJson(Map<String, dynamic> json) {
-    return Msgmodel(
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
       id: json["id"],
       image: json["image"],
       activeUser: json["activeUser"],
@@ -82,8 +82,8 @@ class Message {
   final String createdAt;
   final String updatedAt;
   final String? deletedAt;
-  final Msgmodel fromUid;
-  final Msgmodel toUid;
+  final User fromUid;
+  final User toUid;
 
   Message({
     required this.id,
@@ -106,8 +106,8 @@ class Message {
       createdAt: json["created_at"],
       updatedAt: json["updated_at"],
       deletedAt: json["deleted_at"],
-      fromUid: Msgmodel.fromJson(json["fromuid"]),
-      toUid: Msgmodel.fromJson(json["touid"]),
+      fromUid: User.fromJson(json["fromuid"]),
+      toUid: User.fromJson(json["touid"]),
     );
   }
 

@@ -5,12 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/getchatmodel.dart';
 
 var chatClass = ChangeNotifierProvider<ChatApi>((ref) => ChatApi());
 
 class ChatApi with ChangeNotifier {
   List chatedUsersList = []; // ✅ API se aaya list store hoga
-  List messagesList = [];
+  GetChatModel? usersChatingData;
   String loadingFor = "";
 
   setLoading([String loadingName = ""]) {
@@ -44,7 +45,7 @@ class ChatApi with ChangeNotifier {
     }
   }
 
-  //////
+  ////// ✅ Get User Messages
   Future getUserMsgs({
     required String senderId,
     required String recieverId,
@@ -52,10 +53,9 @@ class ChatApi with ChangeNotifier {
     required ScrollController scrollController,
   }) async {
     try {
-      // 🔹 Step 1: Internet check karo
       if (await checkInternet() == false) return;
       setLoading(loadingfor);
-      // 🔹 Step 2: API call
+
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/getchats"),
         body: {"recieverId": recieverId, "senderId": senderId},
@@ -66,12 +66,18 @@ class ChatApi with ChangeNotifier {
       var result = json.decode(response.body);
       print("👉 Response: $result");
 
-      List reverseList = result['chats'];
-      messagesList = reverseList.toList().reversed.toList();
-      print("messagesList.length: ${messagesList.length}");
+      usersChatingData = GetChatModel.fromJson(result);
+
+      // /// ✅ model lagaya yahan
+      // messagesList = reverseList
+      //     .map<GetChatModel>((item) => GetChatModel.fromJson(item))
+      //     .toList()
+      //     .reversed
+      //     .toList();
+
+      // print("messagesList.length: ${messagesList.length}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // toast(result['msg'], backgroundColor: Colors.green);
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
@@ -95,12 +101,10 @@ class ChatApi with ChangeNotifier {
     required ScrollController scrollController,
   }) async {
     try {
-      // 🔹 Step 1: Internet check karo
       if (await checkInternet() == false) return;
 
       setLoading(loadingfor);
 
-      // 🔹 Step 2: API call
       final response = await http.post(
         Uri.parse("https://thelocalrent.com/api/sendmsg"),
         body: {

@@ -22,8 +22,9 @@ class _ChatsState extends ConsumerState<Chats> {
   ScrollController scrollController = ScrollController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       var senderId = ref.watch(userDataClass).userdata.id.toString();
 
@@ -132,12 +133,7 @@ class _ChatsState extends ConsumerState<Chats> {
 
       body:
           // Text("Chat with ${widget.msgdata}"),
-          // SizedBox(
-          //   height: 777,
-          //   child: SingleChildScrollView(
-          //     child: Text("${chatProvider.messagesList}"),
-          //   ),
-          // ),
+          // Text("Chat with ${chatProvider.usersChatingData!.success ?? "empty"}"),
           // ✅ Chats List
           chatProvider.loadingFor == "getallchats"
           ? const Center(
@@ -147,7 +143,7 @@ class _ChatsState extends ConsumerState<Chats> {
               ),
             )
           : ListView.builder(
-              itemCount: chatProvider.messagesList.length,
+              itemCount: chatProvider.chatedUsersList.length,
               padding: const EdgeInsets.only(
                 left: 8,
                 right: 8,
@@ -157,8 +153,8 @@ class _ChatsState extends ConsumerState<Chats> {
               controller: scrollController,
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                var chat = chatProvider.messagesList[index];
-                bool isMe = userProvider.userdata.id == chat['sid'];
+                var chat = chatProvider.usersChatingData!.chats[index];
+                bool isMe = userProvider.userdata.id == chat.sid;
 
                 return Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 4),
@@ -185,7 +181,7 @@ class _ChatsState extends ConsumerState<Chats> {
                             vertical: 8.0,
                           ),
                           child: Text(
-                            chat['msg'],
+                            chat.msg,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
@@ -198,7 +194,6 @@ class _ChatsState extends ConsumerState<Chats> {
                 );
               },
             ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: // ✅ Chat Input Box
       Container(
