@@ -36,13 +36,13 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Chats",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         automaticallyImplyLeading: false,
         actions: [
-          SizedBox(width: 5),
+          const SizedBox(width: 5),
           Container(
             decoration: BoxDecoration(
               color: Colors.cyan.shade700,
@@ -55,15 +55,14 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
               url: Config.imgUrl + ref.watch(userDataClass).userdata.image,
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
         ],
       ),
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 3),
-
       body: Center(
         child: Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ref.watch(chatClass).loadingFor == "abc"
                 ? const Center(
                     child: Padding(
@@ -71,55 +70,107 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
                       child: DotLoader(),
                     ),
                   )
-                :
-                  // ✅ ListView.builder yahan lagaya h
-                  Expanded(
+                : Expanded(
                     child: ListView.separated(
-                      itemCount: ref.watch(chatClass).chatedUsersList.length,
-                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: ref
+                          .watch(chatClass)
+                          .usersChatedData!
+                          .chatedUsers
+                          .length,
+                      separatorBuilder: (context, index) => const Divider(),
                       itemBuilder: (context, index) {
-                        final msg = ref.watch(chatClass).chatedUsersList[index];
+                        final chatedUser = ref
+                            .watch(chatClass)
+                            .usersChatedData!
+                            .chatedUsers[index];
                         return ListTile(
                           minVerticalPadding: 1,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.cyan.shade700,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            width: 41,
-                            height: 41,
-                            clipBehavior: Clip.antiAlias,
-                            child: CacheImageWidget(
-                              url: Config.imgUrl + msg['fromuid']["image"],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
+                          leading: GestureDetector(
+                            onTap: () {
+                              showGeneralDialog(
+                                context: context,
+                                barrierDismissible: true,
+                                barrierColor: Colors.black,
+                                transitionDuration: const Duration(
+                                  milliseconds: 200,
+                                ),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                      return Scaffold(
+                                        backgroundColor: Colors.black,
+                                        appBar: AppBar(
+                                          backgroundColor: Colors.black,
+                                          elevation: 0,
+                                          iconTheme: const IconThemeData(
+                                            color: Colors.white,
+                                          ),
+                                          title: const Text(
+                                            "Profile photo",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          actions: const [
+                                            Icon(
+                                              Icons.edit,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(width: 20),
+                                            Icon(
+                                              Icons.share,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(width: 10),
+                                          ],
+                                        ),
+                                        body: Center(
+                                          child: InteractiveViewer(
+                                            minScale: 1,
+                                            maxScale: 4,
+                                            child: CacheImageWidget(
+                                              url:
+                                                  Config.imgUrl +
+                                                  chatedUser.fromuid.image,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.cyan.shade700,
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              width: 41,
+                              height: 41,
+                              clipBehavior: Clip.antiAlias,
+                              child: CacheImageWidget(
+                                url: Config.imgUrl + chatedUser.fromuid.image,
+                              ),
                             ),
                           ),
                           title: Text(
-                            msg['fromuid']['name'].toString(),
+                            chatedUser.fromuid.name,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text(msg['msg'].toString()),
+                          subtitle: Text(chatedUser.msg),
                           onTap: () async {
-                            var result = await goto(Chats(msgdata: msg));
-
-                            if (result != null &&
-                                result is String &&
-                                result.isNotEmpty) {
-                              setState(() {
-                                msg['lastMsg'] =
-                                    result; // last message update hoga
-                              });
-                            }
+                            await goto(Chats(msgdata: chatedUser));
                           },
                         );
                       },
                     ),
                   ),
-
-            // Text("${ref.watch(chatClass).messege}"),
           ],
         ),
       ),

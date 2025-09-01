@@ -35,9 +35,11 @@ class UserData with ChangeNotifier {
       var box = Hive.box('userBox'); // File Name
       var checkData = box.get('userData'); // save the user object (map) data
       if (checkData != null) {
-        userdata = ProfileModel.fromJson(Map<String, dynamic>.from(checkData));
+        final Map<String, dynamic> userMap = Map<String, dynamic>.from(
+          checkData as Map,
+        );
+        userdata = ProfileModel.fromJson(userMap);
         notifyListeners();
-        // print("user dtaa from hive box: $checkData");
       }
     } catch (e) {
       print(e);

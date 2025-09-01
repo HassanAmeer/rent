@@ -5,12 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/chatedmodel.dart';
 import 'package:rent/models/getchatmodel.dart';
 
 var chatClass = ChangeNotifierProvider<ChatApi>((ref) => ChatApi());
 
 class ChatApi with ChangeNotifier {
-  List chatedUsersList = []; // ✅ API se aaya list store hoga
+  ChatedUsersModel? usersChatedData; // ✅ API se aaya list store hoga
   GetChatModel? usersChatingData;
   String loadingFor = "";
 
@@ -33,10 +34,11 @@ class ChatApi with ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        chatedUsersList = data['chatedUsers'] ?? []; // ✅ safe parsing
+        usersChatedData = ChatedUsersModel.fromJson(data);
+
         setLoading();
       } else {
-        toast(data['message'] ?? data['msg'] ?? 'Failed to fetch chats');
+        toast(data['msg'] ?? 'Failed to fetch chats');
         setLoading();
       }
     } catch (e) {

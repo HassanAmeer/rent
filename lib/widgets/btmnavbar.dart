@@ -22,8 +22,8 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        if(widget.currentIndex >0){
-            goto(HomePage());
+        if (widget.currentIndex > 0) {
+          goto(HomePage());
         }
         return Future.value(true);
       },

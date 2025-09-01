@@ -60,7 +60,7 @@ class _ChatsState extends ConsumerState<Chats> {
 
       print("senderId: $senderId");
       print("recieverId: $recieverId");
-      // return;
+
       await ref
           .watch(chatClass)
           .sndingmsgs(
@@ -71,6 +71,7 @@ class _ChatsState extends ConsumerState<Chats> {
             loadingfor: "sendmsg",
             scrollController: scrollController,
           );
+
       // ✅ Clear input field
       _controller.clear();
     } else {
@@ -78,12 +79,41 @@ class _ChatsState extends ConsumerState<Chats> {
     }
   }
 
+  /// ✅ Fullscreen Image Viewer with swipe-to-close
+  void _openFullImage(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            GestureDetector(
+              onVerticalDragEnd: (_) => Navigator.of(context).pop(),
+              child: InteractiveViewer(
+                child: Center(
+                  child: CacheImageWidget(url: imageUrl, fit: BoxFit.contain),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 30,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var chatProvider = ref.watch(chatClass);
     var userProvider = ref.watch(userDataClass);
-
-    // ✅ Last message preview
 
     return Scaffold(
       appBar: AppBar(
@@ -99,26 +129,31 @@ class _ChatsState extends ConsumerState<Chats> {
             Navigator.pop(context);
           },
         ),
-
         title: Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.cyan.shade700,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              width: 35,
-              height: 35,
-              clipBehavior: Clip.antiAlias,
-              child: CacheImageWidget(
-                url: Config.imgUrl + widget.msgdata['fromuid']["image"],
+            GestureDetector(
+              onTap: () {
+                _openFullImage(
+                  Config.imgUrl + widget.msgdata['fromuid']["image"],
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.cyan.shade700,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                width: 35,
+                height: 35,
+                clipBehavior: Clip.antiAlias,
+                child: CacheImageWidget(
+                  url: Config.imgUrl + widget.msgdata['fromuid']["image"],
+                ),
               ),
             ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Text("${widget.msgdata['sid']}"),
                 Text(
                   widget.msgdata['fromuid']["name"] ?? "User Name",
                   style: const TextStyle(
@@ -131,12 +166,7 @@ class _ChatsState extends ConsumerState<Chats> {
           ],
         ),
       ),
-
-      body:
-          // Text("Chat with ${widget.msgdata}"),
-          // Text("Chat with ${chatProvider.usersChatingData!.success ?? "empty"}"),
-          // ✅ Chats List
-          chatProvider.loadingFor == "getallchats"
+      body: chatProvider.loadingFor == "getallchats"
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.only(top: 2),
@@ -144,7 +174,7 @@ class _ChatsState extends ConsumerState<Chats> {
               ),
             )
           : ListView.builder(
-              itemCount: chatProvider.chatedUsersList.length,
+              itemCount: chatProvider.usersChatedData!.chatedUsers.length,
               padding: const EdgeInsets.only(
                 left: 8,
                 right: 8,
