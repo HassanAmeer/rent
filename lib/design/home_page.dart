@@ -173,13 +173,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: [
                       homeTextWidget(
                         title: "Total Earning",
-                        value: "\$${dashboardService.DashboardData}",
+                        value:
+                            "\$${dashboardService.DashboardData!.totalEarning}",
                       ),
                       // const SizedBox(width: 12),
                       homeTextWidget(
                         title: " Total Rating",
                         value:
-                            dashboardService.DashboardData?.toString() ?? "0.0",
+                            dashboardService.DashboardData!.totalReviewsRatio
+                                ?.toString() ??
+                            "0.0",
                       ),
                     ],
                   )

@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/user.dart';
+import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/message/chat.dart';
 import 'package:rent/models/blogmodel.dart';
+import 'package:rent/models/chatedmodel.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/floatingbutton.dart';
 
-class Blogsdetails extends StatefulWidget {
+class Blogsdetails extends ConsumerStatefulWidget {
   final Blogmodel blog;
   const Blogsdetails({super.key, required this.blog});
 
   @override
-  State<Blogsdetails> createState() => _BlogsdetailsState();
+  ConsumerState<Blogsdetails> createState() => _BlogsdetailsState();
 }
 
-class _BlogsdetailsState extends State<Blogsdetails> {
+class _BlogsdetailsState extends ConsumerState<Blogsdetails> {
   bool isLoading = true;
 
   @override

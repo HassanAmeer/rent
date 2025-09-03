@@ -56,6 +56,7 @@ class UserData with ChangeNotifier {
       if (checkData != null) {
         userdata = ProfileModel.fromJson(Map<String, dynamic>.from(checkData));
         notifyListeners();
+        await Future.delayed(Duration(milliseconds: 1000));
         goto(HomePage(), delayInMilliSeconds: 2000, canBack: false);
       } else {
         // await Future.delayed(Duration(milliseconds: 1000));

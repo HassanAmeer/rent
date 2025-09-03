@@ -4,12 +4,13 @@ import 'package:rent/apidata/messegeapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/chatedmodel.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 // ignore: must_be_immutable
 class Chats extends ConsumerStatefulWidget {
-  var msgdata;
+  ChatedUser msgdata = ChatedUser(fromuid: User(), touid: User());
   Chats({super.key, required this.msgdata});
 
   @override
@@ -30,10 +31,9 @@ class _ChatsState extends ConsumerState<Chats> {
       var senderId = ref.watch(userDataClass).userdata.id.toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata.id.toString() ==
-              widget.msgdata['sid'].toString()
-          ? widget.msgdata['rid']
-          : widget.msgdata['sid'];
+          ref.watch(userDataClass).userdata.id.toString() == widget.msgdata.sid
+          ? widget.msgdata.rid
+          : widget.msgdata.sid;
       await ref
           .watch(chatClass)
           .getUserMsgs(
@@ -53,10 +53,9 @@ class _ChatsState extends ConsumerState<Chats> {
       var senderId = ref.watch(userDataClass).userdata.id.toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata.id.toString() ==
-              widget.msgdata['sid'].toString()
-          ? widget.msgdata['rid']
-          : widget.msgdata['sid'];
+          ref.watch(userDataClass).userdata.id.toString() == widget.msgdata.sid
+          ? widget.msgdata.rid
+          : widget.msgdata.sid;
 
       print("senderId: $senderId");
       print("recieverId: $recieverId");
@@ -133,9 +132,7 @@ class _ChatsState extends ConsumerState<Chats> {
           children: [
             GestureDetector(
               onTap: () {
-                _openFullImage(
-                  Config.imgUrl + widget.msgdata['fromuid']["image"],
-                );
+                _openFullImage(Config.imgUrl + widget.msgdata.fromuid.image);
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -146,7 +143,7 @@ class _ChatsState extends ConsumerState<Chats> {
                 height: 35,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url: Config.imgUrl + widget.msgdata['fromuid']["image"],
+                  url: Config.imgUrl + widget.msgdata.fromuid.image,
                 ),
               ),
             ),
@@ -155,7 +152,7 @@ class _ChatsState extends ConsumerState<Chats> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.msgdata['fromuid']["name"] ?? "User Name",
+                  widget.msgdata.fromuid.name,
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,

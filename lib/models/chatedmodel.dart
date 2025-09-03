@@ -37,13 +37,13 @@ class ChatedUser {
   final User touid;
 
   ChatedUser({
-    required this.id,
-    required this.sid,
-    required this.msg,
-    required this.rid,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
+    this.id = 0,
+    this.sid = 0,
+    this.msg = "",
+    this.rid = 0,
+    this.createdAt = "",
+    this.updatedAt = "",
+    this.deletedAt,
     required this.fromuid,
     required this.touid,
   });
@@ -95,21 +95,21 @@ class User {
   final dynamic deletedAt;
 
   User({
-    required this.id,
-    required this.image,
-    required this.activeUser,
-    required this.name,
-    required this.phone,
-    required this.email,
-    required this.lastOnlineTime,
-    required this.address,
-    required this.aboutUs,
-    required this.verifiedBy,
-    required this.sendEmail,
-    required this.password,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
+    this.id = 0,
+    this.image = "",
+    this.activeUser = 0,
+    this.name = "",
+    this.phone = "",
+    this.email = "",
+    this.lastOnlineTime = "",
+    this.address = "",
+    this.aboutUs = "",
+    this.verifiedBy = "",
+    this.sendEmail = 0,
+    this.password = "",
+    this.createdAt = "",
+    this.updatedAt = "",
+    this.deletedAt = "",
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -152,3 +152,62 @@ class User {
     };
   }
 }
+// https://mocki.io/v1/4cb45c96-50f1-4144-ba6a-66fea7376546
+// class ProductsModel {
+//   final bool status;
+//   final String message;
+//   final List<Product> products;
+
+//   ProductsModel({
+//      this.status,
+//     required this.message,
+//     required this.products,
+//   });
+
+//   factory ProductsModel.fromJson(Map<String, dynamic> json) {
+//     return ProductsModel(
+//       status: json['status'] ?? false,
+//       message: json['message'] ?? '',
+
+// List<Product> tempList = []; // empty list banayi
+
+// // json['products'] ko list me cast kiya
+// List<dynamic> productList = json['products'] as List<dynamic>? ?? [];
+
+// // loop lagaya har product pe
+// for (var e in productList) {
+//   // har ek map ko Product object banaya
+//   Product product = Product.fromJson(e);
+
+//   tempList.add(product);
+// }
+
+// products: tempList,
+// class OrdersModel {
+//   final bool isSuccess;
+//   final String info;
+//   final List<Order> orders;
+
+//   OrdersModel({
+//     required this.isSuccess,
+//     required this.info,
+//     required this.orders,
+//   });
+
+//   factory OrdersModel.fromJson(Map<String, dynamic> json) {
+//     return OrdersModel(
+//       isSuccess: json['isSuccess'] ?? false,
+//       info: json['info'] ?? '',
+//       orders: () {
+//         List<Order> tempList = [];
+//         List<dynamic> orderList = json['orders'] as List<dynamic>? ?? [];
+
+//         for (var e in orderList) {
+//           tempList.add(Order.fromJson(e));
+//         }
+
+//         return tempList;
+//       }(),
+//     );
+//   }
+// }

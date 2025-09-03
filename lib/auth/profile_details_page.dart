@@ -13,6 +13,7 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/scrensizes.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/lartgeimageview.dart';
 import 'package:transparent_route/transparent_route.dart';
 // import '../apidata/user.dart';
 import '../widgets/btmnavbar.dart';
@@ -59,14 +60,8 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
               InkWell(
                 borderRadius: BorderRadius.circular(100),
                 onTap: () {
-                  pushScreen(
-                    context,
-                    Profileview(
-                      imagelink:
-                          Config.imgUrl +
-                          ref.watch(userDataClass).userdata.image,
-                    ),
-                    isTransparent: true,
+                  LargeImageViewSheet(
+                    Config.imgUrl + ref.watch(userDataClass).userdata.image,
                   );
                 },
                 child: Hero(
@@ -248,41 +243,3 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
 }
 
 ///////////for profileview widget page
-class Profileview extends StatelessWidget {
-  final String imagelink;
-  const Profileview({super.key, required this.imagelink});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(200, 0, 0, 0),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios, color: Colors.grey),
-        ),
-      ),
-      body: InkWell(
-        onTapUp: (v) {
-          Navigator.pop(context);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(0),
-          child: Hero(
-            tag: "123",
-            child: CacheImageWidget(
-              url: imagelink,
-              isCircle: false,
-              fit: BoxFit.contain,
-              height: ScreenSize.height * 0.7,
-              width: ScreenSize.width,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
