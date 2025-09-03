@@ -4,7 +4,7 @@ import 'package:rent/apidata/messegeapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rent/message/chat.dart';
+import 'package:rent/message/chatingWithUser.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
@@ -113,7 +113,7 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
                   ),
                   subtitle: Text(chatedUser.msg),
                   onTap: () async {
-                    await goto(Chats(msgdata: chatedUser));
+                    await goto(ChatingWithUserPage(msgdata: chatedUser));
                   },
                 );
               },

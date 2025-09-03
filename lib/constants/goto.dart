@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rent/main.dart';
-import 'package:rent/message/chat.dart';
+import 'package:rent/message/chatingWithUser.dart';
 
 goto(pageName, {bool canBack = true, int delayInMilliSeconds = 300}) {
   //// new with animation

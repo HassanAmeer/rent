@@ -7,20 +7,20 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/models/chatedmodel.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/lartgeimageview.dart';
 
 // ignore: must_be_immutable
-class Chats extends ConsumerStatefulWidget {
-  ChatedUser msgdata = ChatedUser(fromuid: User(), touid: User());
-  Chats({super.key, required this.msgdata});
+class ChatingWithUserPage extends ConsumerStatefulWidget {
+  ChatedUser msgdata;
+  ChatingWithUserPage({super.key, required this.msgdata});
 
   @override
-  ConsumerState<Chats> createState() => _ChatsState();
+  ConsumerState<ChatingWithUserPage> createState() =>
+      _ChatingWithUserPageState();
 }
 
-//////////
-class _ChatsState extends ConsumerState<Chats> {
+class _ChatingWithUserPageState extends ConsumerState<ChatingWithUserPage> {
   final TextEditingController _controller = TextEditingController();
-
   ScrollController scrollController = ScrollController();
 
   @override
@@ -34,6 +34,7 @@ class _ChatsState extends ConsumerState<Chats> {
           ref.watch(userDataClass).userdata.id.toString() == widget.msgdata.sid
           ? widget.msgdata.rid
           : widget.msgdata.sid;
+
       await ref
           .watch(chatClass)
           .getUserMsgs(
@@ -51,14 +52,10 @@ class _ChatsState extends ConsumerState<Chats> {
       String message = _controller.text.trim();
 
       var senderId = ref.watch(userDataClass).userdata.id.toString();
-
       var recieverId =
           ref.watch(userDataClass).userdata.id.toString() == widget.msgdata.sid
           ? widget.msgdata.rid
           : widget.msgdata.sid;
-
-      print("senderId: $senderId");
-      print("recieverId: $recieverId");
 
       await ref
           .watch(chatClass)
@@ -71,42 +68,10 @@ class _ChatsState extends ConsumerState<Chats> {
             scrollController: scrollController,
           );
 
-      // ✅ Clear input field
       _controller.clear();
     } else {
       toast("Write Something");
     }
-  }
-
-  /// ✅ Fullscreen Image Viewer with swipe-to-close
-  void _openFullImage(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: EdgeInsets.zero,
-        child: Stack(
-          children: [
-            GestureDetector(
-              onVerticalDragEnd: (_) => Navigator.of(context).pop(),
-              child: InteractiveViewer(
-                child: Center(
-                  child: CacheImageWidget(url: imageUrl, fit: BoxFit.contain),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 30,
-              right: 20,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -132,7 +97,9 @@ class _ChatsState extends ConsumerState<Chats> {
           children: [
             GestureDetector(
               onTap: () {
-                _openFullImage(Config.imgUrl + widget.msgdata.fromuid.image);
+                LargeImageViewSheet(
+                  Config.imgUrl + widget.msgdata.fromuid.image,
+                );
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -143,7 +110,12 @@ class _ChatsState extends ConsumerState<Chats> {
                 height: 35,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url: Config.imgUrl + widget.msgdata.fromuid.image,
+                  url:
+                      Config.imgUrl +
+                      (widget.msgdata.fromuid.id.toString() ==
+                              ref.watch(userDataClass).userdata.id.toString()
+                          ? widget.msgdata.touid.image
+                          : widget.msgdata.fromuid.image),
                 ),
               ),
             ),
@@ -152,7 +124,10 @@ class _ChatsState extends ConsumerState<Chats> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.msgdata.fromuid.name,
+                  widget.msgdata.fromuid.id.toString() ==
+                          ref.watch(userDataClass).userdata.id.toString()
+                      ? widget.msgdata.touid.name
+                      : widget.msgdata.fromuid.name,
                   style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
@@ -170,8 +145,11 @@ class _ChatsState extends ConsumerState<Chats> {
                 child: DotLoader(),
               ),
             )
+          : chatProvider.usersChatingData == null ||
+                chatProvider.usersChatingData!.chats.isEmpty
+          ? const Center(child: Text("No messages yet"))
           : ListView.builder(
-              itemCount: chatProvider.usersChatedData!.chatedUsers.length,
+              itemCount: chatProvider.usersChatingData!.chats.length,
               padding: const EdgeInsets.only(
                 left: 8,
                 right: 8,
@@ -223,8 +201,7 @@ class _ChatsState extends ConsumerState<Chats> {
               },
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: // ✅ Chat Input Box
-      Container(
+      floatingActionButton: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         color: Colors.white,
         child: Row(

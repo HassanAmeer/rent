@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/images.dart';
-import 'package:rent/message/chat.dart';
+import 'package:rent/message/chatingWithUser.dart';
 import 'package:rent/models/blogmodel.dart';
 import 'package:rent/models/chatedmodel.dart';
 import 'package:rent/widgets/casheimage.dart';
