@@ -132,7 +132,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: DropdownButtonFormField<String>(
-                  initialValue: _selectedCategory,
+                  value: _selectedCategory,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
@@ -623,7 +623,7 @@ class ListingBox extends StatelessWidget {
             Stack(
               children: [
                 CacheImageWidget(
-                  url:image,
+                  url: image,
                   height: 130,
                   width: double.infinity,
                   fit: BoxFit.cover,

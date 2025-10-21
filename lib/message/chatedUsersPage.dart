@@ -27,7 +27,7 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
           .watch(chatClass)
           .chatedUsers(
             loadingFor: "abc",
-            uid: ref.watch(userDataClass).userdata['id'].toString(),
+            uid: ref.watch(userDataClass).userData['id'].toString(),
           );
     });
   }
@@ -52,13 +52,13 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
             height: 38,
             clipBehavior: Clip.antiAlias,
             child: CacheImageWidget(
-              url: Config.imgUrl + ref.watch(userDataClass).userdata['image'],
+              url: Config.imgUrl + ref.watch(userDataClass).userData['image'],
             ),
           ),
           SizedBox(width: 10),
         ],
       ),
-      bottomNavigationBar: BottomNavBarWidget(currentIndex: 3,),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 3),
 
       body: Center(
         child: Column(
@@ -80,7 +80,7 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
                       itemBuilder: (context, index) {
                         final msg = ref.watch(chatClass).chatedUsersList[index];
                         return ListTile(
-                          minVerticalPadding:1,
+                          minVerticalPadding: 1,
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           leading: Container(
                             decoration: BoxDecoration(

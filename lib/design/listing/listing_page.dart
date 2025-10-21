@@ -30,7 +30,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
       ref
           .watch(listingDataProvider)
           .fetchMyItems(
-            uid: ref.watch(userDataClass).userdata["id"].toString(),
+            uid: ref.watch(userDataClass).userData["id"].toString(),
             search: "",
             loadingfor: "123",
           );
@@ -59,24 +59,23 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           child: Column(
             children: [
               /// Search Bar
-              SearchFeildWidget(searchFieldController: searchfieldcontroller, 
-              hint: "Search Listings...",
-              onSearchIconTap: (){
-                if(searchfieldcontroller.text.isEmpty){
-                  toast("Write Someting");
-                  return;
-                }
+              SearchFeildWidget(
+                searchFieldController: searchfieldcontroller,
+                hint: "Search Listings...",
+                onSearchIconTap: () {
+                  if (searchfieldcontroller.text.isEmpty) {
+                    toast("Write Someting");
+                    return;
+                  }
                   ref
-                          .watch(listingDataProvider)
-                          .fetchMyItems(
-                            uid: ref
-                                .watch(userDataClass)
-                                .userdata["id"]
-                                .toString(),
-                            search: searchfieldcontroller.text,
-                            loadingfor: "123",
-                          );
-              },),
+                      .watch(listingDataProvider)
+                      .fetchMyItems(
+                        uid: ref.watch(userDataClass).userData["id"].toString(),
+                        search: searchfieldcontroller.text,
+                        loadingfor: "123",
+                      );
+                },
+              ),
               SizedBox(height: 10),
               ref.watch(listingDataProvider).loadingfor == "123"
                   ? const Center(
@@ -86,34 +85,34 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       ),
                     )
                   : GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.1,
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 10,
-                        ),
-                        shrinkWrap: true,
-                        controller: ScrollController(),
-                    itemCount: listingProvider.listings.length,
-                    itemBuilder: (context, index) {
-                      final item = listingProvider.listings[index];
-                      return GestureDetector(
-                        onTap: () {
-                          goto(ListingDetailPage(fullData: item));
-                        },
-                        child: ListingBox(
-                          ref: ref, // ✅ ref pass kar diya constructor se
-                          id: item['id'].toString(),
-                          productBy: item["productBy"],
-                          title: item['title'] ?? 'No Name',
-                          imageUrl:
-                              Config.imgUrl +
-                              (item['images'][0] ?? ImgLinks.product),
-                        ),
-                      );
-                    },
-                  ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.1,
+                            mainAxisSpacing: 15,
+                            crossAxisSpacing: 10,
+                          ),
+                      shrinkWrap: true,
+                      controller: ScrollController(),
+                      itemCount: listingProvider.listings.length,
+                      itemBuilder: (context, index) {
+                        final item = listingProvider.listings[index];
+                        return GestureDetector(
+                          onTap: () {
+                            goto(ListingDetailPage(fullData: item));
+                          },
+                          child: ListingBox(
+                            ref: ref, // ✅ ref pass kar diya constructor se
+                            id: item['id'].toString(),
+                            productBy: item["productBy"],
+                            title: item['title'] ?? 'No Name',
+                            imageUrl:
+                                Config.imgUrl +
+                                (item['images'][0] ?? ImgLinks.product),
+                          ),
+                        );
+                      },
+                    ),
             ],
           ),
         ),
@@ -190,85 +189,91 @@ class ListingBox extends StatelessWidget {
                 top: 5,
                 right: 5,
 
-                child: ref
-                                  .read(listingDataProvider).loadingfor.toString() == id.toString()  ? CircleAvatar(
+                child:
+                    ref.read(listingDataProvider).loadingfor.toString() ==
+                        id.toString()
+                    ? CircleAvatar(
                         radius: 10,
                         backgroundColor: Colors.black,
-                        child: DotLoader(showDots: 1)) : GestureDetector(
-                  onTap: () {
-                    // Show confirm
-                    //Dation dialog
+                        child: DotLoader(showDots: 1),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          // Show confirm
+                          //Dation dialog
 
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        backgroundColor: Colors.black,
-                        title: const Text(
-                          'Delete Listing',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        content: const Text(
-                          'Are you sure you want to delete this listing?',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text(
-                              'Cancel',
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Colors.black,
+                              title: const Text(
+                                'Delete Listing',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              content: const Text(
+                                'Are you sure you want to delete this listing?',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text(
+                                    'Cancel',
 
-                              style: TextStyle(color: Colors.grey),
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // ✅ delete using ref
+
+                                    ref
+                                        .read(listingDataProvider)
+                                        .deleteNotifications(
+                                          notificationId: id,
+                                          uid: ref
+                                              .watch(userDataClass)
+                                              .userData["id"]
+                                              .toString(),
+                                          loadingfor: id,
+                                        );
+                                    Navigator.pop(context);
+                                  },
+                                  child:
+                                      const Text(
+                                            'Delete',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          )
+                                          .animate(
+                                            onPlay: (controller) => controller
+                                                .repeat(reverse: true),
+                                          )
+                                          .shimmer(color: Colors.red.shade200),
+                                ),
+                              ],
                             ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(
+                              255,
+                              238,
+                              236,
+                              236,
+                            ).withOpacity(0.7),
+                            shape: BoxShape.circle,
                           ),
-                          TextButton(
-                            onPressed: () {
-                              // ✅ delete using ref
-
-                              ref
-                                  .read(listingDataProvider)
-                                  .deleteNotifications(
-                                    notificationId: id,
-                                    uid: ref
-                                        .watch(userDataClass)
-                                        .userdata["id"]
-                                        .toString(),
-                                    loadingfor: id,
-                                  );
-                              Navigator.pop(context);
-                            },
-                            child:
-                                const Text(
-                                      'Delete',
-                                      style: TextStyle(color: Colors.grey),
-                                    )
-                                    .animate(
-                                      onPlay: (controller) =>
-                                          controller.repeat(reverse: true),
-                                    )
-                                    .shimmer(color: Colors.red.shade200),
+                          child: const Icon(
+                            Icons.delete,
+                            size: 18,
+                            color: Color.fromARGB(255, 193, 16, 4),
                           ),
-                        ],
+                        ),
                       ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(
-                        255,
-                        238,
-                        236,
-                        236,
-                      ).withOpacity(0.7),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.delete,
-                      size: 18,
-                      color: Color.fromARGB(255, 193, 16, 4),
-                    ),
-                  ),
-                ),
               ),
             ],
           ),

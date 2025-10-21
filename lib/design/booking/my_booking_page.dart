@@ -31,7 +31,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
       ref
           .watch(bookingDataProvider)
           .fetchComingOrders(
-            uid: ref.watch(userDataClass).userdata["id"].toString(),
+            uid: ref.watch(userDataClass).userData["id"].toString(),
             search: "",
             loadingfor: "3421",
           );
@@ -54,38 +54,34 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
-      bottomNavigationBar: BottomNavBarWidget(
-        currentIndex: 2,
-      ),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
       body: SingleChildScrollView(
         controller: ScrollController(),
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
-            // Search bar just below AppBar (with grey background) 
+            // Search bar just below AppBar (with grey background)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SearchFeildWidget(searchFieldController: searchfieldcontroller, 
-              hint: "Search How to & More",
-              onSearchIconTap: (){
-                 if(searchfieldcontroller.text.isEmpty){
-                  toast("Write Someting");
-                  return;
-                }
+              child: SearchFeildWidget(
+                searchFieldController: searchfieldcontroller,
+                hint: "Search How to & More",
+                onSearchIconTap: () {
+                  if (searchfieldcontroller.text.isEmpty) {
+                    toast("Write Someting");
+                    return;
+                  }
                   ref
-                            .watch(bookingDataProvider)
-                            .fetchComingOrders(
-                              uid: ref
-                                  .watch(userDataClass)
-                                  .userdata["id"]
-                                  .toString(),
-                              search: searchfieldcontroller.text,
-                              loadingfor: "3421",
-                            );
-              },),
+                      .watch(bookingDataProvider)
+                      .fetchComingOrders(
+                        uid: ref.watch(userDataClass).userData["id"].toString(),
+                        search: searchfieldcontroller.text,
+                        loadingfor: "3421",
+                      );
+                },
+              ),
             ),
-            
-            
+
             ref.watch(bookingDataProvider).loadingfor == "3421"
                 ? const Center(
                     child: Padding(
@@ -94,28 +90,28 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                     ),
                   )
                 : GridView.builder(
-                  shrinkWrap: true,
-                  controller: ScrollController(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
+                    shrinkWrap: true,
+                    controller: ScrollController(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
+                    itemCount: ref
+                        .watch(bookingDataProvider)
+                        .comingOrders
+                        .length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // Mobile 2 columns
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                          childAspectRatio: 0.85,
+                        ),
+                    itemBuilder: (context, index) => _bookingCard(
+                      context,
+                      ref.watch(bookingDataProvider).comingOrders[index],
+                    ),
                   ),
-                  itemCount: ref
-                      .watch(bookingDataProvider)
-                      .comingOrders
-                      .length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Mobile 2 columns
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        childAspectRatio: 0.85,
-                      ),
-                  itemBuilder: (context, index) => _bookingCard(
-                    context,
-                    ref.watch(bookingDataProvider).comingOrders[index],
-                  ),
-                ),
           ],
         ),
       ),
@@ -162,7 +158,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                           fit: BoxFit.cover,
                           width: ScreenSize.width * 0.45,
                           // width: double.infinity,
-                          height: ScreenSize.height* 0.2,
+                          height: ScreenSize.height * 0.2,
                           url:
                               Config.imgUrl +
                               (jsonDecode(booking['productImage'])[0] ??

@@ -23,6 +23,7 @@ import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
+import '../constants/checkInternet.dart';
 
 /// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {
@@ -37,17 +38,29 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     // Fetch dashboard data when the page loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.watch(userDataClass).getProfileData();
-      ref
-          .read(dashboardProvider)
-          .fetchDashboard(
-            loadingfor: "dashboard",
-            uid: "${ref.watch(userDataClass).userdata['id']}",
-          );
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Check internet connection first
+      if (await checkInternet() == false) {
+        showErrorToast("No internet connection");
+        return;
+      }
+
+      // Get user profile data
+      await ref.read(userDataClass).getProfileData();
+
+      // Fetch dashboard data with user ID
+      final userId = ref.read(userDataClass).userId;
+      if (userId.isNotEmpty) {
+        ref
+            .read(dashboardProvider)
+            .fetchDashboard(loadingfor: "dashboard", uid: userId);
+      } else {
+        debugPrint("User ID not available for dashboard fetch");
+      }
     });
   }
 
+  /// Safely parse dynamic data to List<double> with error handling
   List<double> _parseDoubleList(dynamic data) {
     if (data == null) return [];
 
@@ -56,27 +69,28 @@ class _HomePageState extends ConsumerState<HomePage> {
         return data.map((e) {
           if (e is double) return e;
           if (e is int) return e.toDouble();
-          if (e is String) return double.parse(e);
+          if (e is String) return double.tryParse(e) ?? 0.0;
           return 0.0;
         }).toList();
       }
       return [];
     } catch (e) {
+      debugPrint("Error parsing double list: $e");
       return [];
     }
   }
 
+  /// Safely parse dynamic data to List<String> with error handling
   List<String> _parseStringList(dynamic data) {
     if (data == null) return [];
 
     try {
       if (data is List) {
-        return data.map((e) {
-          return e.toString();
-        }).toList();
+        return data.map((e) => e?.toString() ?? '').toList();
       }
       return [];
     } catch (e) {
+      debugPrint("Error parsing string list: $e");
       return [];
     }
   }
@@ -93,7 +107,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
-          title: Image.asset(ImgAssets.logo, width: 100),
+          title: Image.asset(ImgAssets.logoShadow, width: 100),
           actions: [
             IconButton(
               onPressed: () {
@@ -122,9 +136,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 height: 47,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url:
-                      Config.imgUrl +
-                      ref.watch(userDataClass).userdata['image'],
+                  url: Config.imgUrl + ref.watch(userDataClass).userImage,
                 ),
               ),
             ),
@@ -153,8 +165,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                           labels: _parseStringList(
                             dashboardService
-                                .dashboardData["productTitelsListForChart"]
-                                .map((e) => e.toString()),
+                                .dashboardData["productTitelsListForChart"],
                           ),
                         )
                         .animate(
@@ -165,7 +176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               // Text(
               //   "${dashboardService.dashboardData['orderCountsListForChart']}",
               // ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 20),
               // ✅ Earnings & Rating Row
               Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -244,7 +255,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     },
                     child:
                         Container(
-                              width: ScreenSize.width* 0.9,
+                              width: ScreenSize.width * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10),
@@ -304,6 +315,28 @@ class HomeChart extends ConsumerStatefulWidget {
 class _HomeChartState extends ConsumerState<HomeChart> {
   @override
   Widget build(BuildContext context) {
+    debugPrint("👉🏻 Bookings Data: ${widget.bookingsData}");
+    debugPrint("Rentals Data: ${widget.rentalsData}");
+
+    double maxYValue = 0;
+    if (widget.bookingsData.isNotEmpty) {
+      maxYValue = widget.bookingsData.reduce(
+        (curr, next) => curr > next ? curr : next,
+      );
+    }
+    if (widget.rentalsData.isNotEmpty) {
+      double maxRentalValue = widget.rentalsData.reduce(
+        (curr, next) => curr > next ? curr : next,
+      );
+      if (maxRentalValue > maxYValue) {
+        maxYValue = maxRentalValue;
+      }
+    }
+
+    // Add some padding to the maxYValue for better visualization
+    maxYValue = (maxYValue + 1).ceilToDouble();
+    if (maxYValue < 5) maxYValue = 5; // Ensure a minimum maxY for small values
+
     return Column(
       children: [
         // const Text(
@@ -348,7 +381,8 @@ class _HomeChartState extends ConsumerState<HomeChart> {
         const SizedBox(height: 10),
 
         SizedBox(
-          height: 288,
+          height: ScreenSize.height * 0.3,
+          width: double.infinity,
           child: LineChart(
             LineChartData(
               gridData: FlGridData(show: true),
@@ -362,7 +396,11 @@ class _HomeChartState extends ConsumerState<HomeChart> {
                         return Transform.rotate(
                           angle: -0.5,
                           child: Text(
-                            widget.labels[value.toInt()],
+                            widget.labels[value.toInt()].toString().length > 15
+                                ? widget.labels[value.toInt()]
+                                      .toString()
+                                      .substring(0, 15)
+                                : widget.labels[value.toInt()].toString(),
                             style: const TextStyle(fontSize: 10),
                           ),
                         );
@@ -380,18 +418,18 @@ class _HomeChartState extends ConsumerState<HomeChart> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 0.5,
+                    interval: 20,
                     getTitlesWidget: (value, meta) {
                       return Text(
                         value.toStringAsFixed(1),
-                        style: const TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 8),
                       );
                     },
                   ),
                 ),
               ),
               minY: 0,
-              maxY: 3,
+              maxY: maxYValue,
               lineBarsData: [
                 LineChartBarData(
                   spots: widget.bookingsData.asMap().entries.map((entry) {
@@ -450,58 +488,105 @@ class LoadingChart extends StatelessWidget {
   }
 }
 
-homeTextWidget({required String title, required String value}) {
+/// Enhanced home text widget with better styling and error handling
+Widget homeTextWidget({
+  required String title,
+  required String value,
+  double titleFontSize = 14,
+  double valueFontSize = 25,
+  Color titleColor = Colors.grey,
+  Color valueColor = Colors.grey,
+  FontWeight titleWeight = FontWeight.normal,
+  FontWeight valueWeight = FontWeight.bold,
+}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Text(
         title,
         style: TextStyle(
-          // fontWeight: FontWeight.bold,
-          color: AppColors.mainColor.shade300,
+          fontSize: titleFontSize,
+          color: titleColor,
+          fontWeight: titleWeight,
         ),
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
       const SizedBox(height: 4),
       Text(
         value,
-        style: const TextStyle(
-          fontSize: 25,
-          color: Colors.grey,
-          fontWeight: FontWeight.bold,
+        style: TextStyle(
+          fontSize: valueFontSize,
+          color: valueColor,
+          fontWeight: valueWeight,
         ),
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     ],
   );
 }
 
-homeMenuBoxWidget({
-  String label = "",
-  IconData icon = Icons.menu,
+/// Enhanced home menu box widget with better styling and error handling
+Widget homeMenuBoxWidget({
+  required String label,
+  required IconData icon,
   Widget? pageName,
+  double width = 145,
+  double height = 120,
+  double iconSize = 50,
+  Color backgroundColor = Colors.white,
+  Color iconColor = Colors.cyan,
+  BorderRadius borderRadius = const BorderRadius.all(Radius.circular(12)),
+  EdgeInsets padding = const EdgeInsets.all(18),
+  VoidCallback? onTap,
 }) {
   return Padding(
     padding: const EdgeInsets.all(8),
     child: InkWell(
-      onTap: () {
-        if (pageName != null) {
-          goto(pageName);
-        }
-      },
+      onTap:
+          onTap ??
+          () {
+            if (pageName != null) {
+              goto(pageName);
+            }
+          },
+      borderRadius: borderRadius,
       child: Container(
-        width: 145,
+        width: width,
+        height: height,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: backgroundColor,
+          borderRadius: borderRadius,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: padding,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: AppColors.mainColor, size: 50),
+              Icon(icon, color: iconColor, size: iconSize),
               const SizedBox(height: 10),
-              Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),

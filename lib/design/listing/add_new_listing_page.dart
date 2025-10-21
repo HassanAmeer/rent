@@ -142,7 +142,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
       try {
         final listingApi = ref.read(listingDataProvider);
         final userId =
-            ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+            ref.read(userDataClass).userData['id']?.toString() ?? '1';
 
         await listingApi.addNewListing(
           uid: userId,
@@ -166,7 +166,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         ref
             .watch(listingDataProvider)
             .fetchMyItems(
-              uid: ref.watch(userDataClass).userdata["id"].toString(),
+              uid: ref.watch(userDataClass).userData["id"].toString(),
               search: "",
               loadingfor: "123",
             );
@@ -226,7 +226,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                   border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: DropdownButtonFormField<String>(
-                  initialValue: _selectedCategory,
+                  value: _selectedCategory,
                   hint: const Text('Select a category'),
                   decoration: const InputDecoration(
                     border: InputBorder.none,

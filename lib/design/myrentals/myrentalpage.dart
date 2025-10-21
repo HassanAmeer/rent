@@ -29,7 +29,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userId = ref.read(userDataClass).userdata['id']?.toString() ?? '1';
+      final userId = ref.read(userDataClass).userData['id']?.toString() ?? '1';
       ref
           .read(rentalDataProvider)
           .fetchMyRentals(
@@ -68,7 +68,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                 suffixIcon: IconButton(
                   onPressed: () {
                     final userId =
-                        ref.read(userDataClass).userdata['id']?.toString() ??
+                        ref.read(userDataClass).userData['id']?.toString() ??
                         '1';
                     ref
                         .watch(rentalDataProvider)
@@ -135,7 +135,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
                 : RefreshIndicator(
                     onRefresh: () async {
                       final userId =
-                          ref.read(userDataClass).userdata['id']?.toString() ??
+                          ref.read(userDataClass).userData['id']?.toString() ??
                           '1';
                       await ref
                           .read(rentalDataProvider)

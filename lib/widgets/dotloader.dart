@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math show sin, pi;
 import '../constants/appColors.dart';
 
+/// Enhanced Dot Loader Widget with better customization and performance
 class DotLoader extends StatefulWidget {
   const DotLoader({
     super.key,
@@ -11,17 +12,15 @@ class DotLoader extends StatefulWidget {
     this.duration = const Duration(milliseconds: 1100),
     this.controller,
     this.showDots = 3,
+    this.spacing = 5.0,
+    this.curve = Curves.easeInOut,
   });
-
-  // assertion is used for show errors on whole screen
-  // assert(
-  //     !(itemBuilder is IndexedWidgetBuilder && color is Color) &&
-  //         !(itemBuilder == null && color == null),
-  //     'You should specify itemBuilder or a color For Dot Loader');
 
   final int? showDots;
   final Color? color;
   final double size;
+  final double spacing;
+  final Curve curve;
   final IndexedWidgetBuilder? itemBuilder;
   final Duration duration;
   final AnimationController? controller;
@@ -56,19 +55,22 @@ class _DotLoaderState extends State<DotLoader>
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox.fromSize(
-        size: Size(widget.size * 2, widget.size),
+        size: Size(widget.size * 2.5, widget.size),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(widget.showDots!, (i) {
-            return ScaleTransition(
-              scale: DelayTween(
-                begin: 0.0,
-                end: 1.0,
-                delay: i * .2,
-              ).animate(_controller),
-              child: SizedBox.fromSize(
-                size: Size.square(widget.size * 0.5),
-                child: _itemBuilder(i),
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: widget.spacing / 2),
+              child: ScaleTransition(
+                scale: DelayTween(
+                  begin: 0.0,
+                  end: 1.0,
+                  delay: i * .2,
+                ).animate(_controller),
+                child: SizedBox.fromSize(
+                  size: Size.square(widget.size * 0.5),
+                  child: _itemBuilder(i),
+                ),
               ),
             );
           }),
@@ -79,19 +81,18 @@ class _DotLoaderState extends State<DotLoader>
 
   Widget _itemBuilder(int index) => widget.itemBuilder != null
       ? widget.itemBuilder!(context, index)
-      : DecoratedBox(
+      : Container(
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black,
-                offset: Offset(1, 1),
-                blurRadius: 1,
+                color: Colors.black.withOpacity(0.2),
+                offset: const Offset(1, 1),
+                blurRadius: 2,
               ),
               BoxShadow(
-                color: Colors.grey,
-                offset: Offset(-1, -1),
-                blurRadius: 25,
-                // spreadRadius: 2,
+                color: Colors.white.withOpacity(0.8),
+                offset: const Offset(-1, -1),
+                blurRadius: 2,
               ),
             ],
             color: widget.color,

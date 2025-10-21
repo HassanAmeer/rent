@@ -27,7 +27,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
           .watch(notifyData)
           .getNotifyData(
             loadingFor: "fetchNotifyData",
-            uid: ref.watch(userDataClass).userdata['id'].toString(),
+            uid: ref.watch(userDataClass).userData['id'].toString(),
           );
     });
     super.initState();
@@ -66,19 +66,21 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         .deleteNotification(
           loadingfor: notifyId,
           notificationId: notifyId,
-          uid: ref.read(userDataClass).userdata['id'].toString(),
+          uid: ref.read(userDataClass).userData['id'].toString(),
         );
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    var userData = ref.watch(userDataClass).userdata;
+    var userData = ref.watch(userDataClass).userData;
 
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Image.asset(ImgAssets.logo, width: 100),
+        centerTitle: false,
+        titleSpacing: 0,
+        title: Image.asset(ImgAssets.logoShadow, width: 80),
         actions: [
           InkWell(
             onTap: () {
@@ -135,7 +137,8 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                 CacheImageWidget(
                                   width: 48,
                                   height: 48,
-                                  url: Config.imgUrl +
+                                  url:
+                                      Config.imgUrl +
                                       (item['fromuid']['image'] ?? ''),
                                 ),
                                 Positioned(

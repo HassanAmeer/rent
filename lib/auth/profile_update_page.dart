@@ -179,17 +179,17 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                                   url:
                                       (ref
                                                   .watch(userDataClass)
-                                                  .userdata['image'] !=
+                                                  .userData['image'] !=
                                               null &&
                                           ref
                                               .watch(userDataClass)
-                                              .userdata['image']
+                                              .userData['image']
                                               .toString()
                                               .isNotEmpty)
                                       ? Config.imgUrl +
                                             ref
                                                 .watch(userDataClass)
-                                                .userdata['image']
+                                                .userData['image']
                                       : ImgLinks.profileImage,
                                 ),
 
@@ -375,12 +375,12 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                       goto(TermsConditionPage());
                     },
                     leading: Checkbox(
-                       value: acceptTerms,
-                        onChanged: (val) {
-                          setState(() {
-                            acceptTerms = val ?? false;
-                          });
-                        },
+                      value: acceptTerms,
+                      onChanged: (val) {
+                        setState(() {
+                          acceptTerms = val ?? false;
+                        });
+                      },
                     ),
                     title: RichText(
                       text: TextSpan(
@@ -396,49 +396,47 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                     ),
                   ),
 
-
                   const SizedBox(height: 100),
-
-                  
                 ],
               ),
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-            floatingActionButton: SizedBox(
-                    width: double.infinity,
-                    height: 65,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: (acceptPrivacy && acceptTerms)?  Colors.black: Colors.grey,
-                        ),
-                        onPressed:  () {
-                          if(acceptPrivacy && acceptTerms){
-
-                                ref
-                                    .watch(userDataClass)
-                                    .updateProfile(
-                                      name: nameController.text,
-                                      phone: phoneController.text,
-                                      email: emailController.text,
-                                      aboutUs: aboutController.text,
-                                      address: addressController.text,
-                                      imagePath: pikedImage,
-                                    );
-                          }else{
-                            toast("please accept our policies !");
-                          }
-                              },
-                        child: ref.watch(userDataClass).isLoading
-                            ? const DotLoader()
-                            : const Text(
-                                "Update Profile",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                      ),
-                    ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: SizedBox(
+        width: double.infinity,
+        height: 65,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: (acceptPrivacy && acceptTerms)
+                  ? Colors.black
+                  : Colors.grey,
+            ),
+            onPressed: () {
+              if (acceptPrivacy && acceptTerms) {
+                ref
+                    .watch(userDataClass)
+                    .updateProfile(
+                      name: nameController.text,
+                      phone: phoneController.text,
+                      email: emailController.text,
+                      aboutUs: aboutController.text,
+                      address: addressController.text,
+                      imagePath: pikedImage,
+                    );
+              } else {
+                toast("please accept our policies !");
+              }
+            },
+            child: ref.watch(userDataClass).isLoading
+                ? const DotLoader()
+                : const Text(
+                    "Update Profile",
+                    style: TextStyle(color: Colors.white),
                   ),
+          ),
+        ),
+      ),
     );
   }
 }

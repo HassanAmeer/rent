@@ -24,10 +24,10 @@ class _ChatsState extends ConsumerState<Chats> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var senderId = ref.watch(userDataClass).userdata['id'].toString();
+      var senderId = ref.watch(userDataClass).userData['id'].toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata['id'].toString() ==
+          ref.watch(userDataClass).userData['id'].toString() ==
               widget.msgdata['sid'].toString()
           ? widget.msgdata['rid']
           : widget.msgdata['sid'];
@@ -47,10 +47,10 @@ class _ChatsState extends ConsumerState<Chats> {
     if (_controller.text.trim().isNotEmpty) {
       String message = _controller.text.trim();
 
-      var senderId = ref.watch(userDataClass).userdata['id'].toString();
+      var senderId = ref.watch(userDataClass).userData['id'].toString();
 
       var recieverId =
-          ref.watch(userDataClass).userdata['id'].toString() ==
+          ref.watch(userDataClass).userData['id'].toString() ==
               widget.msgdata['sid'].toString()
           ? widget.msgdata['rid']
           : widget.msgdata['sid'];
@@ -90,7 +90,7 @@ class _ChatsState extends ConsumerState<Chats> {
             ref
                 .read(chatClass)
                 .chatedUsers(
-                  uid: ref.read(userDataClass).userdata['id'].toString(),
+                  uid: ref.read(userDataClass).userData['id'].toString(),
                 );
 
             Navigator.pop(context);
@@ -157,7 +157,7 @@ class _ChatsState extends ConsumerState<Chats> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 var chat = chatProvider.messagesList[index];
-                bool isMe = userProvider.userdata['id'] == chat['sid'];
+                bool isMe = userProvider.userData['id'] == chat['sid'];
 
                 return Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 4),

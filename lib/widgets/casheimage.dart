@@ -36,7 +36,7 @@ class CacheImageWidget extends StatelessWidget {
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     DotLoader(showDots: 1),
                 errorWidget: (context, url, error) =>
-                    Image.asset(ImgAssets.noimg),
+                    Image.asset(ImgAssets.noImg),
               ),
             )
           : CachedNetworkImage(
@@ -45,7 +45,7 @@ class CacheImageWidget extends StatelessWidget {
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   DotLoader(),
               errorWidget: (context, url, error) =>
-              Image.asset(ImgAssets.noimg)
+                  Image.asset(ImgAssets.noImg),
             ),
     );
   }

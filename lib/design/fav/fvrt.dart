@@ -31,7 +31,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
   }
 
   Future<void> _loadFavorites() async {
-    final userId = ref.read(userDataClass).userdata["id"].toString();
+    final userId = ref.read(userDataClass).userData["id"].toString();
     await ref
         .read(favrtdata)
         .favoritems(loadingFor: "loadFullData", uid: userId, search: "");
@@ -56,10 +56,13 @@ class _FavouriteState extends ConsumerState<Favourite> {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 3),
               // Search Bar
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10,
+                ),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
@@ -95,7 +98,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                       loadingFor: "loadFullData",
                                       uid: ref
                                           .watch(userDataClass)
-                                          .userdata["id"]
+                                          .userData["id"]
                                           .toString(),
                                       search: searchcontrollers.text,
                                     );
@@ -149,9 +152,9 @@ class _FavouriteState extends ConsumerState<Favourite> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 20,
-                          childAspectRatio: 0.8,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1,
                         ),
                     itemCount: favrtProvider.favrt.length,
                     itemBuilder: (context, index) {
@@ -206,7 +209,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                                   .addfavrt(
                                                     uid: ref
                                                         .watch(userDataClass)
-                                                        .userdata['id']
+                                                        .userData['id']
                                                         .toString(),
                                                     itemId:
                                                         item['products']["id"]
