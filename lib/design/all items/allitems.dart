@@ -33,7 +33,6 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref.read(userDataClass).userData['id']?.toString() ?? '1';
       ref
           .read(getAllItems)
           .fetchAllItems(loadingfor: "loadFullData", search: "");
@@ -69,10 +68,9 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                 hint: "Search items...",
                 onSearchIconTap: () {
                   if (searchfieldcontroller.text.isEmpty) {
-                    toast("Write Someting");
+                    toast("Write Something");
                     return;
                   }
-                  ref.read(userDataClass).userData['id']?.toString() ?? '1';
                   ref
                       .read(getAllItems)
                       .fetchAllItems(
@@ -109,16 +107,15 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                         // return Text(item.toString());
                         return GestureDetector(
                           onTap: () {
-                            goto(Allitemdetailspage(fullData: item));
+                            goto(Allitemdetailspage(item: item));
                           },
                           child: ItemsBox(
                             fullDataBytIndex: item,
-                            id: item['id'].toString(),
-                            title: item['title'] ?? 'No Name',
-                            imageUrl: item['images'].toList().isEmpty
-                                ? ImgLinks.product
-                                : (Config.imgUrl + item['images'][0]) ??
-                                      ImgLinks.product,
+                            id: item.id.toString(),
+                            title: item.displayTitle,
+                            imageUrl: item.primaryImageUrl.isNotEmpty
+                                ? item.primaryImageUrl
+                                : ImgLinks.product,
                           ),
                         );
                       },
@@ -194,10 +191,7 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                             ref
                                 .watch(favrtdata)
                                 .addfavrt(
-                                  uid: ref
-                                      .watch(userDataClass)
-                                      .userData['id']
-                                      .toString(),
+                                  uid: ref.watch(userDataClass).userId,
                                   itemId: widget.id.toString(),
                                   loadingFor: widget.id.toString(),
                                 );
@@ -282,10 +276,7 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                   endDate.difference(startDate).inDays + 1;
                               ////
                               debugPrint(
-                                (int.parse(
-                                          widget.fullDataBytIndex['dailyrate'],
-                                        ) *
-                                        daysCount)
+                                (widget.fullDataBytIndex.dailyRate * daysCount)
                                     .toString(),
                               );
                               // return;
@@ -295,19 +286,15 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                     userCanPickupInDateRange: finalDateRange,
                                     productId: widget.id,
                                     totalprice_by:
-                                        (int.parse(
-                                                  widget
-                                                      .fullDataBytIndex['dailyrate'],
-                                                ) *
+                                        (widget.fullDataBytIndex.dailyRate *
                                                 daysCount)
                                             .toString(),
-                                    product_by:
-                                        widget.fullDataBytIndex['dailyrate'],
-
-                                    userId: ref
-                                        .watch(userDataClass)
-                                        .userData['id']
+                                    product_by: widget
+                                        .fullDataBytIndex
+                                        .dailyRate
                                         .toString(),
+
+                                    userId: ref.watch(userDataClass).userId,
 
                                     loadingFor: "${widget.id}order",
 

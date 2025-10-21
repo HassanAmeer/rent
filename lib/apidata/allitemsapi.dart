@@ -10,6 +10,8 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/item_model.dart';
+import 'package:rent/models/api_response.dart';
 
 // import '../main.dart';
 
@@ -17,8 +19,8 @@ import 'package:rent/design/home_page.dart';
 final getAllItems = ChangeNotifierProvider<GetAllItems>((ref) => GetAllItems());
 
 class GetAllItems with ChangeNotifier {
-  var allItems = [];
-  var order = [];
+  List<ItemModel> allItems = [];
+  List<ItemModel> orderedItems = [];
   //////
   String loadingFor = "";
   setLoading([String value = ""]) {
@@ -44,9 +46,13 @@ class GetAllItems with ChangeNotifier {
       print("👉 data: $data");
       if (response.statusCode == 200) {
         allItems.clear();
-        allItems = data['items'] ?? [];
+        final itemsData = data['items'] ?? [];
+        allItems = itemsData
+            .map<ItemModel>((item) => ItemModel.fromJson(item))
+            .toList();
 
         setLoading("");
+        notifyListeners();
       } else {
         toast(data['msg']);
       }
@@ -57,7 +63,7 @@ class GetAllItems with ChangeNotifier {
     }
   }
 
-  List orderedItems = [];
+  // List orderedItems = [];
 
   /// ✅ Place Order
   Future<void> orderitems({

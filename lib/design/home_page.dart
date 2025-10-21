@@ -146,10 +146,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
         /// ✅ Body
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              SizedBox(height: 5),
+              SizedBox(height: 0),
 
               // ✅ Sirf API wala chart
               ref.watch(dashboardProvider).loadingfor == "dashboard"
@@ -176,7 +176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               // Text(
               //   "${dashboardService.dashboardData['orderCountsListForChart']}",
               // ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 28),
               // ✅ Earnings & Rating Row
               Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

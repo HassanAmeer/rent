@@ -10,7 +10,6 @@ import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
 class Blogs extends ConsumerStatefulWidget {
-  
   const Blogs({super.key});
 
   @override
@@ -32,14 +31,14 @@ class _BlogsState extends ConsumerState<Blogs> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            "My Blogs",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+        titleSpacing: 0,
+        centerTitle: true,
+        title: Text(
+          "My Blogs",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
       ),
@@ -104,14 +103,11 @@ class _BlogsState extends ConsumerState<Blogs> {
                       ),
 
                       const SizedBox(height: 4),
-
-
                     ],
                   ),
                 );
               },
             ),
-            
     );
   }
 }
