@@ -11,6 +11,7 @@ import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/item_model.dart';
 
 // import '../main.dart';
 
@@ -20,7 +21,7 @@ final listingDataProvider = ChangeNotifierProvider<ListingData>(
 );
 
 class ListingData with ChangeNotifier {
-  var listings = [];
+  List<ItemModel> listings = [];
 
   //////
   String loadingfor = "";
@@ -49,7 +50,10 @@ class ListingData with ChangeNotifier {
       print("👉Response status: ${response.statusCode}");
       print("👉 data: $data");
       if (response.statusCode == 200) {
-        listings = data['items'] ?? [];
+        final itemsData = data['items'] ?? [];
+        listings = itemsData
+            .map<ItemModel>((item) => ItemModel.fromJson(item))
+            .toList();
         // listings =  [];
         setLoading("");
         notifyListeners();
@@ -63,27 +67,51 @@ class ListingData with ChangeNotifier {
     }
   }
 
-  editsmyitems({
+  Future editsmyitems({
     required String itemId,
     required String uid,
-    Map? newItemData,
+    required Map newItemData,
   }) async {
     try {
       if (await checkInternet() == false) return;
 
-      final response = await http.put(
+      var req = http.MultipartRequest(
+        "PUT",
         Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
-        body: newItemData,
       );
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
+
+      req.headers['Content-Type'] = 'application/json';
+
+      req.fields['uid'] = uid;
+      req.fields['title'] = newItemData['title'];
+      req.fields['description'] = newItemData['description'];
+      req.fields['avalibilityDays'] = newItemData['avalibilityDays'];
+      req.fields['dailyrate'] = newItemData['dailyrate'];
+      req.fields['weeklyrate'] = newItemData['weeklyrate'];
+      req.fields['monthlyrate'] = newItemData['monthlyrate'];
+      req.fields['category'] = newItemData['category'];
+      req.fields['existingImages'] = jsonEncode(newItemData['existingImages']);
+
+      for (var image in newItemData['newImages']) {
+        if (await image.exists()) {
+          req.files.add(
+            await http.MultipartFile.fromPath('images[]', image.path),
+          );
+        }
+      }
+
+      var sendedRequest = await req.send();
+      var response = await sendedRequest.stream.bytesToString();
+
+      if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
+        toast("Successfully Updated", backgroundColor: Colors.green);
         fetchMyItems(uid: uid);
-        toast(data["msg"], backgroundColor: Colors.green);
       } else {
-        toast(data["msg"], backgroundColor: Colors.red);
+        toast("Failed to update", backgroundColor: Colors.red);
       }
     } catch (e) {
-      print("errore$e");
+      debugPrint("Error updating listing: $e");
+      toast("Network error: Please check your connection");
     }
   }
 

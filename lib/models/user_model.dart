@@ -76,11 +76,14 @@ class UserModel {
     };
   }
 
-  /// Get full image URL
+  /// Get full image URL with null safety
   String get fullImageUrl {
-    if (image == null || image!.isEmpty) return '';
+    if (image == null || image!.trim().isEmpty) return '';
     return 'https://thelocalrent.com/uploads/$image';
   }
+
+  /// Check if user has a valid image
+  bool get hasImage => image != null && image!.trim().isNotEmpty;
 
   /// Check if user is active
   bool get isActive => activeUser == 1;

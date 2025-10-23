@@ -99,16 +99,16 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                         final item = listingProvider.listings[index];
                         return GestureDetector(
                           onTap: () {
-                            goto(ListingDetailPage(fullData: item));
+                            goto(ListingDetailPage(item: item));
                           },
                           child: ListingBox(
                             ref: ref, // ✅ ref pass kar diya constructor se
-                            id: item['id'].toString(),
-                            productBy: item["productBy"],
-                            title: item['title'] ?? 'No Name',
-                            imageUrl:
-                                Config.imgUrl +
-                                (item['images'][0] ?? ImgLinks.product),
+                            id: item.id.toString(),
+                            productBy: item.userId.toString(),
+                            title: item.displayTitle,
+                            imageUrl: item.primaryImageUrl.isNotEmpty
+                                ? item.primaryImageUrl
+                                : ImgLinks.product,
                           ),
                         );
                       },

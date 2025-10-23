@@ -6,6 +6,11 @@ import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
+import 'package:rent/models/item_model.dart';
+import 'dart:developer' as dev;
+import 'package:fl_html_editor/fl_html_editor.dart';
+import 'package:rent/apidata/categoryapi.dart';
+import 'package:rent/widgets/custom_image_text_dropdown.dart';
 
 // import '../../apidata/listingapi.dart';
 // import '../../apidata/user.dart';
@@ -14,9 +19,9 @@ import '../../apidata/user.dart';
 import '../../constants/toast.dart';
 
 class EditListingPage extends ConsumerStatefulWidget {
-  final Map<String, dynamic> itemData;
+  final ItemModel item;
 
-  const EditListingPage({super.key, required this.itemData});
+  const EditListingPage({super.key, required this.item});
 
   @override
   ConsumerState<EditListingPage> createState() => _EditListingPageState();
@@ -24,60 +29,197 @@ class EditListingPage extends ConsumerStatefulWidget {
 
 class _EditListingPageState extends ConsumerState<EditListingPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _dailyRateController = TextEditingController();
-  final TextEditingController _weeklyRateController = TextEditingController();
-  final TextEditingController _monthlyRateController = TextEditingController();
-  final TextEditingController _availiablityDaysController =
-      TextEditingController();
-  final List<String> _selectedImages = [];
-  String? _selectedCategory = "Electronics";
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late HtmlEditorController _descriptionHTMLController;
+  late TextEditingController _dailyRateController;
+  late TextEditingController _weeklyRateController;
+  late TextEditingController _monthlyRateController;
+  late TextEditingController _availiablityDaysController;
+  late List<String> _selectedImages;
+  late String? _selectedCategory;
   bool _isLoading = false;
 
-  final List<String> _categories = [
-    'Electronics',
-    'Furniture',
-    'Vehicles',
-    'Tools & Equipment',
-    'Sports & Recreation',
-    'Clothing & Accessories',
-    'Books & Media',
-    'Home & Garden',
-    'Musical Instruments',
-    'Other',
+  // Availability Schedule Management
+  late Map<String, Map<String, TimeOfDay?>> _availabilitySchedule;
+  final List<String> _daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
   ];
+
+  // Categories will be loaded from API
+
+  // Categories will be loaded from API
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(
-      text: widget.itemData['title'] ?? '',
+    _titleController = TextEditingController(text: widget.item.displayTitle);
+    _descriptionController = TextEditingController(
+      text: widget.item.description ?? '',
     );
-    // _descriptionController = TextEditingController(
-    //   text: widget.itemData['description'] ?? '',
-    // );
-    // _dailyRateController = TextEditingController(
-    //   text: widget.itemData['dailyrate']?.toString() ?? '0',
-    // );
-    // _weeklyRateController = TextEditingController(
-    //   text: widget.itemData['weeklyrate']?.toString() ?? '0',
-    // );
-    // _monthlyRateController = TextEditingController(
-    //   text: widget.itemData['monthlyrate']?.toString() ?? '0',
-    // );
-    // // _selectedCategory = widget.itemData['category'] ?? _categories.first;
-    // _selectedImages = List.from(widget.itemData['images'] ?? []);
+    _descriptionHTMLController = HtmlEditorController();
+    _dailyRateController = TextEditingController(
+      text: widget.item.dailyRate.toString(),
+    );
+    _weeklyRateController = TextEditingController(
+      text: widget.item.weeklyRate.toString(),
+    );
+    _monthlyRateController = TextEditingController(
+      text: widget.item.monthlyRate.toString(),
+    );
+    _availiablityDaysController = TextEditingController(
+      text: widget.item.availabilityDays ?? '',
+    );
+    _selectedCategory = widget.item.categoryName ?? '';
+    _selectedImages = List.from(widget.item.validImageUrls);
+
+    // Initialize availability schedule
+    _availabilitySchedule = _parseAvailabilitySchedule(
+      widget.item.availabilityDays,
+    );
+
+    // Fetch categories and set HTML content
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryProvider).fetchCategories();
+      _descriptionHTMLController.setHtml(widget.item.description ?? '');
+    });
+  }
+
+  // Parse availability days string into schedule map
+  Map<String, Map<String, TimeOfDay?>> _parseAvailabilitySchedule(
+    String? availabilityString,
+  ) {
+    final schedule = <String, Map<String, TimeOfDay?>>{};
+
+    if (availabilityString == null || availabilityString.isEmpty) {
+      // Initialize with default empty schedule
+      for (final day in _daysOfWeek) {
+        schedule[day] = {'start': null, 'end': null};
+      }
+      return schedule;
+    }
+
+    // Parse the availability string (format: "Monday: 09:00 To 17:00,Tuesday: 10:00 To 18:00")
+    final dayEntries = availabilityString.split(',');
+    for (final entry in dayEntries) {
+      final parts = entry.trim().split(':');
+      if (parts.length >= 2) {
+        final day = parts[0].trim();
+        final timePart = parts[1].trim();
+
+        TimeOfDay? startTime;
+        TimeOfDay? endTime;
+
+        if (timePart.contains('To')) {
+          final timeParts = timePart.split('To');
+          if (timeParts.length == 2) {
+            startTime = _parseTimeString(timeParts[0].trim());
+            endTime = _parseTimeString(timeParts[1].trim());
+          }
+        }
+
+        if (_daysOfWeek.contains(day)) {
+          schedule[day] = {'start': startTime, 'end': endTime};
+        }
+      }
+    }
+
+    // Ensure all days are initialized
+    for (final day in _daysOfWeek) {
+      schedule[day] ??= {'start': null, 'end': null};
+    }
+
+    return schedule;
+  }
+
+  // Parse time string like "09:00" or "9:00 AM" into TimeOfDay
+  TimeOfDay? _parseTimeString(String timeString) {
+    try {
+      // Handle formats like "09:00", "9:00 AM", "9:00 PM"
+      final cleanTime = timeString.replaceAll(RegExp(r'\s*(AM|PM|am|pm)'), '');
+      final parts = cleanTime.split(':');
+      if (parts.length == 2) {
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        return TimeOfDay(hour: hour, minute: minute);
+      }
+    } catch (e) {
+      debugPrint('Error parsing time: $timeString');
+    }
+    return null;
   }
 
   Future<void> _pickImages() async {
-    final pickedFile = await ImagePicker().pickImage(
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromGallery();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromCamera();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getImageFromGallery() async {
+    final XFile? image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
-    if (pickedFile != null) {
+    if (image != null) {
       setState(() {
-        _selectedImages.add(pickedFile.path);
+        _selectedImages.add(image.path);
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image added from gallery!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _getImageFromCamera() async {
+    final XFile? image = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
+    if (image != null) {
+      setState(() {
+        _selectedImages.add(image.path);
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image captured from camera!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
     }
   }
 
@@ -87,8 +229,165 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     });
   }
 
+  // Availability Schedule Methods
+  void _toggleDayAvailability(String day, bool isAvailable) {
+    setState(() {
+      if (isAvailable) {
+        _availabilitySchedule[day] = {
+          'start': const TimeOfDay(hour: 9, minute: 0),
+          'end': const TimeOfDay(hour: 17, minute: 0),
+        };
+      } else {
+        _availabilitySchedule[day] = {'start': null, 'end': null};
+      }
+    });
+  }
+
+  Future<void> _setDayTime(String day, String type) async {
+    final initialTime = _availabilitySchedule[day]![type];
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime ?? const TimeOfDay(hour: 9, minute: 0),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _availabilitySchedule[day]![type] = pickedTime;
+      });
+    }
+  }
+
+  String _formatTime(TimeOfDay? time) {
+    if (time == null) return 'Select Time';
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _buildAvailabilityString() {
+    final availableDays = <String>[];
+
+    for (final day in _daysOfWeek) {
+      final schedule = _availabilitySchedule[day];
+      final startTime = schedule!['start'];
+      final endTime = schedule['end'];
+
+      if (startTime != null && endTime != null) {
+        availableDays.add(
+          '$day: ${_formatTime(startTime)} To ${_formatTime(endTime)}',
+        );
+      }
+    }
+
+    return availableDays.join(',');
+  }
+
+  Widget _buildDayAvailabilityRow(String day) {
+    final schedule = _availabilitySchedule[day]!;
+    final startTime = schedule['start'];
+    final endTime = schedule['end'];
+    final isAvailable = startTime != null && endTime != null;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  day,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Switch(
+                value: isAvailable,
+                onChanged: (value) => _toggleDayAvailability(day, value),
+                activeColor: Colors.cyan,
+              ),
+            ],
+          ),
+          if (isAvailable) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _setDayTime(day, 'start'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            size: 18,
+                            color: Colors.cyan,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Start: ${_formatTime(startTime)}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _setDayTime(day, 'end'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[400]!),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time,
+                            size: 18,
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'End: ${_formatTime(endTime)}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final categoryApi = ref.watch(categoryProvider);
     return Scaffold(
       appBar: AppBar(title: const Text("Edit Listing")),
       body: _isLoading
@@ -101,26 +400,33 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Category
-                    DropdownButtonFormField<String>(
-                      value: _selectedCategory,
-                      decoration: InputDecoration(
-                        labelText: 'Category',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      items: _categories.map((category) {
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedCategory = value;
-                        });
-                      },
-                    ),
+                    categoryApi.loadingFor == "category"
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Loading categories...'),
+                              ],
+                            ),
+                          )
+                        : CustomImageTextDropdown(
+                            selectedCategory: _selectedCategory,
+                            onCategorySelected: (category) {
+                              setState(() {
+                                _selectedCategory = category;
+                              });
+                            },
+                            hintText: 'Select a category',
+                          ),
 
                     const SizedBox(height: 20),
 
@@ -143,21 +449,13 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
 
                     const SizedBox(height: 20),
 
-                    // Description
-                    TextFormField(
-                      controller: _descriptionController,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        labelText: 'Description',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a description';
-                        }
-                        return null;
+                    // Description with HTML Editor
+                    HtmlEditor(
+                      controller: _descriptionHTMLController,
+                      height: 270,
+                      settings: EditorSettings(placeholder: "Description"),
+                      onChanged: (content) {
+                        debugPrint('Content changed: $content');
                       },
                     ),
 
@@ -209,18 +507,34 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                     ),
 
                     const SizedBox(height: 20),
-                    TextFormField(
-                      controller: _availiablityDaysController,
-                      keyboardType: TextInputType.text,
-                      // minLines: 3,
-                      // maxLines: 5,
-                      decoration: InputDecoration(
-                        labelText: 'Availibilty Days',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+
+                    // Availability Schedule Section
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Availability Schedule',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          ..._daysOfWeek.map(
+                            (day) => _buildDayAvailabilityRow(day),
+                          ),
+                        ],
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     // Images
@@ -229,76 +543,132 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 10),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[300]!),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
-                      itemCount: _selectedImages.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return GestureDetector(
-                            onTap: _pickImages,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.add_a_photo),
-                              ),
-                            ),
-                          );
-                        }
-                        final imageIndex = index - 1;
-                        return Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image:
-                                      _selectedImages[imageIndex].startsWith(
-                                        'http',
-                                      )
-                                      ? NetworkImage(
-                                          Config.imgUrl +
-                                              _selectedImages[imageIndex],
-                                        )
-                                      : FileImage(
-                                              File(_selectedImages[imageIndex]),
-                                            )
-                                            as ImageProvider,
-                                  fit: BoxFit.cover,
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _pickImages,
+                              icon: const Icon(Icons.add_photo_alternate),
+                              label: const Text('Add New Image'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.cyan.withOpacity(0.1),
+                                foregroundColor: Colors.cyan,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: BorderSide(
+                                    color: Colors.cyan.withOpacity(0.3),
+                                  ),
                                 ),
                               ),
                             ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: GestureDetector(
-                                onTap: () => _removeImage(imageIndex),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                          ),
+                          if (_selectedImages.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              'Selected Images (${_selectedImages.length})',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              height: 100,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _selectedImages.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          child: Image.network(
+                                            _selectedImages[index].startsWith(
+                                                  'http',
+                                                )
+                                                ? Config.imgUrl +
+                                                      _selectedImages[index]
+                                                : _selectedImages[index],
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return Container(
+                                                    width: 100,
+                                                    height: 100,
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(
+                                                      Icons.image_not_supported,
+                                                    ),
+                                                  );
+                                                },
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 4,
+                                          right: 4,
+                                          child: GestureDetector(
+                                            onTap: () => _removeImage(index),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.withOpacity(
+                                                  0.9,
+                                                ),
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 4,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: const Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
-                        );
-                      },
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 30),
@@ -314,23 +684,30 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                             });
 
                             // Prepare data for update
+                            final availabilityString =
+                                _buildAvailabilityString();
+                            dev.log('Availability String: $availabilityString');
+
                             final updatedData = {
-                              'title': _titleController.text,
-                              'description': _descriptionController.text,
-                              'avalibilityDays':
-                                  _availiablityDaysController.text,
-                              'dailyrate': _dailyRateController.text,
-                              'weeklyrate': _weeklyRateController.text,
-                              'monthlyrate': _monthlyRateController.text,
+                              'title': _titleController.text.trim(),
+                              'description': _descriptionHTMLController
+                                  .getHtml()
+                                  .toString(),
+                              'avalibilityDays': availabilityString,
+                              'dailyrate': _dailyRateController.text.trim(),
+                              'weeklyrate': _weeklyRateController.text.trim(),
+                              'monthlyrate': _monthlyRateController.text.trim(),
                               'category': _selectedCategory,
                               'images': _selectedImages,
                             };
+
+                            dev.log('Updated Data: $updatedData');
 
                             // Call the API to update the listing
                             ref
                                 .read(listingDataProvider)
                                 .editsmyitems(
-                                  itemId: widget.itemData['id'].toString(),
+                                  itemId: widget.item.id.toString(),
                                   uid: ref
                                       .watch(userDataClass)
                                       .userData['id']

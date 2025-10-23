@@ -115,15 +115,24 @@ class ItemModel {
     };
   }
 
-  /// Get primary image URL
+  /// Get primary image URL with null safety
   String get primaryImageUrl {
-    if (images.isEmpty) return '';
+    if (images.isEmpty || images.first.isEmpty) return '';
     return 'https://thelocalrent.com/uploads/${images.first}';
   }
 
-  /// Get all image URLs
+  /// Get all image URLs with null safety
   List<String> get imageUrls {
     return images
+        .where((img) => img.isNotEmpty)
+        .map((img) => 'https://thelocalrent.com/uploads/$img')
+        .toList();
+  }
+
+  /// Get valid image URLs only (filter out empty/null)
+  List<String> get validImageUrls {
+    return images
+        .where((img) => img != null && img.isNotEmpty)
         .map((img) => 'https://thelocalrent.com/uploads/$img')
         .toList();
   }

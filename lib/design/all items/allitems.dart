@@ -17,6 +17,7 @@ import 'package:intl/intl.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
+import '../../models/item_model.dart';
 // import '../../design/orders/mybooking.dart';
 import '../../widgets/searchfield.dart';
 import '../booking/my_booking_page.dart'; // ✅ Import MyBooking page
@@ -42,7 +43,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var allItemsList = ref.watch(getAllItems).allItems;
+    List<ItemModel> allItemsList = ref.watch(getAllItems).allItems;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
@@ -110,7 +111,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                             goto(Allitemdetailspage(item: item));
                           },
                           child: ItemsBox(
-                            fullDataBytIndex: item,
+                            fullDataBytIndex: item.toJson(),
                             id: item.id.toString(),
                             title: item.displayTitle,
                             imageUrl: item.primaryImageUrl.isNotEmpty
@@ -276,7 +277,8 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                   endDate.difference(startDate).inDays + 1;
                               ////
                               debugPrint(
-                                (widget.fullDataBytIndex.dailyRate * daysCount)
+                                (widget.fullDataBytIndex['dailyRate'] *
+                                        daysCount)
                                     .toString(),
                               );
                               // return;

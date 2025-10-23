@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/models/item_model.dart';
 
 import '../../widgets/casheimage.dart';
 import 'listing_edit_page.dart'; // ✅ Edit page import
 
 class ListingDetailPage extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+  final ItemModel item;
 
-  const ListingDetailPage({super.key, required this.fullData});
+  const ListingDetailPage({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +27,13 @@ class ListingDetailPage extends StatelessWidget {
                 children: [
                   CacheImageWidget(
                     width: double.infinity,
-                    height: ScreenSize.height*0.4,
+                    height: ScreenSize.height * 0.4,
                     isCircle: false,
                     fit: BoxFit.contain,
                     radius: 0,
-                    url:
-                        Config.imgUrl + fullData['images'][0] ??
-                        ImgLinks.profileImage,
+                    url: item.primaryImageUrl.isNotEmpty
+                        ? item.primaryImageUrl
+                        : ImgLinks.product,
                   ),
                 ],
               ),
@@ -40,7 +41,7 @@ class ListingDetailPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               Text(
-                "${fullData['title'] ?? 'Title.......'}",
+                item.displayTitle,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -48,49 +49,54 @@ class ListingDetailPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(fullData['description'] ?? 'Description.......'),
+              HtmlWidget(item.description ?? 'No description available'),
 
               Divider(),
 
+              ListTile(title: Text("Daily Rate: ${item.formattedDailyRate}")),
+              Divider(),
+              ListTile(title: Text("Weekly Rate: ${item.formattedWeeklyRate}")),
+              Divider(),
               ListTile(
-                title: Text("dailyrate: ${fullData['dailyrate'] ?? '0'}"),
+                title: Text("Monthly Rate: ${item.formattedMonthlyRate}"),
               ),
               Divider(),
               ListTile(
-                title: Text("weeklyrate: ${fullData['weeklyrate'] ?? '0'}"),
+                title: Text("Created: ${item.createdAt?.toString() ?? 'N/A'}"),
               ),
               Divider(),
               ListTile(
-                title: Text(" monthlyrate: ${fullData['monthlyrate'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text("created_at: ${fullData['created_at'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(" updated_at: ${fullData[' updated_at'] ?? '0'}"),
+                title: Text("Updated: ${item.updatedAt?.toString() ?? 'N/A'}"),
               ),
               Divider(),
               ListTile(
                 title: Text(
-                  " availabilityDays: ${fullData['availabilityDays'] ?? '0'}",
+                  "Availability: ${item.availabilityDays ?? 'Not specified'}",
                 ),
               ),
               Divider(),
 
               const ListTile(title: Text("From User")),
-              ListTile(
-                leading: CacheImageWidget(
-                  width: 50,
-                  height: 50,
-                  isCircle: true,
-                  radius: 200,
-                  url:
-                      Config.imgUrl + fullData["rentalusers"]['image'] ??
-                      ImgLinks.profileImage,
+              if (item.user != null) ...[
+                ListTile(
+                  leading: CacheImageWidget(
+                    width: 50,
+                    height: 50,
+                    isCircle: true,
+                    radius: 200,
+                    url: item.user!.fullImageUrl.isNotEmpty
+                        ? item.user!.fullImageUrl
+                        : ImgLinks.profileImage,
+                  ),
+                  title: Text(item.user!.displayName),
+                  subtitle: Text(item.user!.email),
                 ),
-              ),
+              ] else ...[
+                const ListTile(
+                  leading: Icon(Icons.account_circle, size: 50),
+                  title: Text("User information not available"),
+                ),
+              ],
             ],
           ),
         ),
@@ -103,7 +109,7 @@ class ListingDetailPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditListingPage(itemData: fullData),
+              builder: (context) => EditListingPage(item: item),
             ),
           );
         },

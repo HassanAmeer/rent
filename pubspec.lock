@@ -241,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.69.2"
+  fl_html_editor:
+    dependency: "direct main"
+    description:
+      name: fl_html_editor
+      sha256: "303b583def3f71b6b25bf573dd7e9b9fcbdb7eb6cfcf4f8b4a8e99c63f73bb8c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   flutter:
     dependency: "direct main"
     description: flutter
