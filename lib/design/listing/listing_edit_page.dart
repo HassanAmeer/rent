@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -10,13 +12,14 @@ import 'package:rent/models/item_model.dart';
 import 'dart:developer' as dev;
 import 'package:fl_html_editor/fl_html_editor.dart';
 import 'package:rent/apidata/categoryapi.dart';
-import 'package:rent/widgets/custom_image_text_dropdown.dart';
 
 // import '../../apidata/listingapi.dart';
 // import '../../apidata/user.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
+import '../../constants/api_endpoints.dart';
 import '../../constants/toast.dart';
+import '../../widgets/mediadropdown.dart';
 
 class EditListingPage extends ConsumerStatefulWidget {
   final ItemModel item;
@@ -37,8 +40,8 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   late TextEditingController _monthlyRateController;
   late TextEditingController _availiablityDaysController;
   late List<String> _selectedImages;
-  late String? _selectedCategory;
   bool _isLoading = false;
+  int? _selectedCategoryId = 00;
 
   // Availability Schedule Management
   late Map<String, Map<String, TimeOfDay?>> _availabilitySchedule;
@@ -76,7 +79,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     _availiablityDaysController = TextEditingController(
       text: widget.item.availabilityDays ?? '',
     );
-    _selectedCategory = widget.item.categoryName ?? '';
+    _selectedCategoryId = widget.item.categoryName!;
     _selectedImages = List.from(widget.item.validImageUrls);
 
     // Initialize availability schedule
@@ -400,33 +403,87 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Category
-                    categoryApi.loadingFor == "category"
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                    // categoryApi.loadingFor == "category"
+                    //     ? Container(
+                    //         padding: const EdgeInsets.symmetric(vertical: 16),
+                    //         child: const Row(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: [
+                    //             SizedBox(
+                    //               width: 20,
+                    //               height: 20,
+                    //               child: CircularProgressIndicator(
+                    //                 strokeWidth: 2,
+                    //               ),
+                    //             ),
+                    //             SizedBox(width: 12),
+                    //             Text('Loading categories...'),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     : CustomImageTextDropdown(
+                    //         selectedCategory: _selectedCategory,
+                    //         onCategorySelected: (category) {
+                    //           setState(() {
+                    //             _selectedCategory = category;
+                    //           });
+                    //         },
+                    //         hintText: 'Select a category',
+                    //       ),
+                    const SizedBox(height: 8),
+
+                    MediaDropdown(
+                          items: ref
+                              .watch(categoryProvider)
+                              .categories
+                              .map(
+                                (e) => DropdownItem(
+                                  title: e.name,
+                                  subtitle: e.id.toString(),
+                                  image: CachedNetworkImage(
+                                    imageUrl: e.fullImageUrl,
                                   ),
+                                  value: e.name,
                                 ),
-                                SizedBox(width: 12),
-                                Text('Loading categories...'),
-                              ],
-                            ),
-                          )
-                        : CustomImageTextDropdown(
-                            selectedCategory: _selectedCategory,
-                            onCategorySelected: (category) {
-                              setState(() {
-                                _selectedCategory = category;
-                              });
-                            },
-                            hintText: 'Select a category',
+                              )
+                              .toList(),
+                          hint: 'Select an Category',
+                          onSelected: (index, value) {
+                            // print('Selected index: $index, value: $value');
+                            _selectedCategoryId = ref
+                                .watch(categoryProvider)
+                                .categories[index]
+                                .id;
+                          },
+                          onTap: (index) {
+                            print('Item tapped: $index');
+                          },
+                          onArrowTap: () async {
+                            await ref
+                                .read(categoryProvider)
+                                .fetchCategories(loadingFor: "category");
+                          },
+                          isLoading:
+                              ref.watch(categoryProvider).loadingFor ==
+                              "category",
+                          hintStyle: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
                           ),
+                          dropdownBackgroundColor: Colors.white,
+                          width: double.infinity,
+                          // height: 70,
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 3),
+                        )
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: 150.ms)
+                        .slideX(begin: -0.2, end: 0, duration: 500.ms)
+                        .scale(
+                          begin: Offset(0.95, 0.95),
+                          end: Offset(1, 1),
+                          duration: 300.ms,
+                        ),
 
                     const SizedBox(height: 20),
 
@@ -612,7 +669,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                                             _selectedImages[index].startsWith(
                                                   'http',
                                                 )
-                                                ? Config.imgUrl +
+                                                ? Api.imgPath +
                                                       _selectedImages[index]
                                                 : _selectedImages[index],
                                             width: 100,
@@ -697,7 +754,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                               'dailyrate': _dailyRateController.text.trim(),
                               'weeklyrate': _weeklyRateController.text.trim(),
                               'monthlyrate': _monthlyRateController.text.trim(),
-                              'category': _selectedCategory,
+                              'category': _selectedCategoryId,
                               'images': _selectedImages,
                             };
 

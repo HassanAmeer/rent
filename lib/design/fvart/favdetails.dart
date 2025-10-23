@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
+import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
 class FavDetailsPage extends StatelessWidget {
@@ -43,7 +44,7 @@ class FavDetailsPage extends StatelessWidget {
                     isCircle: false,
                     radius: 0,
                     url:
-                        Config.imgUrl + fullData['images'][0] ??
+                        Api.imgPath + fullData['images'][0] ??
                         ImgLinks.profileImage,
                   ),
                 ],
@@ -99,7 +100,7 @@ class FavDetailsPage extends StatelessWidget {
                   isCircle: true,
                   radius: 200,
                   url:
-                      Config.imgUrl + fullData['images'][0] ??
+                      Api.imgPath + fullData['images'][0] ??
                       ImgLinks.profileImage,
                 ),
               ),

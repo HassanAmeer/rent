@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
 
@@ -37,7 +38,7 @@ class RentalData with ChangeNotifier {
 
       setLoading(true, loadingFor);
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/myrentals/"),
+        Uri.parse("${Api.myRentalsEndpoint}"),
         body: {'search': search, "uid": userId},
       );
 
@@ -75,7 +76,7 @@ class RentalData with ChangeNotifier {
 
       setLoading(true, loadingFor);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/rentaldetails/$rentalId"),
+        Uri.parse("${Api.rentalDetailsEndpoint}$rentalId"),
       );
 
       final data = jsonDecode(response.body);
@@ -115,7 +116,7 @@ class RentalData with ChangeNotifier {
 
       setLoading(true, loadingFor);
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/updaterentalstatus"),
+        Uri.parse(Api.updateRentalStatusEndpoint),
         body: {'rentalId': rentalId, 'delivered': status},
       );
 

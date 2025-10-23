@@ -7,6 +7,8 @@ import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../../constants/api_endpoints.dart';
+
 class Rentaldetails extends ConsumerStatefulWidget {
   final dynamic renting;
   const Rentaldetails({super.key, this.renting});
@@ -217,7 +219,7 @@ class _RentaldetailsState extends ConsumerState<Rentaldetails> {
       if (rental['productImage'] != null) {
         var images = jsonDecode(rental['productImage']);
         if (images is List && images.isNotEmpty) {
-          return Config.imgUrl + images[0];
+          return Api.imgPath + images[0];
         }
       }
     } catch (e) {
@@ -230,10 +232,10 @@ class _RentaldetailsState extends ConsumerState<Rentaldetails> {
   String _getUserImageUrl(dynamic rental) {
     try {
       if (rental['orderby'] != null && rental['orderby']['image'] != null) {
-        return Config.imgUrl + rental['orderby']['image'];
+        return Api.imgPath + rental['orderby']['image'];
       }
       if (rental['productby'] != null && rental['productby']['image'] != null) {
-        return Config.imgUrl + rental['productby']['image'];
+        return Api.imgPath + rental['productby']['image'];
       }
     } catch (e) {
       print("Error getting user image: $e");

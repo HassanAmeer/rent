@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_html_editor/fl_html_editor.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,6 @@ import 'package:rent/constants/appColors.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/dotloader.dart';
-import 'package:rent/widgets/custom_image_text_dropdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -32,7 +33,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   final _weeklyRateController = TextEditingController();
   final _monthlyRateController = TextEditingController();
 
-  String? _selectedCategory;
+  int? _selectedCategoryId = 00;
   final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
@@ -200,8 +201,11 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
 
   /// ✅ Form Submit with API Call
   void _submitForm() async {
+    // var chec = await _descriptionHTMLController.getHtml();
+
+    // debugPrint("chec: $chec");
     if (_formKey.currentState!.validate()) {
-      if (_selectedCategory == null || _selectedCategory!.isEmpty) {
+      if (_selectedCategoryId == null || _selectedCategoryId == 00) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a category'),
@@ -219,7 +223,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         await listingApi.addNewListing(
           uid: userId,
           title: _titleController.text.trim(),
-          catgname: _selectedCategory ?? "",
+          catgId: _selectedCategoryId ?? 0,
           dailyRate: _dailyRateController.text.trim().isEmpty
               ? "0"
               : _dailyRateController.text.trim(),
@@ -230,7 +234,12 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
               ? "0"
               : _monthlyRateController.text.trim(),
           availabilityDays: _generateAvailabilityString(),
-          description: _descriptionHTMLController.getHtml().toString(),
+          description: jsonEncode(await _descriptionHTMLController.getHtml())
+              .replaceAllMapped(
+                RegExp(r'\\u([0-9A-Fa-f]{4})'),
+                (match) =>
+                    String.fromCharCode(int.parse(match.group(1)!, radix: 16)),
+              ),
           images: _selectedImages,
           loadingFor: "uploadData",
         );
@@ -252,7 +261,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         _monthlyRateController.clear();
 
         setState(() {
-          _selectedCategory = null;
+          _selectedCategoryId = null;
           _selectedImages.clear();
           _availabilitySchedule.clear();
         });
@@ -305,126 +314,45 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
               const SizedBox(height: 8),
 
               MediaDropdown(
-                items: ref
-                    .watch(categoryProvider)
-                    .categories
-                    .map(
-                      (e) => DropdownItem(
-                        title: e.name,
-                        subtitle: e.id.toString(),
-                        image: CachedNetworkImage(imageUrl: e.fullImageUrl),
-                        value: e.name,
-                      ),
-                    )
-                    .toList(),
-                hint: 'Select an option',
-                onSelected: (index, value) {
-                  print('Selected index: $index, value: $value');
-                },
-                onTap: (index) {
-                  print('Item tapped: $index');
-                },
-                onArrowTap: () async {
-                  print('Arrow tapped:');
-                  // if (!categoryApi.hasLoaded) {
-                  await ref
-                      .read(categoryProvider)
-                      .fetchCategories(loadingFor: "category");
-                  // .fetchCategoriesIfNeeded(loadingFor: "category");
-                  // }
-                },
-                isLoading: ref.watch(categoryProvider).loadingFor == "category",
-                titleStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                subtitleStyle: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.blueGrey,
-                ),
-                hintStyle: const TextStyle(fontSize: 16, color: Colors.grey),
-                dropdownBackgroundColor: Colors.white,
-                width: double.infinity,
-                // height: 70,
-                elevation: 4,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                margin: const EdgeInsets.symmetric(vertical: 8),
-              ),
-
-              Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: categoryApi.loadingFor == "category"
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Text('Loading categories...'),
-                              ],
-                            ),
-                          )
-                        : InkWell(
-                            onTap: () async {
-                              if (!categoryApi.hasLoaded) {
-                                await ref
-                                    .read(categoryProvider)
-                                    .fetchCategoriesIfNeeded(
-                                      loadingFor: "category",
-                                    );
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      _selectedCategory?.isNotEmpty == true
-                                          ? _selectedCategory!
-                                          : 'Select a category',
-                                      style: TextStyle(
-                                        color:
-                                            _selectedCategory?.isNotEmpty ==
-                                                true
-                                            ? Colors.black
-                                            : Colors.grey[600],
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.grey[600],
-                                  ),
-                                ],
-                              ),
-                            ),
+                    items: ref
+                        .watch(categoryProvider)
+                        .categories
+                        .map(
+                          (e) => DropdownItem(
+                            title: e.name,
+                            subtitle: e.id.toString(),
+                            image: CachedNetworkImage(imageUrl: e.fullImageUrl),
+                            value: e.name,
                           ),
+                        )
+                        .toList(),
+                    hint: 'Select an Category',
+                    onSelected: (index, value) {
+                      // print('Selected index: $index, value: $value');
+                      _selectedCategoryId = ref
+                          .watch(categoryProvider)
+                          .categories[index]
+                          .id;
+                    },
+                    onTap: (index) {
+                      print('Item tapped: $index');
+                    },
+                    onArrowTap: () async {
+                      await ref
+                          .read(categoryProvider)
+                          .fetchCategories(loadingFor: "category");
+                    },
+                    isLoading:
+                        ref.watch(categoryProvider).loadingFor == "category",
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    dropdownBackgroundColor: Colors.white,
+                    width: double.infinity,
+                    // height: 70,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 3),
                   )
                   .animate()
                   .fadeIn(duration: 400.ms, delay: 150.ms)

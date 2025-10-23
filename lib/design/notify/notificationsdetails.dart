@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
+import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
 class NotificationsDetails extends StatelessWidget {
@@ -39,7 +40,7 @@ class NotificationsDetails extends StatelessWidget {
                 isCircle: true,
                 radius: 200,
                 url:
-                    Config.imgUrl + fullData['fromuid']['image'] ??
+                    Api.imgPath + fullData['fromuid']['image'] ??
                     ImgLinks.profileImage,
               ),
               title: Text(fullData['fromuid']['name'] ?? 'Unknown'),

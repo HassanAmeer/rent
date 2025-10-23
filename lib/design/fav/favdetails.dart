@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:flutter/animation.dart';
+import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
 class FavDetailsPage extends StatefulWidget {
@@ -155,7 +156,7 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                             url:
                                 widget.fullData['images'] != null &&
                                     widget.fullData['images'].isNotEmpty
-                                ? Config.imgUrl + widget.fullData['images'][0]
+                                ? Api.imgPath + widget.fullData['images'][0]
                                 : ImgLinks.profileImage,
                           ),
                         ),
@@ -240,7 +241,7 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                           url:
                               widget.fullData['images'] != null &&
                                   widget.fullData['images'].isNotEmpty
-                              ? Config.imgUrl + widget.fullData['images'][0]
+                              ? Api.imgPath + widget.fullData['images'][0]
                               : ImgLinks.profileImage,
                         ),
                         title: const Text(

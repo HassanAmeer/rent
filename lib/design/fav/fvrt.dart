@@ -10,6 +10,7 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
+import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 
 class Favourite extends ConsumerStatefulWidget {
@@ -190,7 +191,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                             item['products']['images']
                                                 .toList()
                                                 .isNotEmpty
-                                        ? Config.imgUrl +
+                                        ? Api.imgPath +
                                               item['products']['images'][0]
                                         : ImgLinks.product,
                                   ),

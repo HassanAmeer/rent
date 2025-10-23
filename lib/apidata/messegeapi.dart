@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
 
@@ -26,7 +27,7 @@ class ChatApi with ChangeNotifier {
       setLoading(loadingFor);
 
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/getchatedusers/$uid"),
+        Uri.parse("${Api.getChatedUsersEndpoint}$uid"),
       );
 
       final data = jsonDecode(response.body);
@@ -57,7 +58,7 @@ class ChatApi with ChangeNotifier {
       setLoading(loadingfor);
       // 🔹 Step 2: API call
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/getchats"),
+        Uri.parse(Api.getChatsEndpoint),
         body: {"recieverId": recieverId, "senderId": senderId},
       );
 
@@ -102,7 +103,7 @@ class ChatApi with ChangeNotifier {
 
       // 🔹 Step 2: API call
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/sendmsg"),
+        Uri.parse(Api.sendMsgEndpoint),
         body: {
           "recieverId": recieverId,
           "senderId": senderId,

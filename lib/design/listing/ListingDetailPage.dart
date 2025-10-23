@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/models/item_model.dart';
 
 import '../../widgets/casheimage.dart';

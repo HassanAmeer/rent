@@ -7,7 +7,7 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/design/booking/bookingdetails.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
@@ -15,6 +15,7 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/bookingapi.dart';
 import '../../apidata/user.dart';
+import '../../constants/api_endpoints.dart';
 import '../../widgets/searchfield.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {
@@ -160,7 +161,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                           // width: double.infinity,
                           height: ScreenSize.height * 0.2,
                           url:
-                              Config.imgUrl +
+                              Api.imgPath +
                               (jsonDecode(booking['productImage'])[0] ??
                                   ImgLinks.product),
                         ),

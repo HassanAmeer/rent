@@ -10,11 +10,12 @@ import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/images.dart';
 import 'package:rent/Auth/login.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:transparent_route/transparent_route.dart';
 // import '../apidata/user.dart';
+import '../constants/api_endpoints.dart';
 import '../widgets/btmnavbar.dart';
 // import '../apidata/user.dart';
 // import '../constants/data.dart';
@@ -69,7 +70,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                                   .userData['image']
                                   .toString()
                                   .isNotEmpty)
-                          ? Config.imgUrl +
+                          ? Api.imgPath +
                                 ref.watch(userDataClass).userData['image']
                           : ImgLinks.profileImage,
                     ),
@@ -90,7 +91,7 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
                                 .userData['image']
                                 .toString()
                                 .isNotEmpty)
-                        ? Config.imgUrl +
+                        ? Api.imgPath +
                               ref.watch(userDataClass).userData['image']
                         : ImgLinks.profileImage,
                   ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/toast.dart';
 
 import '../constants/checkInternet.dart';
@@ -38,7 +39,7 @@ class DashboardService with ChangeNotifier {
       setLoading(loadingfor);
 
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/dashboard/$uid"),
+        Uri.parse("${Api.dashboardEndpoint}$uid"),
       );
 
       final data = jsonDecode(response.body);

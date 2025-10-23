@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/blogapi.dart' show blogDataProvider;
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/design/blogs/blogsdetails.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
@@ -82,7 +83,7 @@ class _BlogsState extends ConsumerState<Blogs> {
                         child: CacheImageWidget(
                           isCircle: false,
                           url: imageUrl != null && imageUrl.isNotEmpty
-                              ? Config.imgUrl + imageUrl
+                              ? Api.imgPath + imageUrl
                               : ImgLinks.product,
                           height: ScreenSize.height * 0.24,
                           width: ScreenSize.width,

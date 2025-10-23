@@ -7,6 +7,8 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../constants/api_endpoints.dart';
+
 class Chats extends ConsumerStatefulWidget {
   var msgdata;
   Chats({super.key, required this.msgdata});
@@ -108,7 +110,7 @@ class _ChatsState extends ConsumerState<Chats> {
               height: 35,
               clipBehavior: Clip.antiAlias,
               child: CacheImageWidget(
-                url: Config.imgUrl + widget.msgdata['fromuid']["image"],
+                url: Api.imgPath + widget.msgdata['fromuid']["image"],
               ),
             ),
             const SizedBox(width: 10),

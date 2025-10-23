@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -30,7 +31,7 @@ class NotifyData with ChangeNotifier {
 
       setLoading(loadingFor);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/notifications/$uid"),
+        Uri.parse("${Api.notificationsEndpoint}$uid"),
       );
       debugPrint("👉 getNotifyData Response status: ${response.statusCode}");
       // log(" 👉 getNotifyData Response body: ${response.body}");
@@ -66,7 +67,7 @@ class NotifyData with ChangeNotifier {
     // debugPrint("uid : $uid");
 
     final respnse = await http.delete(
-      Uri.parse("https://thelocalrent.com/api/delnotification/$notificationId"),
+      Uri.parse("${Api.deleteNotificationEndpoint}$notificationId"),
     );
 
     final data = jsonDecode(respnse.body);

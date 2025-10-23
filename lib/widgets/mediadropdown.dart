@@ -167,7 +167,14 @@ class MediaDropdownState extends State<MediaDropdown> {
                               SizedBox(width: screenSize.width * 0.02),
                             ],
                             if (item.image != null) ...[
-                              item.image!,
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                width: screenSize.width * 0.06,
+                                child: item.image!,
+                              ),
                               SizedBox(width: screenSize.width * 0.02),
                             ],
                             Expanded(
@@ -338,7 +345,7 @@ class MediaDropdownState extends State<MediaDropdown> {
         height:
             widget.height ??
             (isMobile
-                ? 50
+                ? 55
                 : isTablet
                 ? 60
                 : 70),
@@ -365,7 +372,14 @@ class MediaDropdownState extends State<MediaDropdown> {
             //   SizedBox(width: screenSize.width * 0.02),
             // ],
             if (selectedItem != null && selectedItem.image != null) ...[
-              selectedItem.image!,
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                clipBehavior: Clip.antiAlias,
+                width: screenSize.width * 0.06,
+                child: selectedItem.image!,
+              ),
               SizedBox(width: screenSize.width * 0.02),
             ],
             Expanded(
@@ -414,7 +428,7 @@ class MediaDropdownState extends State<MediaDropdown> {
                 ],
               ),
             ),
-            !widget.isLoading!
+            widget.isLoading!
                 ? Padding(
                     padding: EdgeInsets.only(right: widget.loaderRightPadding),
                     child: SizedBox(

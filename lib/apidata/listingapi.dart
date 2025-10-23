@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -42,7 +44,7 @@ class ListingData with ChangeNotifier {
       setLoading(loadingfor);
       print("Fetching my items for user ID: $uid");
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/myitems"),
+        Uri.parse(Api.myItemsEndpoint),
         body: {'search': search, "uid": uid},
       );
       final data = jsonDecode(response.body);
@@ -77,14 +79,15 @@ class ListingData with ChangeNotifier {
 
       var req = http.MultipartRequest(
         "PUT",
-        Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
+        // Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
+        Uri.parse("${Api.myItemsEndpoint}/$itemId"),
       );
 
       req.headers['Content-Type'] = 'application/json';
 
       req.fields['uid'] = uid;
       req.fields['title'] = newItemData['title'];
-      req.fields['description'] = newItemData['description'];
+      req.fields['descriptioneditor'] = newItemData['description'];
       req.fields['avalibilityDays'] = newItemData['avalibilityDays'];
       req.fields['dailyrate'] = newItemData['dailyrate'];
       req.fields['weeklyrate'] = newItemData['weeklyrate'];
@@ -128,7 +131,7 @@ class ListingData with ChangeNotifier {
     // debugPrint("uid : $uid");
 
     final respnse = await http.delete(
-      Uri.parse("https://thelocalrent.com/api/delitem/$notificationId"),
+      Uri.parse("${Api.deleteItemEndpoint}/$notificationId"),
     );
     setLoading("");
     // debugPrint("Response status: ${respnse.statusCode}");
@@ -147,7 +150,7 @@ class ListingData with ChangeNotifier {
   Future<void> addNewListing({
     required String uid,
     required String title,
-    required String catgname,
+    required int catgId,
     required String dailyRate,
     required String weeklyRate,
     required String monthlyRate,
@@ -160,22 +163,23 @@ class ListingData with ChangeNotifier {
       if (await checkInternet() == false) return;
 
       setLoading(loadingFor);
-      var req = http.MultipartRequest(
-        "POST",
-        Uri.parse("https://thelocalrent.com/api/additem"),
-      );
+      var req = http.MultipartRequest("POST", Uri.parse(Api.addItemEndpoint));
 
       req.headers['Content-Type'] = 'application/json';
 
-      print("dailyRate:$dailyRate");
+      debugPrint("dailyRate:$dailyRate");
 
       //// for fields
       req.fields['uid'] = uid;
       req.fields['title'] = title;
-      req.fields['catgname'] = catgname.toString();
+      req.fields['catg_id'] = catgId.toString();
       req.fields['weekly_rate'] = weeklyRate;
-      req.fields['availabilityrange'] = availabilityDays;
-      req.fields['description'] = description;
+      req.fields['availabilityrange'] =
+          availabilityDays; // This field seems to be correctly assigned
+      req.fields['descriptioneditor'] = description.replaceAll(
+        '"',
+        '',
+      ); // Remove all double quotes
       req.fields['monthly_rate'] = monthlyRate;
       req.fields['daily_rate'] = dailyRate;
 
@@ -192,8 +196,8 @@ class ListingData with ChangeNotifier {
       var sendedRequest = await req.send();
       var response = await sendedRequest.stream.bytesToString();
 
-      debugPrint("😊 sendedRequest status: ${sendedRequest.statusCode}");
-      debugPrint("😊 response data: $response");
+      debugPrint("👉🏻 sendedRequest status: ${sendedRequest.statusCode}");
+      debugPrint("👉🏻 response data: $response");
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Added", backgroundColor: Colors.green);

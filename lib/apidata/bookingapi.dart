@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart'; // Apne toast function ke liye import
 
@@ -31,7 +32,7 @@ class BookingData with ChangeNotifier {
 
       setLoading(loadingfor);
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/getcommingorders"),
+        Uri.parse(Api.comingOrdersEndpoint),
         body: {"uid": uid, "search": search},
       );
 
@@ -68,7 +69,7 @@ class BookingData with ChangeNotifier {
       if (await checkInternet() == false) return;
 
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/orderrejection/"),
+        Uri.parse(Api.orderRejectionEndpoint),
         body: {
           'orderId': orderId,
           ...rejectionData, // Additional details if any

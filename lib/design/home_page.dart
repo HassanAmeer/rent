@@ -6,8 +6,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/apidata/dashboardapi.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/Blogs.dart';
@@ -136,7 +137,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 height: 47,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url: Config.imgUrl + ref.watch(userDataClass).userImage,
+                  url: Api.imgPath + ref.watch(userDataClass).userImage,
                 ),
               ),
             ),

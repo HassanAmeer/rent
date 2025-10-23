@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/images.dart';
@@ -137,7 +138,7 @@ class UserData with ChangeNotifier {
 
       // Make API call
       final response = await http.post(
-        Uri.parse(Config.registerEndpoint),
+        Uri.parse(Api.registerEndpoint),
         body: {
           'name': name.trim(),
           'email': email.trim(),
@@ -195,7 +196,7 @@ class UserData with ChangeNotifier {
 
       // Make API call
       final response = await http.post(
-        Uri.parse(Config.loginEndpoint),
+        Uri.parse(Api.loginEndpoint),
         body: {'email': email.trim(), 'password': password},
       );
 
@@ -247,7 +248,7 @@ class UserData with ChangeNotifier {
 
       setLoading(true);
       final response = await http.get(
-        Uri.parse("${Config.getUserByIdEndpoint}${_userData['id']}"),
+        Uri.parse("${Api.getUserByIdEndpoint}${_userData['id']}"),
       );
 
       debugPrint("👉 Profile Data Response status: ${response.statusCode}");
@@ -302,7 +303,7 @@ class UserData with ChangeNotifier {
       setLoading(true);
       var req = http.MultipartRequest(
         "POST",
-        Uri.parse(Config.updateProfileEndpoint),
+        Uri.parse(Api.updateProfileEndpoint),
       );
 
       req.headers['Content-Type'] = 'application/json';

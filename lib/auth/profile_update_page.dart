@@ -12,6 +12,7 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../constants/api_endpoints.dart';
 import 'privacyPolicyPage.dart';
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
@@ -186,7 +187,7 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                                               .userData['image']
                                               .toString()
                                               .isNotEmpty)
-                                      ? Config.imgUrl +
+                                      ? Api.imgPath +
                                             ref
                                                 .watch(userDataClass)
                                                 .userData['image']

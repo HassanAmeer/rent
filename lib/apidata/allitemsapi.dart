@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -36,7 +37,7 @@ class GetAllItems with ChangeNotifier {
       print("👉 search: $search");
       setLoading(loadingfor);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/allitems/$search"),
+        Uri.parse("${Api.allItemsEndpoint}$search"),
         // body: {"search": search, "uid": uid},
       );
 
@@ -82,7 +83,7 @@ class GetAllItems with ChangeNotifier {
     setLoading(loadingFor);
 
     final response = await http.post(
-      Uri.parse("https://thelocalrent.com/api/addorder"),
+      Uri.parse(Api.addOrderEndpoint),
       body: {
         "uid": userId,
         'userCanPickupInDateRange': userCanPickupInDateRange,

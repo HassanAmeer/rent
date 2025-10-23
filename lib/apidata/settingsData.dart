@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -33,9 +34,7 @@ class SettingsDataClass with ChangeNotifier {
       if (await checkInternet() == false) return;
       setLoading(loadingFor);
 
-      final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/settings"),
-      );
+      final response = await http.get(Uri.parse(Api.settingsEndpoint));
 
       var result = json.decode(response.body);
       debugPrint("👉 Response: $result");
@@ -46,7 +45,7 @@ class SettingsDataClass with ChangeNotifier {
         toast(result['msg'], backgroundColor: Colors.red);
       }
       setLoading();
-    } catch (e,st) {
+    } catch (e, st) {
       debugPrint("💥 getSettingsData: error: $e, st$st");
       setLoading();
     } finally {
@@ -72,9 +71,7 @@ class SettingsDataClass with ChangeNotifier {
 
       if (docData.id == 00) {
         setLoading(loadingFor);
-        final response = await http.get(
-          Uri.parse("https://thelocalrent.com/api/doc"),
-        );
+        final response = await http.get(Uri.parse(Api.docEndpoint));
 
         var result = json.decode(response.body);
         debugPrint("👉 Response: $result");
@@ -86,7 +83,7 @@ class SettingsDataClass with ChangeNotifier {
         }
         setLoading();
       }
-    } catch (e,st) {
+    } catch (e, st) {
       debugPrint("💥 getDocData: error: $e, st$st");
       setLoading();
     } finally {

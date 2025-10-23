@@ -9,6 +9,7 @@ import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../constants/api_endpoints.dart';
 import '../constants/goto.dart';
 
 class ChatedUsersPage extends ConsumerStatefulWidget {
@@ -52,7 +53,7 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
             height: 38,
             clipBehavior: Clip.antiAlias,
             child: CacheImageWidget(
-              url: Config.imgUrl + ref.watch(userDataClass).userData['image'],
+              url: Api.imgPath + ref.watch(userDataClass).userData['image'],
             ),
           ),
           SizedBox(width: 10),
@@ -91,7 +92,7 @@ class _ChatedUsersPageState extends ConsumerState<ChatedUsersPage> {
                             height: 41,
                             clipBehavior: Clip.antiAlias,
                             child: CacheImageWidget(
-                              url: Config.imgUrl + msg['fromuid']["image"],
+                              url: Api.imgPath + msg['fromuid']["image"],
                             ),
                           ),
                           title: Text(

@@ -15,6 +15,7 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/myrentalapi.dart';
 import '../../apidata/user.dart';
+import '../../constants/api_endpoints.dart';
 
 class MyRentalPage extends ConsumerStatefulWidget {
   const MyRentalPage({super.key});
@@ -298,7 +299,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
       if (rental['productImage'] != null) {
         var images = jsonDecode(rental['productImage']);
         if (images is List && images.isNotEmpty) {
-          return Config.imgUrl + images[0];
+          return Api.imgPath + images[0];
         }
       }
     } catch (e) {

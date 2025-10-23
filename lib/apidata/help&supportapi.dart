@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/toast.dart';
 
@@ -30,9 +31,7 @@ class supportData with ChangeNotifier {
       print("Fetching all blogs...");
 
       setLoading(loadingFor);
-      final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/settings"),
-      );
+      final response = await http.get(Uri.parse(Api.settingsEndpoint));
 
       final data = jsonDecode(response.body);
 

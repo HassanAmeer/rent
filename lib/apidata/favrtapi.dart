@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
@@ -33,7 +34,7 @@ class Favrt with ChangeNotifier {
 
       setLoading(loadingFor);
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/getfav"),
+        Uri.parse(Api.getFavEndpoint),
         body: {"uid": uid, "search": search},
       );
 
@@ -65,7 +66,7 @@ class Favrt with ChangeNotifier {
 
       setLoading(loadingFor);
       final response = await http.delete(
-        Uri.parse("https://thelocalrent.com/api/unfav/$itemId/$uid"),
+        Uri.parse("${Api.unfavEndpoint}$itemId/$uid"),
       );
 
       final data = jsonDecode(response.body);
@@ -124,7 +125,7 @@ class Favrt with ChangeNotifier {
       setLoading(loadingFor);
       // print("Fetching my items for user ID: $uid");
       final response = await http.post(
-        Uri.parse("https://thelocalrent.com/api/addfav/"),
+        Uri.parse(Api.addFavEndpoint),
         body: {"uid": uid, "itemid": itemId},
       );
 

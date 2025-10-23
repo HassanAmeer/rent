@@ -7,7 +7,7 @@ class ItemModel {
   final int userId;
   final String title;
   final String? description;
-  final String? categoryName;
+  final int? categoryName;
   final double dailyRate;
   final double weeklyRate;
   final double monthlyRate;
@@ -58,8 +58,11 @@ class ItemModel {
       userId: json['userId'] ?? json['user_id'] ?? 0,
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString(),
-      categoryName:
-          json['categoryName']?.toString() ?? json['catgname']?.toString(),
+      categoryName: int.tryParse(
+        json['categoryName']?.toString() ??
+            json['catgname']?.toString() ??
+            '00',
+      ),
       dailyRate:
           double.tryParse(
             json['dailyRate']?.toString() ??

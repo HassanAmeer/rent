@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
 
@@ -33,9 +34,7 @@ class BlogData with ChangeNotifier {
       print("Fetching all blogs...");
 
       setLoading(true, loadingFor);
-      final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/allblogs"),
-      );
+      final response = await http.get(Uri.parse(Api.allBlogsEndpoint));
 
       final data = jsonDecode(response.body);
 
@@ -70,7 +69,7 @@ class BlogData with ChangeNotifier {
 
       setLoading(true, loadingFor);
       final response = await http.get(
-        Uri.parse("https://thelocalrent.com/api/blogdetails/$blogId"),
+        Uri.parse("${Api.blogDetailsEndpoint}$blogId"),
       );
 
       final data = jsonDecode(response.body);

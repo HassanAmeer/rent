@@ -5,6 +5,8 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../../constants/api_endpoints.dart';
+
 class Blogsdetails extends StatefulWidget {
   final Map<String, dynamic> blog;
   const Blogsdetails({super.key, required this.blog});
@@ -78,7 +80,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                               imageUrl:
                                   blog['image'] != null &&
                                       blog['image'].isNotEmpty
-                                  ? Config.imgUrl + blog['image']
+                                  ? Api.imgPath + blog['image']
                                   : ImgLinks.product,
                               fit: BoxFit.cover,
                               width: double.infinity,

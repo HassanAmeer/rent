@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/design/notify/notificationsdetails.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
+import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../apidata/notifyData.dart';
 import '../../apidata/user.dart';
@@ -92,7 +93,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
             child: CacheImageWidget(
               width: 45,
               height: 45,
-              url: Config.imgUrl + userData['image'],
+              url: Api.imgPath + userData['image'],
             ),
           ),
           const SizedBox(width: 16),
@@ -138,7 +139,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                   width: 48,
                                   height: 48,
                                   url:
-                                      Config.imgUrl +
+                                      Api.imgPath +
                                       (item['fromuid']['image'] ?? ''),
                                 ),
                                 Positioned(

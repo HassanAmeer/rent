@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/scrensizes.dart';
+import 'package:rent/constants/screensizes.dart';
 
+import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
 
@@ -34,11 +35,11 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                 children: [
                   CacheImageWidget(
                     width: double.infinity,
-                    height: ScreenSize.height* 0.4,
+                    height: ScreenSize.height * 0.4,
                     isCircle: false,
                     radius: 0,
                     url:
-                        Config.imgUrl +
+                        Api.imgPath +
                             jsonDecode(widget.data['productImage'])[0] ??
                         ImgLinks.profileImage,
                   ),
@@ -99,7 +100,7 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                   isCircle: true,
                   radius: 200,
                   url:
-                      Config.imgUrl + widget.data["orderby"]['image'][0] ??
+                      Api.imgPath + widget.data["orderby"]['image'][0] ??
                       ImgLinks.profileImage,
                 ),
                 title: Text(widget.data['orderby']['name'] ?? 'Unknown'),
