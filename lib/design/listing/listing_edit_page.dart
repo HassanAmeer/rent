@@ -32,7 +32,8 @@ class EditListingPage extends ConsumerStatefulWidget {
   ConsumerState<EditListingPage> createState() => _EditListingPageState();
 }
 
-class _EditListingPageState extends ConsumerState<EditListingPage> {
+class _EditListingPageState extends ConsumerState<EditListingPage>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
@@ -298,9 +299,9 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     final startTime = schedule['start'];
     final endTime = schedule['end'];
     final isAvailable = startTime != null && endTime != null;
-    dev.log(
-      'Day: $day, Start: $startTime, End: $endTime, Available: $isAvailable',
-    );
+    // dev.log(
+    //   'Day: $day, Start: $startTime, End: $endTime, Available: $isAvailable',
+    // );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

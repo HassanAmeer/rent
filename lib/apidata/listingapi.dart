@@ -82,46 +82,48 @@ class ListingData with ChangeNotifier {
       setLoading(loadingFor);
       log('👉🏻 edit ItemData: $newItemData');
 
-      var url = "${Api.myItemsEndpoint}/$itemId";
+      var url = Api.updateItemEndpoint;
       log('👉🏻 edit ItemData url: $url');
 
-      var req = http.MultipartRequest("PUT", Uri.parse(url));
+      var req = http.MultipartRequest("POST", Uri.parse(url));
 
       req.headers['Content-Type'] = 'application/json';
 
       req.fields['uid'] = uid;
+      req.fields['itemid'] = itemId;
+      req.fields['catg_id'] = newItemData['category'].toString();
       req.fields['title'] = newItemData['title'];
       req.fields['descriptioneditor'] = newItemData['description'];
-      req.fields['avalibilityDays'] = newItemData['avalibilityDays'];
-      req.fields['dailyrate'] = newItemData['dailyrate'];
-      req.fields['weeklyrate'] = newItemData['weeklyrate'];
-      req.fields['monthlyrate'] = newItemData['monthlyrate'];
-      req.fields['catg_id'] = newItemData['category'].toString();
+      req.fields['availability_days'] = newItemData['avalibilityDays'];
+      req.fields['daily_rate'] = newItemData['dailyrate'];
+      req.fields['weekly_rate'] = newItemData['weeklyrate'];
+      req.fields['monthly_rate'] = newItemData['monthlyrate'];
       req.fields['existingImages'] = jsonEncode(
         newItemData['existingImages'],
       ); // list of string example like : ['images/image1.png','images/image2.jpeg'];
 
-      // for (var image in newItemData['newImages']) {
-      //   if (await image.exists()) {
-      //     req.files.add(
-      //       await http.MultipartFile.fromPath('images[]', image.path),
-      //     );
-      //   }
-      // }
+      for (var image in newItemData['newImages']) {
+        if (await File(image).exists()) {
+          req.files.add(await http.MultipartFile.fromPath('images[]', image));
+        }
+      }
 
       var sendedRequest = await req.send();
       var response = await sendedRequest.stream.bytesToString();
 
+      debugPrint("Response body: $response");
+
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Updated", backgroundColor: Colors.green);
         fetchMyItems(uid: uid, loadingfor: "refresh");
+        goBack();
+        goBack();
       } else {
         toast("Failed to update", backgroundColor: Colors.red);
       }
-      setLoading("");
     } catch (e, st) {
       setLoading("");
-      debugPrint("💥Error editing my items: $e, st:$st");
+      debugPrint("💥 Error editing my items: $e, st:$st");
       toast("error:$e");
     }
   }
@@ -140,17 +142,18 @@ class ListingData with ChangeNotifier {
     final respnse = await http.delete(
       Uri.parse("${Api.deleteItemEndpoint}$itemId"),
     );
-    setLoading("");
+    setLoading();
 
     // debugPrint("Response status: ${respnse.statusCode}");
     final data = jsonDecode(respnse.body);
+
     if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
       toast(data['msg'], backgroundColor: Colors.green);
       fetchMyItems(uid: uid, loadingfor: "refresh");
     } else {
       toast(data['msg'], backgroundColor: Colors.red);
     }
-    setLoading("");
+    setLoading();
   }
 
   //

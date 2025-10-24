@@ -12,6 +12,7 @@ class Api {
   static const String getCatgEndpoint = "${apiUrl}getcatg";
   static const String allItemsEndpoint = "${apiUrl}allitems/";
   static const String myItemsEndpoint = "${apiUrl}myitems";
+  static const String updateItemEndpoint = "${apiUrl}edititem";
   static const String addItemEndpoint = "${apiUrl}additem";
   static const String updateProfileEndpoint = "${apiUrl}updateprofile";
   static const String getUserByIdEndpoint = "${apiUrl}getuserbyid/";
