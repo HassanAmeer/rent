@@ -330,12 +330,11 @@ class MediaDropdownState extends State<MediaDropdown> {
     }
 
     // Selected item or hint
-    final selectedItem =
-        widget.initalSelectedValue != null &&
-            widget.initalSelectedValue! < widget.items.length
-        ? widget.items[widget.initalSelectedValue!]
-        : _selectedIndex != null
+    final selectedItem = _selectedIndex != null
         ? widget.items[_selectedIndex!]
+        : widget.initalSelectedValue != null &&
+              widget.initalSelectedValue! < widget.items.length
+        ? widget.items[widget.initalSelectedValue!]
         : null;
 
     return GestureDetector(

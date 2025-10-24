@@ -80,12 +80,12 @@ class ListingData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
       setLoading(loadingFor);
+      log('👉🏻 edit ItemData: $newItemData');
 
-      var req = http.MultipartRequest(
-        "PUT",
-        // Uri.parse("https://thelocalrent.com/api/myitems/$itemId"),
-        Uri.parse("${Api.myItemsEndpoint}/$itemId"),
-      );
+      var url = "${Api.myItemsEndpoint}/$itemId";
+      log('👉🏻 edit ItemData url: $url');
+
+      var req = http.MultipartRequest("PUT", Uri.parse(url));
 
       req.headers['Content-Type'] = 'application/json';
 
@@ -99,15 +99,15 @@ class ListingData with ChangeNotifier {
       req.fields['catg_id'] = newItemData['category'].toString();
       req.fields['existingImages'] = jsonEncode(
         newItemData['existingImages'],
-      ); // list of string example like : ['image1.png','image2.jpeg'];
+      ); // list of string example like : ['images/image1.png','images/image2.jpeg'];
 
-      for (var image in newItemData['newImages']) {
-        if (await image.exists()) {
-          req.files.add(
-            await http.MultipartFile.fromPath('images[]', image.path),
-          );
-        }
-      }
+      // for (var image in newItemData['newImages']) {
+      //   if (await image.exists()) {
+      //     req.files.add(
+      //       await http.MultipartFile.fromPath('images[]', image.path),
+      //     );
+      //   }
+      // }
 
       var sendedRequest = await req.send();
       var response = await sendedRequest.stream.bytesToString();

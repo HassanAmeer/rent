@@ -6,12 +6,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
+import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/models/item_model.dart';
 import 'dart:developer' as dev;
 import 'package:fl_html_editor/fl_html_editor.dart';
 import 'package:rent/apidata/categoryapi.dart';
+import 'package:rent/widgets/dotloader.dart';
 
 // import '../../apidata/listingapi.dart';
 // import '../../apidata/user.dart';
@@ -405,12 +407,21 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Edit Listing")),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ref.watch(listingDataProvider).loadingfor == "refresh"
+                  ? Transform.scale(
+                      scale: 1.2,
+                      child: const QuickTikTokLoader(
+                        progressColor: Colors.black,
+                        backgroundColor: Colors.grey,
+                      ),
+                    )
+                  : SizedBox.shrink(),
               const SizedBox(height: 8),
               // category
               MediaDropdown(
@@ -802,40 +813,51 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final availabilityString = _buildAvailabilityString();
+                  onPressed:
+                      ref.watch(listingDataProvider).loadingfor == "refresh"
+                      ? null
+                      : () async {
+                          if (_formKey.currentState!.validate()) {
+                            final availabilityString =
+                                _buildAvailabilityString();
 
-                      final updatedData = {
-                        'title': _titleController.text.trim(),
-                        'description': _descriptionHTMLController
-                            .getHtml()
-                            .toString(),
-                        'avalibilityDays': availabilityString,
-                        'dailyrate': _dailyRateController.text.trim(),
-                        'weeklyrate': _weeklyRateController.text.trim(),
-                        'monthlyrate': _monthlyRateController.text.trim(),
-                        'category': _selectedCategoryId,
-                        'newImages': _newImages,
-                        'existingImages': _existingImages
-                            .map((e) => e.toString().split("uploads/").last)
-                            .toList(),
-                      };
+                            final updatedData = {
+                              'title': _titleController.text.trim(),
+                              'description':
+                                  jsonEncode(
+                                    await _descriptionHTMLController.getHtml(),
+                                  ).replaceAllMapped(
+                                    RegExp(r'\\u([0-9A-Fa-f]{4})'),
+                                    (match) => String.fromCharCode(
+                                      int.parse(match.group(1)!, radix: 16),
+                                    ),
+                                  ),
+                              'avalibilityDays': availabilityString,
+                              'dailyrate': _dailyRateController.text.trim(),
+                              'weeklyrate': _weeklyRateController.text.trim(),
+                              'monthlyrate': _monthlyRateController.text.trim(),
+                              'category': _selectedCategoryId,
+                              'newImages': _newImages,
+                              'existingImages': _existingImages
+                                  .map(
+                                    (e) => e.toString().split("uploads/").last,
+                                  )
+                                  .toList(),
+                            };
 
-                      dev.log('Updated Data: $updatedData');
-
-                      ref
-                          .read(listingDataProvider)
-                          .editsmyitems(
-                            itemId: widget.item.id.toString(),
-                            uid: ref
-                                .watch(userDataClass)
-                                .userData['id']
-                                .toString(),
-                            newItemData: updatedData,
-                          );
-                    }
-                  },
+                            ref
+                                .read(listingDataProvider)
+                                .editsmyitems(
+                                  loadingFor: "refresh",
+                                  itemId: widget.item.id.toString(),
+                                  uid: ref
+                                      .watch(userDataClass)
+                                      .userData['id']
+                                      .toString(),
+                                  newItemData: updatedData,
+                                );
+                          }
+                        },
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.cyan,
@@ -844,10 +866,12 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    'Update Listing',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: ref.watch(listingDataProvider).loadingfor == "refresh"
+                      ? DotLoader(color: Colors.white)
+                      : const Text(
+                          'Update Listing',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
               SizedBox(height: 20),
