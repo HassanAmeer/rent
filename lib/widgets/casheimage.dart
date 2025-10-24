@@ -27,9 +27,11 @@ class CacheImageWidget extends StatelessWidget {
     // print(url);
     // return Text("${url}");
     return GestureDetector(
-      onTap: () {
-        onTap?.call();
-      },
+      onTap: onTap == null
+          ? null
+          : () {
+              onTap?.call();
+            },
       child: SizedBox(
         width: width.toDouble(),
         height: height.toDouble(),

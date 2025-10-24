@@ -3,10 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
-import 'package:rent/design/fav/fav_details.dart';
+import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
+import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
@@ -33,13 +34,13 @@ class _FavouriteState extends ConsumerState<Favourite> {
   Future<void> _loadFavorites() async {
     final userId = ref.read(userDataClass).userId;
     await ref
-        .read(favrtdata)
-        .favorItems(loadingFor: "favorItems", uid: userId, search: "");
+        .read(favProvider)
+        .getAllFavItems(loadingFor: "favorItems", uid: userId, search: "");
   }
 
   @override
   Widget build(BuildContext context) {
-    final favrtProvider = ref.watch(favrtdata);
+    final favrtProvider = ref.watch(favProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -53,8 +54,8 @@ class _FavouriteState extends ConsumerState<Favourite> {
         onRefresh: () async {
           final userId = ref.read(userDataClass).userId;
           await ref
-              .read(favrtdata)
-              .favorItems(
+              .read(favProvider)
+              .getAllFavItems(
                 loadingFor: "refresh",
                 uid: userId,
                 search: "",
@@ -104,20 +105,18 @@ class _FavouriteState extends ConsumerState<Favourite> {
                       Expanded(
                         child: TextField(
                           controller: searchcontrollers,
-
                           decoration: InputDecoration(
                             suffixIcon: InkWell(
                               onTap: () {
                                 ref
-                                    .read(favrtdata)
-                                    .favorItems(
+                                    .read(favProvider)
+                                    .getAllFavItems(
                                       refresh: true,
                                       loadingFor: "refresh",
                                       uid: ref.watch(userDataClass).userId,
                                       search: searchcontrollers.text,
                                     );
                               },
-
                               child: Icon(Icons.search),
                             ),
                             hintText: 'Search How to & more',
@@ -132,15 +131,6 @@ class _FavouriteState extends ConsumerState<Favourite> {
                   ),
                 ),
               ),
-
-              // Column(
-              //   children: favrtProvider.favrt
-              //       .map(
-              //         (e) => Text("$e _____________________________________"),
-              //       )
-              //       .toList(),
-              // ),
-
               // Favorites Grid
               if (favrtProvider.loadingFor == "favorItems")
                 const Center(
@@ -204,15 +194,15 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                     top: 8,
                                     right: 8,
                                     child:
-                                        ref.watch(favrtdata).loadingFor ==
+                                        ref.watch(getAllItems).loadingFor ==
                                             item.id.toString()
                                         ? DotLoader(showDots: 1)
                                         // ? Icon(Icons.h_mobiledata_outlined)
                                         : InkWell(
                                             onTap: () {
                                               ref
-                                                  .watch(favrtdata)
-                                                  .addfavrt(
+                                                  .watch(favProvider)
+                                                  .togglefavrt(
                                                     uid: ref
                                                         .watch(userDataClass)
                                                         .userId,

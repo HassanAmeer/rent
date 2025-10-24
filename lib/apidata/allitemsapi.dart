@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,6 +14,8 @@ import 'package:rent/design/booking/my_booking_page.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/item_model.dart';
 import 'package:rent/models/api_response.dart';
+
+import '../models/favorite_model.dart';
 
 // import '../main.dart';
 
@@ -29,12 +32,15 @@ class GetAllItems with ChangeNotifier {
     notifyListeners();
   }
 
-  fetchAllItems({required String loadingfor, String search = ""}) async {
+  fetchAllItems({
+    required String loadingfor,
+    String search = "",
+    bool refresh = false,
+  }) async {
     try {
       if (await checkInternet() == false) return;
+      if (allItems.isNotEmpty && !refresh) return;
 
-      print("👉 loadingFor: $loadingfor");
-      print("👉 search: $search");
       setLoading(loadingfor);
       final response = await http.get(
         Uri.parse("${Api.allItemsEndpoint}$search"),
@@ -43,11 +49,11 @@ class GetAllItems with ChangeNotifier {
 
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
       if (response.statusCode == 200) {
         allItems.clear();
-        final itemsData = data['items'] ?? [];
+        List itemsData = data['items'] ?? [];
         allItems = itemsData
             .map<ItemModel>((item) => ItemModel.fromJson(item))
             .toList();
@@ -60,7 +66,7 @@ class GetAllItems with ChangeNotifier {
       setLoading("");
     } catch (e) {
       setLoading("");
-      print("Error fetching my items: $e");
+      debugPrint("Error fetching my items: $e");
     }
   }
 
@@ -69,7 +75,6 @@ class GetAllItems with ChangeNotifier {
   /// ✅ Place Order
   Future<void> orderitems({
     required String userId,
-
     required String userCanPickupInDateRange,
     required String productId,
     required String product_by,
@@ -93,8 +98,8 @@ class GetAllItems with ChangeNotifier {
       },
     );
 
-    print("👉 Response status: ${response.statusCode}");
-    print("👉 data: ${response.body}");
+    debugPrint("👉 Response status: ${response.statusCode}");
+    debugPrint("👉 data: ${response.body}");
 
     final data = jsonDecode(response.body);
 
@@ -106,4 +111,117 @@ class GetAllItems with ChangeNotifier {
     }
     setLoading();
   }
+
+  /////////////////// favourite api start
+  // List<FavoriteModel> favouriteItems = [];
+  // favItems({
+  //   var uid,
+  //   String loadingFor = "",
+  //   var search = "",
+  //   bool refresh = false,
+  // }) async {
+  //   try {
+  //     if (await checkInternet() == false) return;
+  //     if (favouriteItems.isNotEmpty && !refresh) return;
+
+  //     setLoading(loadingFor);
+  //     final response = await http.post(
+  //       Uri.parse(Api.getFavEndpoint),
+  //       body: {"uid": uid, "search": search},
+  //     );
+
+  //     final data = jsonDecode(response.body);
+
+  //     debugPrint("👉Response status: ${response.statusCode}");
+  //     log("👉 data: $data");
+  //     if (response.statusCode == 200) {
+  //       favouriteItems.clear();
+  //       List favItems = data['favItems'] ?? [];
+  //       favouriteItems = favItems
+  //           .map<FavoriteModel>((item) => FavoriteModel.fromJson(item))
+  //           .toList()
+  //           .reversed
+  //           .toList();
+  //       // debugPrint("👉 favouriteItems: $favouriteItems");
+  //     } else {
+  //       toast(data['msg']);
+  //     }
+  //     setLoading();
+  //   } catch (e, st) {
+  //     setLoading();
+  //     debugPrint("💥 Error fetching my items: $e,st:$st");
+  //     toast("Could not fetch data");
+  //   } finally {
+  //     setLoading();
+  //   }
+  // }
+
+  // removefromfav({
+  //   required String itemId,
+  //   required String uid,
+  //   String loadingFor = "",
+  // }) async {
+  //   try {
+  //     if (await checkInternet() == false) return;
+
+  //     setLoading(loadingFor);
+  //     final response = await http.delete(
+  //       Uri.parse("${Api.unfavEndpoint}$itemId/$uid"),
+  //     );
+
+  //     final data = jsonDecode(response.body);
+
+  //     debugPrint("👉Response status: ${response.statusCode}");
+  //     debugPrint("👉 data: $data");
+  //     if (response.statusCode == 200) {
+  //       toast(data['msg']);
+  //       favItems(uid: uid);
+  //     } else {
+  //       toast(data['msg'], backgroundColor: Colors.red);
+  //       setLoading();
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error removing from favorites: $e");
+  //   } finally {
+  //     setLoading();
+  //   }
+  // }
+
+  // addfavrt({
+  //   required String uid,
+  //   required itemId,
+  //   String loadingFor = "",
+  // }) async {
+  //   try {
+  //     if (await checkInternet() == false) return;
+
+  //     debugPrint("👉 loadingFor: $loadingFor");
+  //     setLoading(loadingFor);
+  //     final response = await http.post(
+  //       Uri.parse(Api.addFavEndpoint),
+  //       body: {"uid": uid, "itemid": itemId},
+  //     );
+
+  //     final data = jsonDecode(response.body);
+
+  //     // debugPrint("👉Response status: ${response.statusCode}");
+  //     // debugPrint("👉 data: $data");
+
+  //     if (response.statusCode == 200) {
+  //       // for (var e in favouriteItems) {
+  //       //   if (e.id == itemId) {
+  //       //     favouriteItems.add(FavoriteModel());
+  //       //   }
+  //       // }
+  //     } else {}
+  //     toast(data['msg']);
+  //     await favItems(uid: uid);
+  //     setLoading();
+  //   } catch (e) {
+  //     debugPrint("Error fetching my items: $e");
+  //     setLoading();
+  //   }
+  // }
+
+  /////////////////// favourite api end
 }

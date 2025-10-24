@@ -17,7 +17,7 @@ import 'package:rent/models/favorite_model.dart';
 // import '../main.dart';
 
 // Use the correct class name in the provider
-final favrtdata = ChangeNotifierProvider<Favrt>((ref) => Favrt());
+final favProvider = ChangeNotifierProvider<Favrt>((ref) => Favrt());
 
 class Favrt with ChangeNotifier {
   List<FavoriteModel> favouriteItems = [];
@@ -28,7 +28,7 @@ class Favrt with ChangeNotifier {
     notifyListeners();
   }
 
-  favorItems({
+  getAllFavItems({
     var uid,
     String loadingFor = "",
     var search = "",
@@ -45,9 +45,8 @@ class Favrt with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
+      // log("👉 data: $data");
 
-      debugPrint("👉Response status: ${response.statusCode}");
-      log("👉 data: $data");
       if (response.statusCode == 200) {
         favouriteItems.clear();
         List favItems = data['favItems'] ?? [];
@@ -70,47 +69,15 @@ class Favrt with ChangeNotifier {
     }
   }
 
-  removefromfav({
-    required String itemId,
-    required String uid,
-    String loadingFor = "",
-  }) async {
-    try {
-      if (await checkInternet() == false) return;
-
-      setLoading(loadingFor);
-      final response = await http.delete(
-        Uri.parse("${Api.unfavEndpoint}$itemId/$uid"),
-      );
-
-      final data = jsonDecode(response.body);
-
-      debugPrint("👉Response status: ${response.statusCode}");
-      debugPrint("👉 data: $data");
-      if (response.statusCode == 200) {
-        toast(data['msg']);
-        favorItems(uid: uid);
-      } else {
-        toast(data['msg'], backgroundColor: Colors.red);
-        setLoading();
-      }
-    } catch (e) {
-      debugPrint("Error removing from favorites: $e");
-    } finally {
-      setLoading();
-    }
-  }
-
-  addfavrt({
+  togglefavrt({
     required String uid,
     required itemId,
     String loadingFor = "",
   }) async {
     try {
       if (await checkInternet() == false) return;
-
-      debugPrint("👉 loadingFor: $loadingFor");
       setLoading(loadingFor);
+
       final response = await http.post(
         Uri.parse(Api.addFavEndpoint),
         body: {"uid": uid, "itemid": itemId},
@@ -118,45 +85,22 @@ class Favrt with ChangeNotifier {
 
       final data = jsonDecode(response.body);
 
-      // print("👉Response status: ${response.statusCode}");
       // print("👉 data: $data");
-      if (response.statusCode == 200) {
-      } else {}
+      // if (response.statusCode == 200) {
+      // } else {}
+
+      if (favouriteItems.any((e) => e.id == itemId)) {
+        favouriteItems.removeWhere((e) => e.id == itemId);
+      } else {
+        // favouriteItems.add(FavoriteModel(id: itemId));
+      }
+
       toast(data['msg']);
-      await favorItems(uid: uid);
       setLoading();
+      await getAllFavItems(uid: uid, loadingFor: 'refresh', refresh: true);
     } catch (e) {
       debugPrint("Error fetching my items: $e");
       setLoading();
     }
   }
-
-  //////
-  // showallaitems({required String uid}) async {
-  //   try {
-  //     if (await checkInternet() == false) return;
-
-  //     print("Fetching my items for user ID: $uid");
-  //     final response = await http.get(
-  //       Uri.parse("https://thelocalrent.com/api/allitems$uid"),
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     print("👉Response status: ${response.statusCode}");
-  //     print("👉 data: $data");
-  //     if (response.statusCode == 200) {
-  //       favrt = data['items'] ?? [];
-  //       // listings =  [];
-
-  //       notifyListeners();
-  //     } else {
-  //       toast(data['msg']);
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching my items: $e");
-  //   }
-  // }
-
-  //
 }

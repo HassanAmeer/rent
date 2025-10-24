@@ -34,7 +34,7 @@ class ItemModel {
     this.monthlyRate = 0.0,
     this.availabilityDays,
     this.availabilityRange,
-    this.images = const [],
+    this.images = const [ImgLinks.noItem, ImgLinks.noItem],
     this.createdAt,
     this.updatedAt,
     this.user,
@@ -42,20 +42,24 @@ class ItemModel {
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
     List<String> parseImages(dynamic imagesData) {
-      if (imagesData == null) return [];
+      if (imagesData == null) return [ImgLinks.noItem, ImgLinks.noItem];
       if (imagesData is List) {
-        return imagesData.map((img) => Api.imgPath + img).toList();
+        List check = imagesData.map((img) => Api.imgPath + img).toList();
+        check.isEmpty ? [ImgLinks.noItem, ImgLinks.noItem] : check;
+        return check as List<String>;
       }
       if (imagesData is String) {
         try {
           final decoded = jsonDecode(imagesData);
           if (decoded is List) {
-            return decoded.map((img) => Api.imgPath + img).toList();
+            List check = decoded.map((img) => Api.imgPath + img).toList();
+            check.isEmpty ? [ImgLinks.noItem, ImgLinks.noItem] : check;
+            return check as List<String>;
           }
         } catch (_) {}
         return [imagesData];
       }
-      return [];
+      return [ImgLinks.noItem, ImgLinks.noItem];
     }
 
     return ItemModel(
@@ -70,7 +74,11 @@ class ItemModel {
           double.tryParse(json['monthlyrate']?.toString() ?? '0') ?? 0.0,
       availabilityDays: json['availabilityDays']?.toString(),
       availabilityRange: json['pickupDateRange']?.toString(),
-      images: parseImages(json['images']),
+      images:
+          (json['images'] == null ||
+              (json['images'] is List && (json['images'] as List).isEmpty))
+          ? [ImgLinks.noItem, ImgLinks.noItem]
+          : parseImages(json['images']),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

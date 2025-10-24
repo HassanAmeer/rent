@@ -1,9 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/screensizes.dart';
+import '../../apidata/categoryapi.dart';
 import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
@@ -11,7 +13,7 @@ import '../../models/item_model.dart';
 import '../../models/favorite_model.dart';
 import '../../widgets/imageview.dart';
 
-class FavDetailsPage extends StatefulWidget {
+class FavDetailsPage extends ConsumerStatefulWidget {
   final FavoriteModel item;
 
   const FavDetailsPage({super.key, required this.item});
@@ -20,7 +22,7 @@ class FavDetailsPage extends StatefulWidget {
   _FavDetailsPageState createState() => _FavDetailsPageState();
 }
 
-class _FavDetailsPageState extends State<FavDetailsPage>
+class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -125,7 +127,7 @@ class _FavDetailsPageState extends State<FavDetailsPage>
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SingleChildScrollView(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -165,7 +167,6 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                         scrollDirection: Axis.horizontal,
                       ),
                     ),
-                    const SizedBox(height: 15),
                     const SizedBox(height: 16),
                     // Title
                     Text(
@@ -186,32 +187,33 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                       ),
                     ),
 
-                    const SizedBox(height: 16),
-                    // ListTile(
-                    //   tileColor: Colors.grey.shade200,
-                    //   contentPadding: EdgeInsets.only(left: 5),
+                    const SizedBox(height: 10),
 
-                    //   leading: CacheImageWidget(
-                    //     width: 25,
-                    //     height: 25,
-                    //     isCircle: true,
-                    //     radius: 5,
-                    //     url:
-                    //         "${widget.item.categoryId != null
-                    //             ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
-                    //                   ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).image
-                    //                   : null
-                    //             : null}",
-                    //   ),
-                    //   title: Text(
-                    //     "${widget.item.categoryId != null
-                    //         ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
-                    //               ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).name
-                    //               : null
-                    //         : null}",
-                    //   ),
-                    //   trailing: Text("Category  "),
-                    // ),
+                    ListTile(
+                      tileColor: Colors.grey.shade200,
+                      contentPadding: EdgeInsets.only(left: 5),
+
+                      leading: CacheImageWidget(
+                        width: 25,
+                        height: 25,
+                        isCircle: true,
+                        radius: 5,
+                        url:
+                            "${widget.item.products!.category != null
+                                ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.products!.category).isNotEmpty
+                                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.products!.category).image
+                                      : null
+                                : null}",
+                      ),
+                      title: Text(
+                        "${widget.item.products!.category != null
+                            ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.products!.category).isNotEmpty
+                                  ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.products!.category).name
+                                  : null
+                            : null}",
+                      ),
+                      trailing: Text("Category  "),
+                    ),
                     // Rates Section with Staggered Animation
                     RotationTransition(
                       turns: _rotationAnimation,
@@ -272,7 +274,7 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                     const Divider(),
                     _buildDetailRow(
                       context,
-                      "Listing At",
+                      "Listing Date",
 
                       widget.item.createdAt?.toString() ?? 'N/A',
                     ),
