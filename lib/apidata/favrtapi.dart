@@ -20,7 +20,7 @@ import 'package:rent/models/favorite_model.dart';
 final favrtdata = ChangeNotifierProvider<Favrt>((ref) => Favrt());
 
 class Favrt with ChangeNotifier {
-  List<FavoriteModel> favrt = [];
+  List<FavoriteModel> favouriteItems = [];
   //////
   String loadingFor = "";
   setLoading([String loadingName = ""]) {
@@ -36,7 +36,7 @@ class Favrt with ChangeNotifier {
   }) async {
     try {
       if (await checkInternet() == false) return;
-      if (favrt.isNotEmpty && !refresh) return;
+      if (favouriteItems.isNotEmpty && !refresh) return;
 
       setLoading(loadingFor);
       final response = await http.post(
@@ -49,12 +49,14 @@ class Favrt with ChangeNotifier {
       debugPrint("👉Response status: ${response.statusCode}");
       log("👉 data: $data");
       if (response.statusCode == 200) {
-        favrt.clear();
-        final favItems = data['favItems'] ?? [];
-        favrt = favItems
+        favouriteItems.clear();
+        List favItems = data['favItems'] ?? [];
+        favouriteItems = favItems
             .map<FavoriteModel>((item) => FavoriteModel.fromJson(item))
+            .toList()
+            .reversed
             .toList();
-        debugPrint("👉 favrt: $favrt");
+        // debugPrint("👉 favouriteItems: $favouriteItems");
       } else {
         toast(data['msg']);
       }

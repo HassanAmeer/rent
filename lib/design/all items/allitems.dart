@@ -7,7 +7,7 @@ import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/all%20items/allitemdetails.dart';
-import 'package:rent/design/fav/fvrt.dart';
+import 'package:rent/design/fav/fav_items.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
@@ -204,7 +204,7 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                             child:
                                 ref
                                     .watch(favrtdata)
-                                    .favrt
+                                    .favouriteItems
                                     .any(
                                       (i) =>
                                           i.itemId.toString() ==

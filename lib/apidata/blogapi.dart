@@ -18,9 +18,8 @@ class BlogData with ChangeNotifier {
   String loadingFor = "";
   bool isLoading = false;
 
-  void setLoading(bool value, [String loadingName = ""]) {
+  void setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
-    isLoading = value;
     notifyListeners();
   }
 
@@ -28,35 +27,35 @@ class BlogData with ChangeNotifier {
   Future<void> fetchAllBlogs({
     String loadingFor = "",
     String search = "",
+    bool refresh = false,
   }) async {
     try {
       if (await checkInternet() == false) return;
+      if (blogs.isNotEmpty && !refresh) return;
 
-      print("Fetching all blogs...");
-
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.get(Uri.parse(Api.allBlogsEndpoint));
 
       final data = jsonDecode(response.body);
 
-      print("👉 Response status: ${response.statusCode}");
-      print("👉 Data: $data");
+      debugPrint("👉 Response status: ${response.statusCode}");
+      debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
         blogs.clear();
-        final blogsData = data['blogs'] ?? [];
+        List blogsData = data['blogs'] ?? [];
         blogs = blogsData
             .map<BlogModel>((blog) => BlogModel.fromJson(blog))
             .toList();
-        print("👉 Blogs loaded: ${blogs.length} items");
-        setLoading(false);
+
+        setLoading();
         notifyListeners();
       } else {
         toast(data['message'] ?? data['msg'] ?? 'Failed to fetch blogs');
-        setLoading(false);
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
+      setLoading();
       debugPrint("Error fetching blogs: $e");
     }
   }
@@ -69,31 +68,30 @@ class BlogData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
-      print("Fetching blog details for ID: $blogId");
+      debugPrint("Fetching blog details for ID: $blogId");
 
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.get(
         Uri.parse("${Api.blogDetailsEndpoint}$blogId"),
       );
 
       final data = jsonDecode(response.body);
 
-      print("👉 Response status: ${response.statusCode}");
-      print("👉 Data: $data");
+      debugPrint("👉 Response status: ${response.statusCode}");
+      debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
         final blogData =
             data['blog'] ?? data['blogDetails'] ?? data['data'] ?? {};
         blogDetails = BlogModel.fromJson(blogData);
-        print("👉 Blog details loaded");
-        setLoading(false);
+        setLoading();
         notifyListeners();
       } else {
         toast(data['message'] ?? data['msg'] ?? 'Failed to fetch blog details');
-        setLoading(false);
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
+      setLoading();
       debugPrint("Error fetching blog details: $e");
     }
   }

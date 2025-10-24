@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/apidata/blogapi.dart' show blogDataProvider;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/screensizes.dart';
@@ -23,7 +24,7 @@ class _BlogsState extends ConsumerState<Blogs> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      ref.read(blogDataProvider).fetchAllBlogs();
+      ref.read(blogDataProvider).fetchAllBlogs(loadingFor: "blogs");
     });
   }
 
@@ -44,64 +45,91 @@ class _BlogsState extends ConsumerState<Blogs> {
           ),
         ),
       ),
-      body: blogProvider.isLoading
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 250),
-                child: DotLoader(),
-              ),
-            )
-          : blogProvider.blogs.isEmpty
-          ? const Center(child: Text("No blogs found"))
-          : GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: 0.65, // ✅ thoda lamba card
-              ),
-              itemCount: blogProvider.blogs.length,
-              itemBuilder: (context, index) {
-                final blog = blogProvider.blogs[index];
-
-                return InkWell(
-                  onTap: () {
-                    goto(Blogsdetails(blog: blog));
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ✅ Image section
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CacheImageWidget(
-                          isCircle: false,
-                          url: blog.image,
-                          height: ScreenSize.height * 0.24,
-                          width: ScreenSize.width,
-                        ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref
+              .read(blogDataProvider)
+              .fetchAllBlogs(refresh: true, loadingFor: "refresh");
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              blogProvider.loadingFor == "refresh"
+                  ? QuickTikTokLoader(
+                      progressColor: Colors.black,
+                      backgroundColor: Colors.grey,
+                    )
+                  : SizedBox.shrink(),
+              blogProvider.loadingFor == "blogs"
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 250),
+                        child: DotLoader(),
                       ),
+                    )
+                  : blogProvider.blogs.isEmpty
+                  ? const Center(child: Text("No blogs found"))
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 15,
+                            mainAxisSpacing: 15,
+                            childAspectRatio: 0.65, // ✅ thoda lamba card
+                          ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: blogProvider.blogs.length,
+                      itemBuilder: (context, index) {
+                        final blog = blogProvider.blogs[index];
 
-                      const SizedBox(height: 8),
+                        return GestureDetector(
+                          onTap: () {
+                            goto(Blogsdetails(blog: blog));
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ✅ Image section
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: CacheImageWidget(
+                                  onTap: () {
+                                    goto(Blogsdetails(blog: blog));
+                                  },
+                                  isCircle: false,
+                                  url: blog.image,
+                                  height: ScreenSize.height * 0.24,
+                                  width: ScreenSize.width,
+                                ),
+                              ),
 
-                      // ✅ Title
-                      Text(
-                        blog.displayTitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black,
-                        ),
-                      ),
+                              const SizedBox(height: 8),
 
-                      const SizedBox(height: 4),
-                    ],
-                  ),
-                );
-              },
-            ),
+                              // ✅ Title
+                              Text(
+                                blog.displayTitle,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                              ),
+
+                              const SizedBox(height: 4),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

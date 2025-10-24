@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
-// import 'package:rent/apidata/favrtapi.dart';
-// import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
-import 'package:rent/design/fav/favdetails.dart';
+import 'package:rent/design/fav/fav_details.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
@@ -36,7 +34,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
     final userId = ref.read(userDataClass).userId;
     await ref
         .read(favrtdata)
-        .favorItems(loadingFor: "refresh", uid: userId, search: "");
+        .favorItems(loadingFor: "favorItems", uid: userId, search: "");
   }
 
   @override
@@ -144,14 +142,14 @@ class _FavouriteState extends ConsumerState<Favourite> {
               // ),
 
               // Favorites Grid
-              if (favrtProvider.loadingFor == "loadFullData")
+              if (favrtProvider.loadingFor == "favorItems")
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: 260),
                     child: DotLoader(),
                   ),
                 )
-              else if (favrtProvider.favrt.isEmpty)
+              else if (favrtProvider.favouriteItems.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Text("No favorites found"),
@@ -172,13 +170,13 @@ class _FavouriteState extends ConsumerState<Favourite> {
                           mainAxisSpacing: 10,
                           childAspectRatio: 1,
                         ),
-                    itemCount: favrtProvider.favrt.length,
+                    itemCount: favrtProvider.favouriteItems.length,
                     itemBuilder: (context, index) {
-                      final item = favrtProvider.favrt[index];
+                      final item = favrtProvider.favouriteItems[index];
                       // return Text(item.displayTitle.toString());
                       return GestureDetector(
                         onTap: () {
-                          goto(FavDetailsPage(item: item!));
+                          goto(FavDetailsPage(item: item));
                         },
                         child: Column(
                           children: [
