@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/settings_model.dart';
 
 // ✅ Provider for Blogs
 final SupportProvider = ChangeNotifierProvider<supportData>(
@@ -13,7 +14,7 @@ final SupportProvider = ChangeNotifierProvider<supportData>(
 
 class supportData with ChangeNotifier {
   // Loading state
-  Map settings = {};
+  SettingsModel? settings;
 
   var widget;
 
@@ -39,8 +40,11 @@ class supportData with ChangeNotifier {
       print("👉 Data: $data");
 
       if (response.statusCode == 200) {
-        settings = data['settings'] ?? {}; // ✅ API ke response ke hisaab se
-        print("👉 Blogs loaded: ${settings.length} items");
+        final settingsData = data['settings'] ?? {};
+        settings = SettingsModel.fromJson(
+          settingsData,
+        ); // ✅ API ke response ke hisaab se
+        print("👉 Settings loaded: $settings");
         setLoading();
         notifyListeners();
       } else {

@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
@@ -6,10 +7,14 @@ import 'package:rent/constants/screensizes.dart';
 import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
-class FavDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> fullData;
+import '../../models/item_model.dart';
+import '../../models/favorite_model.dart';
+import '../../widgets/imageview.dart';
 
-  const FavDetailsPage({super.key, required this.fullData});
+class FavDetailsPage extends StatefulWidget {
+  final FavoriteModel item;
+
+  const FavDetailsPage({super.key, required this.item});
 
   @override
   _FavDetailsPageState createState() => _FavDetailsPageState();
@@ -130,41 +135,41 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Hero-wrapped Image with shadow
-                    Hero(
-                      tag:
-                          widget.fullData['images']?[0] ??
-                          'image_${widget.fullData['title']}',
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black54,
-                              blurRadius: 10.0,
-                              spreadRadius: 2.0,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
+                    CarouselSlider.builder(
+                      itemCount: widget.item.itemImages.length,
+                      itemBuilder: (context, index, realIndex) {
+                        final imageUrl = widget.item.itemImages[index];
+                        return CacheImageWidget(
+                          onTap: () {
+                            showImageView(context, imageUrl);
+                          },
+                          width: double.infinity,
+                          height: ScreenSize.height * 0.3,
+                          isCircle: false,
+                          fit: BoxFit.contain,
+                          radius: 0,
+                          url: imageUrl,
+                        );
+                      },
+                      options: CarouselOptions(
+                        height: ScreenSize.height * 0.35,
+                        viewportFraction: 0.68,
+                        enlargeCenterPage: true,
+                        autoPlay: widget.item.itemImages.length > 1,
+                        autoPlayInterval: const Duration(seconds: 2),
+                        autoPlayAnimationDuration: const Duration(
+                          milliseconds: 800,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: CacheImageWidget(
-                            width: ScreenSize.width,
-                            height: ScreenSize.height * 0.3,
-                            isCircle: false,
-                            url:
-                                widget.fullData['images'] != null &&
-                                    widget.fullData['images'].isNotEmpty
-                                ? Api.imgPath + widget.fullData['images'][0]
-                                : ImgLinks.profileImage,
-                          ),
-                        ),
+                        autoPlayCurve: Curves.fastOutSlowIn,
+                        enableInfiniteScroll: widget.item.itemImages.length > 1,
+                        scrollDirection: Axis.horizontal,
                       ),
                     ),
+                    const SizedBox(height: 15),
                     const SizedBox(height: 16),
                     // Title
                     Text(
-                      widget.fullData['title'] ?? 'Title...',
+                      widget.item.products!.title,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -174,13 +179,39 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                     const SizedBox(height: 8),
                     // Description
                     HtmlWidget(
-                      widget.fullData['description'] ?? 'Description...',
+                      widget.item.products!.description!,
                       textStyle: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
                     ),
+
                     const SizedBox(height: 16),
+                    // ListTile(
+                    //   tileColor: Colors.grey.shade200,
+                    //   contentPadding: EdgeInsets.only(left: 5),
+
+                    //   leading: CacheImageWidget(
+                    //     width: 25,
+                    //     height: 25,
+                    //     isCircle: true,
+                    //     radius: 5,
+                    //     url:
+                    //         "${widget.item.categoryId != null
+                    //             ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
+                    //                   ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).image
+                    //                   : null
+                    //             : null}",
+                    //   ),
+                    //   title: Text(
+                    //     "${widget.item.categoryId != null
+                    //         ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
+                    //               ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).name
+                    //               : null
+                    //         : null}",
+                    //   ),
+                    //   trailing: Text("Category  "),
+                    // ),
                     // Rates Section with Staggered Animation
                     RotationTransition(
                       turns: _rotationAnimation,
@@ -199,25 +230,13 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                         child: _buildDetailRow(
                           context,
                           "Availability Days",
-                          widget.fullData['availabilityDays'] ?? 'N/A',
+
+                          widget.item.products!.availabilityDays ?? 'N/A',
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Divider(),
-                    _buildDetailRow(
-                      context,
-                      "Created At",
-                      widget.fullData['created_at'] ?? 'N/A',
-                    ),
-                    const Divider(),
-                    _buildDetailRow(
-                      context,
-                      "Updated At",
-                      widget.fullData['updated_at'] ?? 'N/A',
-                    ),
 
-                    const Divider(),
                     const SizedBox(height: 16),
                     // User Section
                     const Text(
@@ -237,19 +256,33 @@ class _FavDetailsPageState extends State<FavDetailsPage>
                           height: 50,
                           isCircle: true,
                           radius: 200,
-                          url:
-                              widget.fullData['images'] != null &&
-                                  widget.fullData['images'].isNotEmpty
-                              ? Api.imgPath + widget.fullData['images'][0]
-                              : ImgLinks.profileImage,
+                          url: widget.item.rentalusers!.fullImageUrl,
                         ),
-                        title: const Text(
-                          "User Profile",
+                        title: Text(
+                          widget.item.rentalusers!.name,
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          widget.item.rentalusers!.email,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+
+                    const Divider(),
+                    _buildDetailRow(
+                      context,
+                      "Listing At",
+
+                      widget.item.createdAt?.toString() ?? 'N/A',
+                    ),
+                    const Divider(),
+                    // _buildDetailRow(
+                    //   context,
+                    //   "Updated At",
+                    //   widget.fullData['updated_at'] ?? 'N/A',
+                    // )
+                    const SizedBox(height: 50),
                   ],
                 ),
               ),
@@ -264,17 +297,17 @@ class _FavDetailsPageState extends State<FavDetailsPage>
     final rates = [
       {
         'label': 'Daily Rate',
-        'value': widget.fullData['dailyrate'] ?? '0',
+        'value': widget.item.formattedDailyRate,
         'icon': Icons.calendar_today,
       },
       {
         'label': 'Weekly Rate',
-        'value': widget.fullData['weeklyrate'] ?? '0',
+        'value': widget.item.products!.formattedWeeklyRate,
         'icon': Icons.date_range,
       },
       {
         'label': 'Monthly Rate',
-        'value': widget.fullData['monthlyrate'] ?? '0',
+        'value': widget.item.products!.formattedMonthlyRate,
         'icon': Icons.event,
       },
     ];

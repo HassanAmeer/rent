@@ -1,6 +1,9 @@
 /// Notification Model for user notifications
 library;
 
+import 'dart:convert';
+import 'package:rent/constants/api_endpoints.dart';
+import 'package:rent/constants/images.dart';
 import 'user_model.dart';
 
 class NotificationModel {
@@ -8,17 +11,17 @@ class NotificationModel {
   final int from;
   final int to;
   final String title;
-  final String? desc;
+  final String description;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final UserModel? fromUser;
+  final UserModel? fromUser; // User who sent the notification
 
   NotificationModel({
-    required this.id,
-    required this.from,
-    required this.to,
-    required this.title,
-    this.desc,
+    this.id = 0,
+    this.from = 0,
+    this.to = 0,
+    this.title = '',
+    this.description = '',
     this.createdAt,
     this.updatedAt,
     this.fromUser,
@@ -30,7 +33,7 @@ class NotificationModel {
       from: json['from'] ?? 0,
       to: json['to'] ?? 0,
       title: json['title']?.toString() ?? '',
-      desc: json['desc']?.toString(),
+      description: json['desc']?.toString() ?? '',
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
@@ -49,82 +52,54 @@ class NotificationModel {
       'from': from,
       'to': to,
       'title': title,
-      'desc': desc,
+      'desc': description,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'fromuid': fromUser?.toJson(),
     };
   }
 
-  /// Get formatted creation date
-  String get formattedDate {
+  /// Get display title with fallback
+  String get displayTitle => title.isNotEmpty ? title : 'No Title';
+
+  /// Get short description for previews
+  String get shortDescription {
+    if (description.isEmpty) return 'No description available';
+    // Remove HTML tags for preview
+    final cleanText = description.replaceAll(RegExp(r'<[^>]*>'), '');
+    return cleanText.length > 100
+        ? '${cleanText.substring(0, 100)}...'
+        : cleanText;
+  }
+
+  /// Get formatted created date
+  String get formattedCreatedDate {
     if (createdAt == null) return '';
     final now = DateTime.now();
     final difference = now.difference(createdAt!);
 
-    if (difference.inDays == 0) {
-      final hours = difference.inHours;
-      if (hours == 0) {
-        final minutes = difference.inMinutes;
-        return minutes == 0
-            ? 'Just now'
-            : '$minutes minute${minutes > 1 ? 's' : ''} ago';
-      }
-      return '$hours hour${hours > 1 ? 's' : ''} ago';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+    if (difference.inDays > 0) {
+      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
     } else {
-      return '${createdAt!.day}/${createdAt!.month}/${createdAt!.year}';
+      return 'Just now';
     }
   }
 
-  /// Get notification type based on title
-  String get notificationType {
-    if (title.toLowerCase().contains('booking')) return 'booking';
-    if (title.toLowerCase().contains('rental')) return 'rental';
-    if (title.toLowerCase().contains('message')) return 'message';
-    return 'general';
-  }
-
-  /// Get notification icon based on type
-  String get iconName {
-    switch (notificationType) {
-      case 'booking':
-        return 'event_available';
-      case 'rental':
-        return 'shopping_cart';
-      case 'message':
-        return 'message';
-      default:
-        return 'notifications';
-    }
-  }
-
-  /// Check if notification is recent (within 24 hours)
+  /// Check if notification is recent (within last 24 hours)
   bool get isRecent {
     if (createdAt == null) return false;
-    final difference = DateTime.now().difference(createdAt!);
+    final now = DateTime.now();
+    final difference = now.difference(createdAt!);
     return difference.inHours < 24;
-  }
-
-  /// Get display title
-  String get displayTitle => title.isNotEmpty ? title : 'Notification';
-
-  /// Get short description for previews
-  String get shortDescription {
-    if (desc == null || desc!.isEmpty) return '';
-    // Remove HTML tags for preview
-    final cleanDesc = desc!.replaceAll(RegExp(r'<[^>]*>'), '');
-    return cleanDesc.length > 100
-        ? '${cleanDesc.substring(0, 100)}...'
-        : cleanDesc;
   }
 
   @override
   String toString() {
-    return 'NotificationModel(id: $id, title: $title, type: $notificationType)';
+    return 'NotificationModel(id: $id, title: $title, from: $from)';
   }
 
   @override

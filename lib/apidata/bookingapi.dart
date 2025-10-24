@@ -5,13 +5,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart'; // Apne toast function ke liye import
+import 'package:rent/models/booking_model.dart';
 
 final bookingDataProvider = ChangeNotifierProvider<BookingData>(
   (ref) => BookingData(),
 );
 
 class BookingData with ChangeNotifier {
-  List comingOrders = [];
+  List<BookingModel> comingOrders = [];
   // bool isLoading = false;
   String loadingfor = "";
   setLoading([String value = ""]) {
@@ -41,7 +42,10 @@ class BookingData with ChangeNotifier {
       print("👉 Coming Orders Data: $data");
 
       if (response.statusCode == 200 && data['success'] == true) {
-        comingOrders = data['commingOrders'] ?? [];
+        final ordersData = data['commingOrders'] ?? [];
+        comingOrders = ordersData
+            .map<BookingModel>((order) => BookingModel.fromJson(order))
+            .toList();
         notifyListeners();
       } else {
         comingOrders = [];

@@ -5,13 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/blog_model.dart';
 
 // ✅ Provider for Blogs
 final blogDataProvider = ChangeNotifierProvider<BlogData>((ref) => BlogData());
 
 class BlogData with ChangeNotifier {
-  List<dynamic> blogs = [];
-  Map<String, dynamic> blogDetails = {};
+  List<BlogModel> blogs = [];
+  BlogModel? blogDetails;
 
   // Loading state
   String loadingFor = "";
@@ -43,7 +44,10 @@ class BlogData with ChangeNotifier {
 
       if (response.statusCode == 200) {
         blogs.clear();
-        blogs = data['blogs'] ?? []; // ✅ API ke response ke hisaab se
+        final blogsData = data['blogs'] ?? [];
+        blogs = blogsData
+            .map<BlogModel>((blog) => BlogModel.fromJson(blog))
+            .toList();
         print("👉 Blogs loaded: ${blogs.length} items");
         setLoading(false);
         notifyListeners();
@@ -78,7 +82,9 @@ class BlogData with ChangeNotifier {
       print("👉 Data: $data");
 
       if (response.statusCode == 200) {
-        blogDetails = data['blog'] ?? data['blogDetails'] ?? data['data'] ?? {};
+        final blogData =
+            data['blog'] ?? data['blogDetails'] ?? data['data'] ?? {};
+        blogDetails = BlogModel.fromJson(blogData);
         print("👉 Blog details loaded");
         setLoading(false);
         notifyListeners();

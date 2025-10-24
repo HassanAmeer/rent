@@ -8,11 +8,12 @@ import 'package:rent/constants/screensizes.dart';
 
 import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
+import '../../models/booking_model.dart';
 import '../../widgets/casheimage.dart';
 
 class Bookindetails extends ConsumerStatefulWidget {
-  var data;
-  Bookindetails({super.key, this.data});
+  BookingModel data;
+  Bookindetails({super.key, required this.data});
 
   @override
   ConsumerState<Bookindetails> createState() => _BookindetailsState();
@@ -30,7 +31,6 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text("${widget.data}"),
               Stack(
                 children: [
                   CacheImageWidget(
@@ -38,10 +38,7 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                     height: ScreenSize.height * 0.4,
                     isCircle: false,
                     radius: 0,
-                    url:
-                        Api.imgPath +
-                            jsonDecode(widget.data['productImage'])[0] ??
-                        ImgLinks.profileImage,
+                    url: widget.data.productImages.first,
                   ),
                 ],
               ),
@@ -49,7 +46,7 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
               const SizedBox(height: 10),
 
               Text(
-                "${widget.data['productTitle'] ?? 'Title.......'}",
+                widget.data.productTitle,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -60,34 +57,20 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
 
               Divider(),
 
+              ListTile(title: Text("daily rate: ${widget.data.dailyRate}")),
+              Divider(),
+              ListTile(title: Text("weekly rate: ${widget.data.weeklyRate}")),
+              Divider(),
               ListTile(
-                title: Text("dailyrate: ${widget.data['dailyrate'] ?? '0'}"),
+                title: Text(" monthly rate: ${widget.data.monthlyRate}"),
               ),
               Divider(),
               ListTile(
-                title: Text("weeklyrate: ${widget.data['weeklyrate'] ?? '0'}"),
+                title: Text("created_at: ${widget.data.createdAt ?? '0'}"),
               ),
               Divider(),
               ListTile(
-                title: Text(
-                  " monthlyrate: ${widget.data['monthlyrate'] ?? '0'}",
-                ),
-              ),
-              Divider(),
-              ListTile(
-                title: Text("created_at: ${widget.data['created_at'] ?? '0'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  " updated_at: ${widget.data[' updated_at'] ?? '0'}",
-                ),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  " availabilityDays: ${widget.data['availabilityDays'] ?? '0'}",
-                ),
+                title: Text(" Availability Days: ${widget.data.availability}"),
               ),
               Divider(),
 
@@ -99,12 +82,10 @@ class _BookindetailsState extends ConsumerState<Bookindetails> {
                   height: 50,
                   isCircle: true,
                   radius: 200,
-                  url:
-                      Api.imgPath + widget.data["orderby"]['image'][0] ??
-                      ImgLinks.profileImage,
+                  url: widget.data.orderByUser!.fullImageUrl,
                 ),
-                title: Text(widget.data['orderby']['name'] ?? 'Unknown'),
-                subtitle: Text(widget.data['orderby']['email'] ?? 'Unknown'),
+                title: Text(widget.data.orderByUser!.name),
+                subtitle: Text(widget.data.orderByUser!.email),
               ),
 
               //

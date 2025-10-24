@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/toast.dart';
 // import 'package:rent/apidata/bookingapi.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
-import 'package:rent/design/booking/bookingdetails.dart';
+import 'package:rent/design/booking/booking_details.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/screensizes.dart';
@@ -17,6 +17,7 @@ import '../../apidata/bookingapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../widgets/searchfield.dart';
+import '../../models/booking_model.dart';
 
 class MyBookingPage extends ConsumerStatefulWidget {
   const MyBookingPage({super.key});
@@ -122,7 +123,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
     );
   }
 
-  Widget _bookingCard(BuildContext context, Map<String, dynamic> booking) {
+  Widget _bookingCard(BuildContext context, BookingModel booking) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -160,10 +161,9 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                           width: ScreenSize.width * 0.45,
                           // width: double.infinity,
                           height: ScreenSize.height * 0.2,
-                          url:
-                              Api.imgPath +
-                              (jsonDecode(booking['productImage'])[0] ??
-                                  ImgLinks.product),
+                          url: booking.productImages.isNotEmpty
+                              ? booking.productImages[0]
+                              : ImgLinks.product,
                         ),
                       ),
                     ),
@@ -171,7 +171,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                   const SizedBox(height: 2),
                   // title text inside fixed width
                   Text(
-                    booking["productTitle"].toString(),
+                    booking.displayTitle,
                     style: const TextStyle(
                       fontSize: 13,
                       color: Colors.blue,
@@ -184,10 +184,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
                   // const SizedBox(height: 1),
                   // orderby name inside fixed width
                   Text(
-                    ref
-                        .watch(bookingDataProvider)
-                        .comingOrders[0]["orderby"]['name']
-                        .toString(),
+                    booking.orderByUser?.displayName ?? 'Unknown User',
                     style: const TextStyle(
                       fontSize: 11,
                       color: Colors.grey,
@@ -206,7 +203,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
           Positioned(
             right: 8,
             top: 8,
-            child: _statusLabel(booking["deliverd"].toString()),
+            child: _statusLabel(booking.delivered.toString()),
           ),
         ],
       ),

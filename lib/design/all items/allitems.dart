@@ -207,7 +207,7 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                     .favrt
                                     .any(
                                       (i) =>
-                                          i['itemId'].toString() ==
+                                          i.itemId.toString() ==
                                           widget.id.toString(),
                                     )
                                 ? const Icon(

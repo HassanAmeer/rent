@@ -9,6 +9,7 @@ import 'package:rent/widgets/dotloader.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../widgets/casheimage.dart';
+import '../../models/blog_model.dart';
 
 class Blogs extends ConsumerStatefulWidget {
   const Blogs({super.key});
@@ -63,16 +64,10 @@ class _BlogsState extends ConsumerState<Blogs> {
               itemCount: blogProvider.blogs.length,
               itemBuilder: (context, index) {
                 final blog = blogProvider.blogs[index];
-                final imageUrl = blog['image'];
 
                 return InkWell(
                   onTap: () {
-                    goto(Blogsdetails(blog: blogProvider.blogs[index]));
-                    // ✅ Yahan aap apna next page call karo
-                    // Example:
-                    // Navigator.push(context, MaterialPageRoute(
-                    //   builder: (_) => BlogDetailPage(blog: blog),
-                    // ));
+                    goto(Blogsdetails(blog: blog));
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,9 +77,7 @@ class _BlogsState extends ConsumerState<Blogs> {
                         borderRadius: BorderRadius.circular(12),
                         child: CacheImageWidget(
                           isCircle: false,
-                          url: imageUrl != null && imageUrl.isNotEmpty
-                              ? Api.imgPath + imageUrl
-                              : ImgLinks.product,
+                          url: blog.image,
                           height: ScreenSize.height * 0.24,
                           width: ScreenSize.width,
                         ),
@@ -94,7 +87,7 @@ class _BlogsState extends ConsumerState<Blogs> {
 
                       // ✅ Title
                       Text(
-                        blog['title'] ?? "No Title",
+                        blog.displayTitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

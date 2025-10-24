@@ -1,33 +1,81 @@
 /// Blog Model for blog posts and articles
+library;
+
+import 'dart:convert';
+import 'package:rent/constants/api_endpoints.dart';
+import 'package:rent/constants/images.dart';
+
 class BlogModel {
   final int id;
   final String title;
-  final String? description;
-  final String? image;
+  final String content;
+  final String excerpt;
+  final String image;
+  final String author;
+  final DateTime? publishedAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<String> tags;
+  final String status; // published, draft, etc.
+  final int views;
+  final String slug;
 
   BlogModel({
-    required this.id,
-    required this.title,
-    this.description,
-    this.image,
+    this.id = 0,
+    this.title = 'No Title Available',
+    this.content = 'No description available',
+    this.excerpt = '',
+    this.image = ImgLinks.noItem,
+    this.author = '',
+    this.publishedAt,
     this.createdAt,
     this.updatedAt,
+    this.tags = const [],
+    this.status = 'draft',
+    this.views = 0,
+    this.slug = '',
   });
 
   factory BlogModel.fromJson(Map<String, dynamic> json) {
+    List<String> parseTags(dynamic tagsData) {
+      if (tagsData == null) return [];
+      if (tagsData is List) {
+        return tagsData.map((tag) => tag.toString()).toList();
+      }
+      if (tagsData is String) {
+        try {
+          final decoded = jsonDecode(tagsData);
+          if (decoded is List) {
+            return decoded.map((tag) => tag.toString()).toList();
+          }
+        } catch (_) {}
+        return [tagsData];
+      }
+      return [];
+    }
+
     return BlogModel(
       id: json['id'] ?? 0,
       title: json['title']?.toString() ?? '',
-      description: json['description']?.toString(),
-      image: json['image']?.toString(),
+      content: json['content']?.toString() ?? '',
+      excerpt: json['excerpt']?.toString() ?? '',
+      image: json['image'] != null
+          ? Api.imgPath + json['image']
+          : ImgLinks.noItem,
+      author: json['author']?.toString() ?? '',
+      publishedAt: json['published_at'] != null
+          ? DateTime.tryParse(json['published_at'].toString())
+          : null,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'].toString())
           : null,
+      tags: parseTags(json['tags']),
+      status: json['status']?.toString() ?? 'draft',
+      views: json['views'] ?? 0,
+      slug: json['slug']?.toString() ?? '',
     );
   }
 
@@ -35,60 +83,50 @@ class BlogModel {
     return {
       'id': id,
       'title': title,
-      'description': description,
+      'content': content,
+      'excerpt': excerpt,
       'image': image,
+      'author': author,
+      'published_at': publishedAt?.toIso8601String(),
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
+      'tags': tags,
+      'status': status,
+      'views': views,
+      'slug': slug,
     };
   }
 
-  /// Get full image URL
-  String get fullImageUrl {
-    if (image == null || image!.isEmpty) return '';
-    return 'https://thelocalrent.com/uploads/$image';
-  }
-
-  /// Check if blog has image
-  bool get hasImage => image != null && image!.isNotEmpty;
-
   /// Get display title with fallback
-  String get displayTitle => title.isNotEmpty ? title : 'Untitled Blog';
+  String get displayTitle => title.isNotEmpty ? title : 'No Title';
 
-  /// Get short description for previews
-  String get shortDescription {
-    if (description == null || description!.isEmpty) return '';
-    return description!.length > 150
-        ? '${description!.substring(0, 150)}...'
-        : description!;
+  /// Get short excerpt for previews
+  String get shortExcerpt {
+    if (excerpt.isNotEmpty) return excerpt;
+    if (content.isNotEmpty) {
+      return content.length > 150 ? '${content.substring(0, 150)}...' : content;
+    }
+    return 'No content available';
   }
 
-  /// Get formatted creation date
-  String get formattedDate {
-    if (createdAt == null) return '';
-    final now = DateTime.now();
-    final difference = now.difference(createdAt!);
+  /// Check if blog is published
+  bool get isPublished => status == 'published';
 
-    if (difference.inDays == 0) {
-      return 'Today';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '$weeks week${weeks > 1 ? 's' : ''} ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '$months month${months > 1 ? 's' : ''} ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '$years year${years > 1 ? 's' : ''} ago';
-    }
+  /// Get formatted published date
+  String get formattedPublishedDate {
+    if (publishedAt == null) return '';
+    return '${publishedAt!.day}/${publishedAt!.month}/${publishedAt!.year}';
+  }
+
+  /// Get reading time estimate (roughly 200 words per minute)
+  int get estimatedReadingTime {
+    final wordCount = content.split(RegExp(r'\s+')).length;
+    return (wordCount / 200).ceil();
   }
 
   @override
   String toString() {
-    return 'BlogModel(id: $id, title: $title)';
+    return 'BlogModel(id: $id, title: $title, status: $status)';
   }
 
   @override

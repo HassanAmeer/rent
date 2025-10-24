@@ -73,8 +73,8 @@ class _HelpState extends ConsumerState<Help> {
             SizedBox(height: 10),
             ref.watch(SupportProvider).loadingFor == "123"
                 ? const Center(child: DotLoader())
-                : ref.watch(SupportProvider).settings.isEmpty
-                ? Center(child: Text("Email is Empty"))
+                : ref.watch(SupportProvider).settings == null
+                ? Center(child: Text("Settings not available"))
                 : ListTile(
                     title: Text(
                       "Email:",
@@ -98,7 +98,7 @@ class _HelpState extends ConsumerState<Help> {
                       // ···
                       final Uri emailLaunchUri = Uri(
                         scheme: 'mailto',
-                        path: 'smith@example.com',
+                        path: ref.watch(SupportProvider).settings!.displayEmail,
                         query: encodeQueryParameters(<String, String>{
                           'subject': 'Hey: welcome to the Local rent',
                         }),
@@ -108,7 +108,7 @@ class _HelpState extends ConsumerState<Help> {
                     },
 
                     subtitle: Text(
-                      ' ${ref.read(SupportProvider).settings["email"]}',
+                      ' ${ref.watch(SupportProvider).settings!.displayEmail}',
                       style: TextStyle(color: Colors.blue),
                     ),
                   ),
@@ -123,7 +123,8 @@ class _HelpState extends ConsumerState<Help> {
               ),
 
               subtitle: Text(
-                '09:00 AM - 06:00 PM PKT (Monday to Friday)',
+                ref.watch(SupportProvider).settings?.supportHours ??
+                    '09:00 AM - 06:00 PM PKT (Monday to Friday)',
                 style: TextStyle(color: Colors.grey.shade600),
               ),
             ),

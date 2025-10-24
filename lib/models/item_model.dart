@@ -34,7 +34,7 @@ class ItemModel {
     this.monthlyRate = 0.0,
     this.availabilityDays,
     this.availabilityRange,
-    this.images = const [ImgLinks.noItem],
+    this.images = const [],
     this.createdAt,
     this.updatedAt,
     this.user,
@@ -105,17 +105,21 @@ class ItemModel {
   /// Check if item has images
   bool get hasImages => images.isNotEmpty;
 
+  /// Get first image or default
+  String get firstImage => images.isNotEmpty ? images.first : ImgLinks.noItem;
+
   /// Get formatted price for display
   String get formattedDailyRate => '\$${dailyRate.toStringAsFixed(2)}';
   String get formattedWeeklyRate => '\$${weeklyRate.toStringAsFixed(2)}';
   String get formattedMonthlyRate => '\$${monthlyRate.toStringAsFixed(2)}';
 
   /// Get display title with fallback
-  String get displayTitle => title.isNotEmpty ? title : 'Untitled Item';
+  String get displayTitle => title.isNotEmpty ? title : 'No Title';
 
   /// Get short description for previews
   String get shortDescription {
-    if (description == null || description!.isEmpty) return '';
+    if (description == null || description!.isEmpty)
+      return 'No description available';
     return description!.length > 100
         ? '${description!.substring(0, 100)}...'
         : description!;
@@ -124,6 +128,12 @@ class ItemModel {
   /// Check if item is available
   bool get isAvailable =>
       availabilityDays != null && availabilityDays!.isNotEmpty;
+
+  /// Get user display name with fallback
+  String get userDisplayName => user?.displayName ?? 'Unknown User';
+
+  /// Get user image with fallback
+  String get userImageUrl => user?.fullImageUrl ?? ImgLinks.profileImage;
 
   @override
   String toString() {

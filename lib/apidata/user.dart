@@ -14,25 +14,27 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/user_model.dart';
 
 /// Provider for user data management
 final userDataClass = ChangeNotifierProvider<UserData>((ref) => UserData());
 
 /// Enhanced UserData class with better error handling and API management
 class UserData with ChangeNotifier {
-  Map<String, dynamic> _userData = {};
+  UserModel? _userModel;
   bool _isLoading = false;
   String _errorMessage = '';
 
   /// Getters
-  Map<String, dynamic> get userData => _userData;
+  UserModel? get userModel => _userModel;
+  Map<String, dynamic> get userData => _userModel?.toJson() ?? {};
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
-  bool get isLoggedIn => _userData.isNotEmpty;
-  String get userId => _userData['id']?.toString() ?? '';
-  String get userName => _userData['name']?.toString() ?? '';
-  String get userEmail => _userData['email']?.toString() ?? '';
-  String get userImage => _userData['image']?.toString() ?? '';
+  bool get isLoggedIn => _userModel != null;
+  String get userId => _userModel?.id.toString() ?? '';
+  String get userName => _userModel?.displayName ?? '';
+  String get userEmail => _userModel?.email ?? '';
+  String get userImage => _userModel?.image ?? '';
 
   /// Load user data from local storage
   Future<void> getStorageData() async {
@@ -41,7 +43,7 @@ class UserData with ChangeNotifier {
       var box = Hive.box('userBox');
       var checkData = box.get('userData');
       if (checkData != null) {
-        _userData = Map<String, dynamic>.from(checkData);
+        _userModel = UserModel.fromJson(Map<String, dynamic>.from(checkData));
         notifyListeners();
       }
     } catch (e) {
@@ -58,7 +60,7 @@ class UserData with ChangeNotifier {
       var box = Hive.box('userBox');
       var checkData = box.get('userData');
       if (checkData != null) {
-        _userData = Map<String, dynamic>.from(checkData);
+        _userModel = UserModel.fromJson(Map<String, dynamic>.from(checkData));
         notifyListeners();
         await Future.delayed(const Duration(milliseconds: 1000));
         navigateTo(const HomePage(), canBack: false, delayInMilliSeconds: 2000);
@@ -82,7 +84,7 @@ class UserData with ChangeNotifier {
       await Hive.openBox("userBox");
       var box = Hive.box('userBox');
       await box.delete('userData');
-      _userData.clear();
+      _userModel = null;
       _errorMessage = '';
       notifyListeners();
       navigateTo(const LoginPage(), canBack: false, delayInMilliSeconds: 500);
@@ -212,7 +214,7 @@ class UserData with ChangeNotifier {
           await box.put('userData', userData);
 
           // Update local state
-          _userData = userData;
+          _userModel = UserModel.fromJson(userData);
           notifyListeners();
 
           showSuccessToast(result['msg'] ?? "Login successful");
@@ -241,14 +243,14 @@ class UserData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
-      if (_userData['id'] == null) {
+      if (_userModel?.id == null) {
         debugPrint("User ID not available for profile fetch");
         return;
       }
 
       setLoading(true);
       final response = await http.get(
-        Uri.parse("${Api.getUserByIdEndpoint}${_userData['id']}"),
+        Uri.parse("${Api.getUserByIdEndpoint}${_userModel!.id}"),
       );
 
       debugPrint("👉 Profile Data Response status: ${response.statusCode}");
@@ -256,7 +258,9 @@ class UserData with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final result = json.decode(response.body);
         if (result['success'] == true && result['user'] != null) {
-          _userData = Map<String, dynamic>.from(result['user']);
+          _userModel = UserModel.fromJson(
+            Map<String, dynamic>.from(result['user']),
+          );
           notifyListeners();
           // Don't show toast here as it's called during init
         } else {
@@ -308,7 +312,7 @@ class UserData with ChangeNotifier {
 
       req.headers['Content-Type'] = 'application/json';
 
-      req.fields['uid'] = _userData['id'].toString();
+      req.fields['uid'] = _userModel!.id.toString();
       req.fields['name'] = name.trim();
       req.fields['phone'] = phone.trim();
       req.fields['email'] = email.trim();

@@ -6,9 +6,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/api_endpoints.dart';
+import '../../models/blog_model.dart';
 
 class Blogsdetails extends StatefulWidget {
-  final Map<String, dynamic> blog;
+  final BlogModel blog;
   const Blogsdetails({super.key, required this.blog});
 
   @override
@@ -77,11 +78,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                           // Background Image - Full size
                           Positioned.fill(
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  blog['image'] != null &&
-                                      blog['image'].isNotEmpty
-                                  ? Api.imgPath + blog['image']
-                                  : ImgLinks.product,
+                              imageUrl: blog.image,
                               fit: BoxFit.cover,
                               width: double.infinity,
                               height: double.infinity,
@@ -125,7 +122,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                             right: 16,
                             child: SafeArea(
                               child: Text(
-                                blog['title'] ?? "No Title",
+                                blog.title,
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -178,7 +175,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                         const SizedBox(height: 12),
                         // ✅ HTML Widget for rich text content
                         HtmlWidget(
-                          blog['description'] ?? "No description available",
+                          blog.content,
                           textStyle: const TextStyle(
                             fontSize: 16,
                             color: Colors.black54,
@@ -195,30 +192,6 @@ class _BlogsdetailsState extends State<Blogsdetails> {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(value, style: const TextStyle(color: Colors.black87)),
-          ),
-        ],
-      ),
     );
   }
 }

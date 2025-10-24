@@ -12,6 +12,7 @@ import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../apidata/notifyData.dart';
 import '../../apidata/user.dart';
+import '../../models/notification_model.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});
@@ -28,7 +29,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
           .watch(notifyData)
           .getNotifyData(
             loadingFor: "fetchNotifyData",
-            uid: ref.watch(userDataClass).userData['id'].toString(),
+            uid: ref.watch(userDataClass).userId,
           );
     });
     super.initState();
@@ -67,7 +68,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         .deleteNotification(
           loadingfor: notifyId,
           notificationId: notifyId,
-          uid: ref.read(userDataClass).userData['id'].toString(),
+          uid: ref.read(userDataClass).userId,
         );
     Navigator.pop(context);
   }
@@ -93,7 +94,9 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
             child: CacheImageWidget(
               width: 45,
               height: 45,
-              url: Api.imgPath + userData['image'],
+              url:
+                  ref.watch(userDataClass).userModel?.fullImageUrl ??
+                  ImgLinks.profileImage,
             ),
           ),
           const SizedBox(width: 16),
@@ -131,7 +134,9 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                         children: [
                           ListTile(
                             onTap: () {
-                              goto(NotificationsDetails(fullData: item));
+                              goto(
+                                NotificationsDetails(fullData: item.toJson()),
+                              );
                             },
                             leading: Stack(
                               children: [
@@ -139,8 +144,8 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                   width: 48,
                                   height: 48,
                                   url:
-                                      Api.imgPath +
-                                      (item['fromuid']['image'] ?? ''),
+                                      item.fromUser?.fullImageUrl ??
+                                      ImgLinks.profileImage,
                                 ),
                                 Positioned(
                                   top: 0,
@@ -160,9 +165,9 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                                 ),
                               ],
                             ),
-                            title: Text(item['title'] ?? "Empty"),
+                            title: Text(item.displayTitle),
                             subtitle: Text(
-                              item['created_at'] ?? "Empty",
+                              item.formattedCreatedDate,
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -171,12 +176,12 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                             right: 5,
                             child:
                                 ref.watch(notifyData).loadingFor ==
-                                    item['id'].toString()
+                                    item.id.toString()
                                 ? DotLoader(showDots: 1)
                                 : GestureDetector(
                                     onTap: () => _deleteNotification(
                                       context,
-                                      item['id'].toString(),
+                                      item.id.toString(),
                                     ),
                                     child: Container(
                                       padding: const EdgeInsets.all(4),

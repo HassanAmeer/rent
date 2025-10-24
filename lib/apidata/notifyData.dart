@@ -11,6 +11,7 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/models/notification_model.dart';
 
 // import '../main.dart';
 
@@ -24,7 +25,7 @@ class NotifyData with ChangeNotifier {
     notifyListeners();
   }
 
-  List notify = [];
+  List<NotificationModel> notify = [];
   Future getNotifyData({required String uid, String loadingFor = ""}) async {
     try {
       if (await checkInternet() == false) return;
@@ -40,7 +41,12 @@ class NotifyData with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         toast(result['msg']);
-        notify = result['notifications'];
+        final notificationsData = result['notifications'] ?? [];
+        notify = notificationsData
+            .map<NotificationModel>(
+              (notification) => NotificationModel.fromJson(notification),
+            )
+            .toList();
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
       }

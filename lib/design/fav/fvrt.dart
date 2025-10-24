@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:quick_widgets/widgets/tiktok.dart';
 // import 'package:rent/apidata/favrtapi.dart';
 // import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/goto.dart';
@@ -12,10 +13,10 @@ import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
+import '../../models/favorite_model.dart';
 
 class Favourite extends ConsumerStatefulWidget {
-  var fvrt;
-  Favourite({super.key, this.fvrt});
+  const Favourite({super.key});
 
   @override
   ConsumerState<Favourite> createState() => _FavouriteState();
@@ -32,10 +33,10 @@ class _FavouriteState extends ConsumerState<Favourite> {
   }
 
   Future<void> _loadFavorites() async {
-    final userId = ref.read(userDataClass).userData["id"].toString();
+    final userId = ref.read(userDataClass).userId;
     await ref
         .read(favrtdata)
-        .favoritems(loadingFor: "loadFullData", uid: userId, search: "");
+        .favorItems(loadingFor: "refresh", uid: userId, search: "");
   }
 
   @override
@@ -45,18 +46,34 @@ class _FavouriteState extends ConsumerState<Favourite> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         title: const Text(
           "My Favorites",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _loadFavorites,
+        onRefresh: () async {
+          final userId = ref.read(userDataClass).userId;
+          await ref
+              .read(favrtdata)
+              .favorItems(
+                loadingFor: "refresh",
+                uid: userId,
+                search: "",
+                refresh: true,
+              );
+        },
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
+              favrtProvider.loadingFor == "refresh"
+                  ? QuickTikTokLoader(
+                      progressColor: Colors.black,
+                      backgroundColor: Colors.grey,
+                    )
+                  : SizedBox.shrink(),
+
               const SizedBox(height: 3),
               // Search Bar
               Padding(
@@ -95,12 +112,10 @@ class _FavouriteState extends ConsumerState<Favourite> {
                               onTap: () {
                                 ref
                                     .read(favrtdata)
-                                    .favoritems(
-                                      loadingFor: "loadFullData",
-                                      uid: ref
-                                          .watch(userDataClass)
-                                          .userData["id"]
-                                          .toString(),
+                                    .favorItems(
+                                      refresh: true,
+                                      loadingFor: "refresh",
+                                      uid: ref.watch(userDataClass).userId,
                                       search: searchcontrollers.text,
                                     );
                               },
@@ -160,10 +175,10 @@ class _FavouriteState extends ConsumerState<Favourite> {
                     itemCount: favrtProvider.favrt.length,
                     itemBuilder: (context, index) {
                       final item = favrtProvider.favrt[index];
-                      // return Text(item.toString());
+                      // return Text(item.displayTitle.toString());
                       return GestureDetector(
                         onTap: () {
-                          goto(FavDetailsPage(fullData: item['products']));
+                          goto(FavDetailsPage(item: item!));
                         },
                         child: Column(
                           children: [
@@ -185,22 +200,14 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                     isCircle: false,
                                     height: 130,
                                     width: 165,
-                                    url:
-                                        item['products']['images']! != null ||
-                                            item['products']['images']! ||
-                                            item['products']['images']
-                                                .toList()
-                                                .isNotEmpty
-                                        ? Api.imgPath +
-                                              item['products']['images'][0]
-                                        : ImgLinks.product,
+                                    url: item.itemImages.first,
                                   ),
                                   Positioned(
                                     top: 8,
                                     right: 8,
                                     child:
                                         ref.watch(favrtdata).loadingFor ==
-                                            item['id'].toString()
+                                            item.id.toString()
                                         ? DotLoader(showDots: 1)
                                         // ? Icon(Icons.h_mobiledata_outlined)
                                         : InkWell(
@@ -210,12 +217,10 @@ class _FavouriteState extends ConsumerState<Favourite> {
                                                   .addfavrt(
                                                     uid: ref
                                                         .watch(userDataClass)
-                                                        .userData['id']
+                                                        .userId,
+                                                    itemId: item.itemId
                                                         .toString(),
-                                                    itemId:
-                                                        item['products']["id"]
-                                                            .toString(),
-                                                    loadingFor: item["id"]
+                                                    loadingFor: item.id
                                                         .toString(),
                                                   );
                                             },
@@ -251,7 +256,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
 
                             const SizedBox(height: 8),
                             Text(
-                              item['products']['title'],
+                              item.displayTitle,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -271,16 +276,13 @@ class _FavouriteState extends ConsumerState<Favourite> {
         ),
       ),
 
-      floatingActionButton: Align(
-        alignment: Alignment.bottomRight,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 30.0, right: 8.0, bottom: 20),
-          child: FloatingActionButton(
-            onPressed: () {
-              goto(AllItemsPage());
-            },
-            child: const Icon(Icons.add, color: Colors.white),
-          ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: FloatingActionButton(
+          onPressed: () {
+            goto(AllItemsPage());
+          },
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
