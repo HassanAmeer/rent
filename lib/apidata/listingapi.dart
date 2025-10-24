@@ -42,7 +42,7 @@ class ListingData with ChangeNotifier {
       if (await checkInternet() == false) return;
 
       setLoading(loadingfor);
-      print("Fetching my items for user ID: $uid");
+      debugPrint("Fetching my items for user ID: $uid");
       final response = await http.post(
         Uri.parse(Api.myItemsEndpoint),
         body: {'search': search, "uid": uid},
@@ -59,14 +59,14 @@ class ListingData with ChangeNotifier {
         // listings =  [];
         // debugPrint("👉 listings: $listings");
 
-        setLoading("");
+        setLoading();
         notifyListeners();
       } else {
         toast(data['msg']);
-        setLoading("");
+        setLoading();
       }
     } catch (e, st) {
-      setLoading("");
+      setLoading();
       debugPrint("💥Error fetching my items: $e, st:$st");
     }
   }
@@ -113,6 +113,7 @@ class ListingData with ChangeNotifier {
 
       debugPrint("Response body: $response");
 
+      setLoading();
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Updated", backgroundColor: Colors.green);
         fetchMyItems(uid: uid, loadingfor: "refresh");
@@ -122,9 +123,11 @@ class ListingData with ChangeNotifier {
         toast("Failed to update", backgroundColor: Colors.red);
       }
     } catch (e, st) {
-      setLoading("");
+      setLoading();
       debugPrint("💥 Error editing my items: $e, st:$st");
       toast("error:$e");
+    } finally {
+      setLoading();
     }
   }
 
@@ -133,27 +136,33 @@ class ListingData with ChangeNotifier {
     required String uid,
     var loadingfor = "",
   }) async {
-    if (await checkInternet() == false) return;
+    try {
+      if (await checkInternet() == false) return;
+      setLoading(loadingfor);
+      // debugPrint("uid : $uid");
+      debugPrint("itemId : $itemId");
 
-    setLoading(loadingfor);
-    // debugPrint("uid : $uid");
-    debugPrint("itemId : $itemId");
+      final respnse = await http.delete(
+        Uri.parse("${Api.deleteItemEndpoint}$itemId"),
+      );
+      setLoading();
+      // debugPrint("Response status: ${respnse.statusCode}");
+      final data = jsonDecode(respnse.body);
 
-    final respnse = await http.delete(
-      Uri.parse("${Api.deleteItemEndpoint}$itemId"),
-    );
-    setLoading();
-
-    // debugPrint("Response status: ${respnse.statusCode}");
-    final data = jsonDecode(respnse.body);
-
-    if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
-      toast(data['msg'], backgroundColor: Colors.green);
-      fetchMyItems(uid: uid, loadingfor: "refresh");
-    } else {
-      toast(data['msg'], backgroundColor: Colors.red);
+      if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
+        toast(data['msg'], backgroundColor: Colors.green);
+        fetchMyItems(uid: uid, loadingfor: "refresh");
+      } else {
+        toast(data['msg'], backgroundColor: Colors.red);
+      }
+      setLoading();
+    } catch (e) {
+      setLoading();
+      debugPrint("💥 try catch error: $e");
+      toast("Error to delete item: $e");
+    } finally {
+      setLoading();
     }
-    setLoading();
   }
 
   //
@@ -219,8 +228,9 @@ class ListingData with ChangeNotifier {
 
       setLoading();
     } catch (e) {
-      debugPrint("Error adding listing: $e");
-      toast("Network error: Please check your connection");
+      debugPrint("💥 Error adding listing: $e");
+      toast("Error to upload item: $e");
+      fetchMyItems(uid: uid, loadingfor: "refresh");
     } finally {
       setLoading();
     }

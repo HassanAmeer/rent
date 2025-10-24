@@ -9,6 +9,7 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/images.dart';
 import 'Auth/login.dart';
 import 'Auth/signup.dart';
+import 'apidata/categoryapi.dart';
 import 'apidata/user.dart';
 import 'design/home_page.dart';
 import 'design/listing/listing_page.dart';
@@ -49,8 +50,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
@@ -59,17 +58,17 @@ class SplashPage extends ConsumerStatefulWidget {
 }
 
 class _SplashPageState extends ConsumerState<SplashPage> {
-
   @override
   void initState() {
     super.initState();
-      syncFirstF();
+    syncFirstF();
   }
 
   syncFirstF() async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.watch(userDataClass).checkAlreadyhaveLogin();
-        // goto(LoginPage(), canBack: false, delay: 3000);
+      // goto(LoginPage(), canBack: false, delay: 3000);
+      ref.read(categoryProvider).fetchCategories(loadingFor: "category");
     });
   }
 
@@ -117,8 +116,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                             // delay: const Duration(milliseconds: 2700)
                           )
                           .shimmer(
-                            color: Colors.cyan, 
-                            duration: 1000.milliseconds
+                            color: Colors.cyan,
+                            duration: 1000.milliseconds,
                           ),
                 ),
 

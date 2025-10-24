@@ -1,3 +1,4 @@
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/tostring.dart';
 
 /// Category Model for item categories
@@ -19,7 +20,7 @@ class CategoryModel {
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
       id: json['id'] ?? 0,
-      image: json['image'].toString().toNullString(),
+      image: Api.imgPath + json['image'].toString().toNullString(),
       name: json['name'].toString().toNullString(),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
@@ -38,22 +39,6 @@ class CategoryModel {
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
-  }
-
-  /// Get full image URL
-  String get fullImageUrl {
-    if (image.isEmpty) return '';
-    // Assuming 'images/' is a prefix for local assets or a base path for remote images
-    // Adjust this logic based on how your images are stored and served
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-      return image;
-    }
-    return 'https://thelocalrent.com/uploads/$image'; // Example for remote images
-  }
-
-  @override
-  String toString() {
-    return 'CategoryModel(id: $id, name: $name)';
   }
 
   @override

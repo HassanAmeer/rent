@@ -53,6 +53,13 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   // Categories will be loaded from API
 
   // Remove initState - categories will be loaded on demand
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(categoryProvider).fetchCategories(loadingFor: "category");
+    });
+  }
 
   @override
   void dispose() {
@@ -321,7 +328,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                           (e) => DropdownItem(
                             title: e.name,
                             subtitle: e.id.toString(),
-                            image: CachedNetworkImage(imageUrl: e.fullImageUrl),
+                            image: CachedNetworkImage(imageUrl: e.image),
                             value: e.name,
                           ),
                         )

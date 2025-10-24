@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -8,30 +9,36 @@ import 'package:rent/constants/toast.dart';
 import 'package:rent/models/item_model.dart';
 import 'package:transparent_route/transparent_route.dart';
 
+import '../../apidata/categoryapi.dart';
 import '../../widgets/casheimage.dart';
 import '../../widgets/imageview.dart' show showImageView;
 import 'listing_edit_page.dart'; // ✅ Edit page import
 
-class ListingDetailPage extends StatelessWidget {
+class ListingDetailPage extends ConsumerStatefulWidget {
   final ItemModel item;
 
   const ListingDetailPage({super.key, required this.item});
 
   @override
+  ConsumerState<ListingDetailPage> createState() => _ListingDetailPageState();
+}
+
+class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("listing Details")),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarouselSlider.builder(
-                itemCount: item.images.length,
+                itemCount: widget.item.images.length,
                 itemBuilder: (context, index, realIndex) {
-                  final imageUrl = item.images[index];
+                  final imageUrl = widget.item.images[index];
                   return CacheImageWidget(
                     onTap: () {
                       showImageView(context, imageUrl);
@@ -48,18 +55,18 @@ class ListingDetailPage extends StatelessWidget {
                   height: ScreenSize.height * 0.35,
                   viewportFraction: 0.68,
                   enlargeCenterPage: true,
-                  autoPlay: item.images.length > 1,
+                  autoPlay: widget.item.images.length > 1,
                   autoPlayInterval: const Duration(seconds: 2),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: item.images.length > 1,
+                  enableInfiniteScroll: widget.item.images.length > 1,
                   scrollDirection: Axis.horizontal,
                 ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 15),
 
               Text(
-                item.displayTitle,
+                widget.item.displayTitle,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -67,9 +74,35 @@ class ListingDetailPage extends StatelessWidget {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(item.description ?? 'No description available'),
+              HtmlWidget(widget.item.description ?? 'No description available'),
+              const SizedBox(height: 15),
 
-              Divider(),
+              ListTile(
+                tileColor: Colors.grey.shade200,
+                contentPadding: EdgeInsets.only(left: 5),
+
+                leading: CacheImageWidget(
+                  width: 25,
+                  height: 25,
+                  isCircle: true,
+                  radius: 5,
+                  url:
+                      "${widget.item.categoryId != null
+                          ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
+                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).image
+                                : null
+                          : null}",
+                ),
+                title: Text(
+                  "${widget.item.categoryId != null
+                      ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
+                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).name
+                            : null
+                      : null}",
+                ),
+                trailing: Text("Category  "),
+              ),
+              // Divider(height: 1, color: Colors.grey.shade300),
               ListTile(
                 contentPadding: EdgeInsets.only(left: 0),
                 title: Text(
@@ -78,35 +111,41 @@ class ListingDetailPage extends StatelessWidget {
                 ),
                 subtitle: Text(
                   style: TextStyle(color: Colors.grey),
-                  item.availabilityDays ?? 'Not specified',
+                  widget.item.availabilityDays ?? 'Not specified',
                 ),
               ),
               Divider(),
 
-              ListTile(title: Text("Daily Rate: ${item.formattedDailyRate}")),
-              Divider(),
-              ListTile(title: Text("Weekly Rate: ${item.formattedWeeklyRate}")),
+              ListTile(
+                title: Text("Daily Rate: ${widget.item.formattedDailyRate}"),
+              ),
               Divider(),
               ListTile(
-                title: Text("Monthly Rate: ${item.formattedMonthlyRate}"),
+                title: Text("Weekly Rate: ${widget.item.formattedWeeklyRate}"),
+              ),
+              Divider(),
+              ListTile(
+                title: Text(
+                  "Monthly Rate: ${widget.item.formattedMonthlyRate}",
+                ),
               ),
 
               Divider(),
 
               const ListTile(title: Text("Listing By")),
-              if (item.user != null) ...[
+              if (widget.item.user != null) ...[
                 ListTile(
                   leading: CacheImageWidget(
                     width: 50,
                     height: 50,
                     isCircle: true,
                     radius: 200,
-                    url: item.user!.fullImageUrl.isNotEmpty
-                        ? item.user!.fullImageUrl
+                    url: widget.item.user!.fullImageUrl.isNotEmpty
+                        ? widget.item.user!.fullImageUrl
                         : ImgLinks.profileImage,
                   ),
-                  title: Text(item.user!.displayName),
-                  subtitle: Text(item.user!.email),
+                  title: Text(widget.item.user!.displayName),
+                  subtitle: Text(widget.item.user!.email),
                 ),
               ] else ...[
                 const ListTile(
@@ -118,10 +157,12 @@ class ListingDetailPage extends StatelessWidget {
               ListTile(
                 minVerticalPadding: 2,
                 title: Text(
-                  "Listing At: ${item.createdAt?.toString() ?? 'N/A'}",
+                  "Listing At: ${widget.item.createdAt?.toString() ?? 'N/A'}",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
+
+              SizedBox(height: 70),
             ],
           ),
         ),
@@ -134,7 +175,7 @@ class ListingDetailPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditListingPage(item: item),
+              builder: (context) => EditListingPage(item: widget.item),
             ),
           );
         },
