@@ -39,8 +39,8 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   late TextEditingController _weeklyRateController;
   late TextEditingController _monthlyRateController;
   late TextEditingController _availiablityDaysController;
-  late List<String> _selectedImages;
-  bool _isLoading = false;
+  late List<String> _existingImages;
+  late List<String> _newImages;
   int? _selectedCategoryId = 00;
 
   // Availability Schedule Management
@@ -79,13 +79,16 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     _availiablityDaysController = TextEditingController(
       text: widget.item.availabilityDays ?? '',
     );
-    _selectedCategoryId = widget.item.categoryName!;
-    _selectedImages = List.from(widget.item.validImageUrls);
+    _selectedCategoryId = widget.item.categoryId ?? 0;
+    _existingImages = List.from(widget.item.images);
+    _newImages = [];
 
     // Initialize availability schedule
+    dev.log('Availability String: ${widget.item.availabilityDays}');
     _availabilitySchedule = _parseAvailabilitySchedule(
       widget.item.availabilityDays,
     );
+    dev.log('Parsed Schedule: $_availabilitySchedule');
 
     // Fetch categories and set HTML content
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -100,42 +103,41 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
   ) {
     final schedule = <String, Map<String, TimeOfDay?>>{};
 
+    // Initialize with default empty schedule
+    for (final day in _daysOfWeek) {
+      schedule[day] = {'start': null, 'end': null};
+    }
+
     if (availabilityString == null || availabilityString.isEmpty) {
-      // Initialize with default empty schedule
-      for (final day in _daysOfWeek) {
-        schedule[day] = {'start': null, 'end': null};
-      }
       return schedule;
     }
 
     // Parse the availability string (format: "Monday: 09:00 To 17:00,Tuesday: 10:00 To 18:00")
     final dayEntries = availabilityString.split(',');
     for (final entry in dayEntries) {
-      final parts = entry.trim().split(':');
-      if (parts.length >= 2) {
-        final day = parts[0].trim();
-        final timePart = parts[1].trim();
+      final trimmedEntry = entry.trim();
+      if (trimmedEntry.isEmpty) continue;
 
-        TimeOfDay? startTime;
-        TimeOfDay? endTime;
+      final colonIndex = trimmedEntry.indexOf(':');
+      if (colonIndex == -1) continue;
 
-        if (timePart.contains('To')) {
-          final timeParts = timePart.split('To');
-          if (timeParts.length == 2) {
-            startTime = _parseTimeString(timeParts[0].trim());
-            endTime = _parseTimeString(timeParts[1].trim());
-          }
-        }
+      final day = trimmedEntry.substring(0, colonIndex).trim();
+      final timePart = trimmedEntry.substring(colonIndex + 1).trim();
 
-        if (_daysOfWeek.contains(day)) {
-          schedule[day] = {'start': startTime, 'end': endTime};
+      TimeOfDay? startTime;
+      TimeOfDay? endTime;
+
+      if (timePart.contains('To')) {
+        final timeParts = timePart.split('To');
+        if (timeParts.length == 2) {
+          startTime = _parseTimeString(timeParts[0].trim());
+          endTime = _parseTimeString(timeParts[1].trim());
         }
       }
-    }
 
-    // Ensure all days are initialized
-    for (final day in _daysOfWeek) {
-      schedule[day] ??= {'start': null, 'end': null};
+      if (_daysOfWeek.contains(day)) {
+        schedule[day] = {'start': startTime, 'end': endTime};
+      }
     }
 
     return schedule;
@@ -194,7 +196,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     );
     if (image != null) {
       setState(() {
-        _selectedImages.add(image.path);
+        _newImages.add(image.path);
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -213,7 +215,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     );
     if (image != null) {
       setState(() {
-        _selectedImages.add(image.path);
+        _newImages.add(image.path);
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -226,9 +228,15 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     }
   }
 
-  void _removeImage(int index) {
+  void _removeExistingImage(int index) {
     setState(() {
-      _selectedImages.removeAt(index);
+      _existingImages.removeAt(index);
+    });
+  }
+
+  void _removeNewImage(int index) {
+    setState(() {
+      _newImages.removeAt(index);
     });
   }
 
@@ -288,6 +296,9 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
     final startTime = schedule['start'];
     final endTime = schedule['end'];
     final isAvailable = startTime != null && endTime != null;
+    dev.log(
+      'Day: $day, Start: $startTime, End: $endTime, Available: $isAvailable',
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -390,419 +401,460 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryApi = ref.watch(categoryProvider);
+    // final categoryApi = ref.watch(categoryProvider);
     return Scaffold(
       appBar: AppBar(title: const Text("Edit Listing")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Category
-                    // categoryApi.loadingFor == "category"
-                    //     ? Container(
-                    //         padding: const EdgeInsets.symmetric(vertical: 16),
-                    //         child: const Row(
-                    //           mainAxisAlignment: MainAxisAlignment.center,
-                    //           children: [
-                    //             SizedBox(
-                    //               width: 20,
-                    //               height: 20,
-                    //               child: CircularProgressIndicator(
-                    //                 strokeWidth: 2,
-                    //               ),
-                    //             ),
-                    //             SizedBox(width: 12),
-                    //             Text('Loading categories...'),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     : CustomImageTextDropdown(
-                    //         selectedCategory: _selectedCategory,
-                    //         onCategorySelected: (category) {
-                    //           setState(() {
-                    //             _selectedCategory = category;
-                    //           });
-                    //         },
-                    //         hintText: 'Select a category',
-                    //       ),
-                    const SizedBox(height: 8),
-
-                    MediaDropdown(
-                          items: ref
-                              .watch(categoryProvider)
-                              .categories
-                              .map(
-                                (e) => DropdownItem(
-                                  title: e.name,
-                                  subtitle: e.id.toString(),
-                                  image: CachedNetworkImage(
-                                    imageUrl: e.fullImageUrl,
-                                  ),
-                                  value: e.name,
-                                ),
-                              )
-                              .toList(),
-                          hint: 'Select an Category',
-                          onSelected: (index, value) {
-                            // print('Selected index: $index, value: $value');
-                            _selectedCategoryId = ref
-                                .watch(categoryProvider)
-                                .categories[index]
-                                .id;
-                          },
-                          onTap: (index) {
-                            print('Item tapped: $index');
-                          },
-                          onArrowTap: () async {
-                            await ref
-                                .read(categoryProvider)
-                                .fetchCategories(loadingFor: "category");
-                          },
-                          isLoading:
-                              ref.watch(categoryProvider).loadingFor ==
-                              "category",
-                          hintStyle: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              // category
+              MediaDropdown(
+                    items: ref
+                        .watch(categoryProvider)
+                        .categories
+                        .map(
+                          (e) => DropdownItem(
+                            title: e.name,
+                            subtitle: e.id.toString(),
+                            image: CachedNetworkImage(imageUrl: e.fullImageUrl),
+                            value: e.name,
                           ),
-                          dropdownBackgroundColor: Colors.white,
-                          width: double.infinity,
-                          // height: 70,
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 3),
                         )
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 150.ms)
-                        .slideX(begin: -0.2, end: 0, duration: 500.ms)
-                        .scale(
-                          begin: Offset(0.95, 0.95),
-                          end: Offset(1, 1),
-                          duration: 300.ms,
-                        ),
+                        .toList(),
+                    hint: 'Select an Category',
 
-                    const SizedBox(height: 20),
+                    initalSelectedValue: _selectedCategoryId != null
+                        ? ref
+                                  .watch(categoryProvider)
+                                  .categories
+                                  .where((e) => e.id == _selectedCategoryId)
+                                  .isNotEmpty
+                              ? ref
+                                    .watch(categoryProvider)
+                                    .categories
+                                    .firstWhere(
+                                      (e) => e.id == _selectedCategoryId,
+                                    )
+                                    .id
+                              : null
+                        : null,
+                    onSelected: (index, value) {
+                      // print('Selected index: $index, value: $value');
+                      _selectedCategoryId = ref
+                          .watch(categoryProvider)
+                          .categories[index]
+                          .id;
+                    },
+                    onTap: (index) {
+                      print('Item tapped: $index');
+                    },
+                    onArrowTap: () async {
+                      await ref
+                          .read(categoryProvider)
+                          .fetchCategories(loadingFor: "category");
+                    },
+                    isLoading:
+                        ref.watch(categoryProvider).loadingFor == "category",
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    dropdownBackgroundColor: Colors.white,
+                    width: double.infinity,
+                    // height: 70,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 3),
+                  )
+                  .animate()
+                  .fadeIn(duration: 400.ms, delay: 150.ms)
+                  .slideX(begin: -0.2, end: 0, duration: 500.ms)
+                  .scale(
+                    begin: Offset(0.95, 0.95),
+                    end: Offset(1, 1),
+                    duration: 300.ms,
+                  ),
 
-                    // Title
-                    TextFormField(
-                      controller: _titleController,
+              const SizedBox(height: 20),
+
+              // Title
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Description with HTML Editor
+              HtmlEditor(
+                controller: _descriptionHTMLController,
+                height: 270,
+                settings: EditorSettings(placeholder: "Description"),
+                onChanged: (content) {
+                  debugPrint('Content changed: $content');
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // Pricing
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _dailyRateController,
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Title',
+                        labelText: 'Daily Rate',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a title';
-                        }
-                        return null;
-                      },
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // Description with HTML Editor
-                    HtmlEditor(
-                      controller: _descriptionHTMLController,
-                      height: 270,
-                      settings: EditorSettings(placeholder: "Description"),
-                      onChanged: (content) {
-                        debugPrint('Content changed: $content');
-                      },
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Pricing
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _dailyRateController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Daily Rate',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _weeklyRateController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Weekly Rate',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _weeklyRateController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Weekly Rate',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _monthlyRateController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Monthly Rate',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Availability Schedule Section
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Availability Schedule',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                          ),
-                          const SizedBox(height: 16),
-                          ..._daysOfWeek.map(
-                            (day) => _buildDayAvailabilityRow(day),
-                          ),
-                        ],
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _monthlyRateController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Monthly Rate',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
 
-                    const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-                    // Images
+              // Availability Schedule Section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'Images',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey[300]!),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _pickImages,
-                              icon: const Icon(Icons.add_photo_alternate),
-                              label: const Text('Add New Image'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.cyan.withOpacity(0.1),
-                                foregroundColor: Colors.cyan,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    color: Colors.cyan.withOpacity(0.3),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (_selectedImages.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            Text(
-                              'Selected Images (${_selectedImages.length})',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            SizedBox(
-                              height: 100,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _selectedImages.length,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          child: Image.network(
-                                            _selectedImages[index].startsWith(
-                                                  'http',
-                                                )
-                                                ? Api.imgPath +
-                                                      _selectedImages[index]
-                                                : _selectedImages[index],
-                                            width: 100,
-                                            height: 100,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Container(
-                                                    width: 100,
-                                                    height: 100,
-                                                    color: Colors.grey[300],
-                                                    child: const Icon(
-                                                      Icons.image_not_supported,
-                                                    ),
-                                                  );
-                                                },
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 4,
-                                          right: 4,
-                                          child: GestureDetector(
-                                            onTap: () => _removeImage(index),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.red.withOpacity(
-                                                  0.9,
-                                                ),
-                                                shape: BoxShape.circle,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.2),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: const Icon(
-                                                Icons.close,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ],
+                      'Availability Schedule',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
                     ),
-
-                    const SizedBox(height: 30),
-
-                    // Update Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-
-                            // Prepare data for update
-                            final availabilityString =
-                                _buildAvailabilityString();
-                            dev.log('Availability String: $availabilityString');
-
-                            final updatedData = {
-                              'title': _titleController.text.trim(),
-                              'description': _descriptionHTMLController
-                                  .getHtml()
-                                  .toString(),
-                              'avalibilityDays': availabilityString,
-                              'dailyrate': _dailyRateController.text.trim(),
-                              'weeklyrate': _weeklyRateController.text.trim(),
-                              'monthlyrate': _monthlyRateController.text.trim(),
-                              'category': _selectedCategoryId,
-                              'images': _selectedImages,
-                            };
-
-                            dev.log('Updated Data: $updatedData');
-
-                            // Call the API to update the listing
-                            ref
-                                .read(listingDataProvider)
-                                .editsmyitems(
-                                  itemId: widget.item.id.toString(),
-                                  uid: ref
-                                      .watch(userDataClass)
-                                      .userData['id']
-                                      .toString(),
-                                  newItemData: updatedData,
-                                )
-                                .then((_) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  Navigator.pop(context);
-                                })
-                                .catchError((error) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  toast('Error updating listing: $error');
-                                });
-                          }
-                        },
-
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.cyan,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Update Listing',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
+                    ..._daysOfWeek.map((day) => _buildDayAvailabilityRow(day)),
                   ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 20),
+
+              // Images
+              Text('Images', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _pickImages,
+                        icon: const Icon(Icons.add_photo_alternate),
+                        label: const Text('Add New Image'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.cyan.withOpacity(0.1),
+                          foregroundColor: Colors.cyan,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: Colors.cyan.withOpacity(0.3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // New Images
+                    if (_newImages.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        'New Images (${_newImages.length})',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _newImages.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.file(
+                                      File(_newImages[index]),
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              width: 100,
+                                              height: 100,
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.image_not_supported,
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: GestureDetector(
+                                      onTap: () => _removeNewImage(index),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.9),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+
+                    // Existing Images
+                    if (_existingImages.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Existing Images',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _existingImages.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl:
+                                          _existingImages[index].startsWith(
+                                            'http',
+                                          )
+                                          ? _existingImages[index]
+                                          : Api.imgPath +
+                                                _existingImages[index],
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        width: 100,
+                                        height: 100,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.image),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                            width: 100,
+                                            height: 100,
+                                            color: Colors.grey[300],
+                                            child: const Icon(
+                                              Icons.image_not_supported,
+                                            ),
+                                          ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: GestureDetector(
+                                      onTap: () => _removeExistingImage(index),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.9),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Update Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      final availabilityString = _buildAvailabilityString();
+
+                      final updatedData = {
+                        'title': _titleController.text.trim(),
+                        'description': _descriptionHTMLController
+                            .getHtml()
+                            .toString(),
+                        'avalibilityDays': availabilityString,
+                        'dailyrate': _dailyRateController.text.trim(),
+                        'weeklyrate': _weeklyRateController.text.trim(),
+                        'monthlyrate': _monthlyRateController.text.trim(),
+                        'category': _selectedCategoryId,
+                        'newImages': _newImages,
+                        'existingImages': _existingImages
+                            .map((e) => e.toString().split("uploads/").last)
+                            .toList(),
+                      };
+
+                      dev.log('Updated Data: $updatedData');
+
+                      ref
+                          .read(listingDataProvider)
+                          .editsmyitems(
+                            itemId: widget.item.id.toString(),
+                            uid: ref
+                                .watch(userDataClass)
+                                .userData['id']
+                                .toString(),
+                            newItemData: updatedData,
+                          );
+                    }
+                  },
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyan,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Update Listing',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

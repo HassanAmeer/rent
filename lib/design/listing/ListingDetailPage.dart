@@ -1,10 +1,15 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/screensizes.dart';
+import 'package:rent/constants/toast.dart';
 import 'package:rent/models/item_model.dart';
+import 'package:transparent_route/transparent_route.dart';
 
 import '../../widgets/casheimage.dart';
+import '../../widgets/imageview.dart' show showImageView;
 import 'listing_edit_page.dart'; // ✅ Edit page import
 
 class ListingDetailPage extends StatelessWidget {
@@ -23,21 +28,34 @@ class ListingDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  CacheImageWidget(
+              CarouselSlider.builder(
+                itemCount: item.images.length,
+                itemBuilder: (context, index, realIndex) {
+                  final imageUrl = item.images[index];
+                  return CacheImageWidget(
+                    onTap: () {
+                      showImageView(context, imageUrl);
+                    },
                     width: double.infinity,
-                    height: ScreenSize.height * 0.4,
+                    height: ScreenSize.height * 0.3,
                     isCircle: false,
                     fit: BoxFit.contain,
                     radius: 0,
-                    url: item.primaryImageUrl.isNotEmpty
-                        ? item.primaryImageUrl
-                        : ImgLinks.product,
-                  ),
-                ],
+                    url: imageUrl,
+                  );
+                },
+                options: CarouselOptions(
+                  height: ScreenSize.height * 0.35,
+                  viewportFraction: 0.68,
+                  enlargeCenterPage: true,
+                  autoPlay: item.images.length > 1,
+                  autoPlayInterval: const Duration(seconds: 2),
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enableInfiniteScroll: item.images.length > 1,
+                  scrollDirection: Axis.horizontal,
+                ),
               ),
-
               const SizedBox(height: 25),
 
               Text(
@@ -52,6 +70,18 @@ class ListingDetailPage extends StatelessWidget {
               HtmlWidget(item.description ?? 'No description available'),
 
               Divider(),
+              ListTile(
+                contentPadding: EdgeInsets.only(left: 0),
+                title: Text(
+                  "Availability: ",
+                  style: TextStyle(color: Colors.black),
+                ),
+                subtitle: Text(
+                  style: TextStyle(color: Colors.grey),
+                  item.availabilityDays ?? 'Not specified',
+                ),
+              ),
+              Divider(),
 
               ListTile(title: Text("Daily Rate: ${item.formattedDailyRate}")),
               Divider(),
@@ -60,23 +90,10 @@ class ListingDetailPage extends StatelessWidget {
               ListTile(
                 title: Text("Monthly Rate: ${item.formattedMonthlyRate}"),
               ),
-              Divider(),
-              ListTile(
-                title: Text("Created: ${item.createdAt?.toString() ?? 'N/A'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text("Updated: ${item.updatedAt?.toString() ?? 'N/A'}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  "Availability: ${item.availabilityDays ?? 'Not specified'}",
-                ),
-              ),
+
               Divider(),
 
-              const ListTile(title: Text("From User")),
+              const ListTile(title: Text("Listing By")),
               if (item.user != null) ...[
                 ListTile(
                   leading: CacheImageWidget(
@@ -97,6 +114,14 @@ class ListingDetailPage extends StatelessWidget {
                   title: Text("User information not available"),
                 ),
               ],
+              Divider(),
+              ListTile(
+                minVerticalPadding: 2,
+                title: Text(
+                  "Listing At: ${item.createdAt?.toString() ?? 'N/A'}",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
             ],
           ),
         ),

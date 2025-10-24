@@ -28,7 +28,8 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  HtmlEditorController _descriptionHTMLController = HtmlEditorController();
+  final HtmlEditorController _descriptionHTMLController =
+      HtmlEditorController();
   final _dailyRateController = TextEditingController();
   final _weeklyRateController = TextEditingController();
   final _monthlyRateController = TextEditingController();
@@ -38,7 +39,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   final ImagePicker _picker = ImagePicker();
 
   // Availability Days Selection
-  Map<String, Map<String, TimeOfDay?>> _availabilitySchedule = {};
+  final Map<String, Map<String, TimeOfDay?>> _availabilitySchedule = {};
   final List<String> _daysOfWeek = [
     'Monday',
     'Tuesday',
@@ -281,7 +282,6 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
   @override
   Widget build(BuildContext context) {
     final listingApi = ref.watch(listingDataProvider);
-    final categoryApi = ref.watch(categoryProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -704,10 +704,10 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                                 )
                                                 .animate()
                                                 .fadeIn(
-                                                  duration: 300.ms,
+                                                  duration: 100.ms,
                                                   delay: Duration(
                                                     milliseconds:
-                                                        600 +
+                                                        100 +
                                                         (_daysOfWeek.indexOf(
                                                               day,
                                                             ) *
@@ -717,7 +717,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                                 .slideX(
                                                   begin: -0.1,
                                                   end: 0,
-                                                  duration: 300.ms,
+                                                  duration: 100.ms,
                                                 ),
                                       ),
                                     ),
@@ -785,10 +785,10 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                                 )
                                                 .animate()
                                                 .fadeIn(
-                                                  duration: 300.ms,
+                                                  duration: 100.ms,
                                                   delay: Duration(
                                                     milliseconds:
-                                                        650 +
+                                                        100 +
                                                         (_daysOfWeek.indexOf(
                                                               day,
                                                             ) *
@@ -798,7 +798,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                                 .slideX(
                                                   begin: 0.1,
                                                   end: 0,
-                                                  duration: 300.ms,
+                                                  duration: 100.ms,
                                                 ),
                                       ),
                                     ),
@@ -844,10 +844,10 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                     controller: _dailyRateController,
                                     hintText: 'Daily rate',
                                     keyboardType: TextInputType.number,
-                                    prefixIcon: Icon(
-                                      Icons.calendar_today,
-                                      color: AppColors.mainColor,
-                                    ),
+                                    // prefixIcon: Icon(
+                                    //   Icons.calendar_today,
+                                    //   color: AppColors.mainColor,
+                                    // ),
                                   )
                                   .animate()
                                   .fadeIn(duration: 300.ms, delay: 650.ms)
@@ -860,10 +860,10 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                     controller: _weeklyRateController,
                                     hintText: 'Weekly rate',
                                     keyboardType: TextInputType.number,
-                                    prefixIcon: Icon(
-                                      Icons.calendar_view_week,
-                                      color: AppColors.mainColor,
-                                    ),
+                                    // prefixIcon: Icon(
+                                    //   Icons.calendar_view_week,
+                                    //   color: AppColors.mainColor,
+                                    // ),
                                   )
                                   .animate()
                                   .fadeIn(duration: 300.ms, delay: 700.ms)
@@ -876,10 +876,10 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                                     controller: _monthlyRateController,
                                     hintText: 'Monthly rate',
                                     keyboardType: TextInputType.number,
-                                    prefixIcon: Icon(
-                                      Icons.calendar_month,
-                                      color: AppColors.mainColor,
-                                    ),
+                                    // prefixIcon: Icon(
+                                    //   Icons.calendar_month,
+                                    //   color: AppColors.mainColor,
+                                    // ),
                                   )
                                   .animate()
                                   .fadeIn(duration: 300.ms, delay: 750.ms)
@@ -929,7 +929,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                         ),
                       ),
                       child: listingApi.loadingfor == "uploadData"
-                          ? const DotLoader()
+                          ? const DotLoader(color: Colors.white)
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

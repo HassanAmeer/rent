@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:quick_widgets/widgets/tiktok.dart';
+import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/screensizes.dart';
@@ -32,7 +34,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           .fetchMyItems(
             uid: ref.watch(userDataClass).userData["id"].toString(),
             search: "",
-            loadingfor: "123",
+            loadingfor: "getlistings",
           );
     });
 
@@ -51,15 +53,69 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           "My Listings",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            color: Colors.black38,
+            shadowColor: Colors.transparent,
+            icon: Icon(Icons.more_vert),
+            onSelected: (String value) async {
+              if (value == 'refresh') {
+                WidgetsBinding.instance.addPostFrameCallback((v) {
+                  ref
+                      .watch(listingDataProvider)
+                      .fetchMyItems(
+                        uid: ref.watch(userDataClass).userData["id"].toString(),
+                        isRefresh: true,
+                        loadingfor: "refresh",
+                      );
+                });
+              }
+            },
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            menuPadding: EdgeInsets.zero,
+            elevation: 0,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                padding: const EdgeInsets.all(0),
+                value: 'refresh',
+                child: Row(
+                  children: [
+                    SizedBox(width: 5),
+                    Icon(
+                      Icons.refresh,
+                      color:
+                          ref.watch(listingDataProvider).loadingfor == "refresh"
+                          ? AppColors.mainColor
+                          : Colors.white,
+                    ),
+                    SizedBox(width: 3),
+                    Text('Refresh', style: TextStyle(color: Colors.white)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          child: Column(
-            children: [
-              /// Search Bar
-              SearchFeildWidget(
+      body: SingleChildScrollView(
+        controller: ScrollController(),
+        child: Column(
+          children: [
+            ref.watch(listingDataProvider).loadingfor == "refresh"
+                ? const QuickTikTokLoader(
+                    progressColor: Colors.black,
+                    backgroundColor: Colors.grey,
+                  )
+                : SizedBox.shrink(),
+            SizedBox(height: 10),
+
+            /// Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SearchFeildWidget(
                 searchFieldController: searchfieldcontroller,
                 hint: "Search Listings...",
                 onSearchIconTap: () {
@@ -72,19 +128,22 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       .fetchMyItems(
                         uid: ref.watch(userDataClass).userData["id"].toString(),
                         search: searchfieldcontroller.text,
-                        loadingfor: "123",
+                        loadingfor: "refresh",
                       );
                 },
               ),
-              SizedBox(height: 10),
-              ref.watch(listingDataProvider).loadingfor == "123"
-                  ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 250),
-                        child: DotLoader(),
-                      ),
-                    )
-                  : GridView.builder(
+            ),
+            SizedBox(height: 10),
+            ref.watch(listingDataProvider).loadingfor == "getlistings"
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 250),
+                      child: DotLoader(),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -106,15 +165,13 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                             id: item.id.toString(),
                             productBy: item.userId.toString(),
                             title: item.displayTitle,
-                            imageUrl: item.primaryImageUrl.isNotEmpty
-                                ? item.primaryImageUrl
-                                : ImgLinks.product,
+                            imageUrl: item.images.first,
                           ),
                         );
                       },
                     ),
-            ],
-          ),
+                  ),
+          ],
         ),
       ),
 
@@ -229,8 +286,8 @@ class ListingBox extends StatelessWidget {
 
                                     ref
                                         .read(listingDataProvider)
-                                        .deleteNotifications(
-                                          notificationId: id,
+                                        .deleteItemById(
+                                          itemId: id,
                                           uid: ref
                                               .watch(userDataClass)
                                               .userData["id"]

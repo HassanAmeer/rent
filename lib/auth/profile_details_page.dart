@@ -6,7 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
 import 'package:rent/apidata/user.dart' show userDataClass;
-// import 'package:rent/auth/login.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/Auth/login.dart';
 import 'package:rent/constants/goto.dart';
@@ -14,15 +13,12 @@ import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:transparent_route/transparent_route.dart';
-// import '../apidata/user.dart';
+import '../Auth/profile_details_page.dart';
 import '../constants/api_endpoints.dart';
 import '../widgets/btmnavbar.dart';
-// import '../apidata/user.dart';
-// import '../constants/data.dart';
 import '../design/home_page.dart';
-// import '../widgets/casheimage.dart';
+import '../widgets/imageview.dart';
 import 'profile_update_page.dart';
-// import '../widgets/btmnavbar.dart';
 
 class ProfileDetailsPage extends ConsumerStatefulWidget {
   const ProfileDetailsPage({super.key});
@@ -261,46 +257,6 @@ class _ProfileDetailsPageState extends ConsumerState<ProfileDetailsPage> {
         },
       ),
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 4),
-    );
-  }
-}
-
-///////////for profileview widget page
-class Profileview extends StatelessWidget {
-  final String imagelink;
-  const Profileview({super.key, required this.imagelink});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(200, 0, 0, 0),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios, color: Colors.grey),
-        ),
-      ),
-      body: InkWell(
-        onTapUp: (v) {
-          Navigator.pop(context);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(0),
-          child: Hero(
-            tag: "123",
-            child: CacheImageWidget(
-              url: imagelink,
-              isCircle: false,
-              fit: BoxFit.contain,
-              height: ScreenSize.height * 0.7,
-              width: ScreenSize.width,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

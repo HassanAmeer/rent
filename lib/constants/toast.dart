@@ -44,7 +44,7 @@ void toast(
         contextKey.currentState!.context,
       ).showSnackBar(snackBar);
     }
-  } catch (e, st) {
+  } catch (e) {
     debugPrint("🔥 toast try catch: error:$e");
     // debugPrint("🔥 toast try catch: error:$e, st:$st");
   }

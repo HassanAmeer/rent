@@ -38,7 +38,7 @@ class RentalData with ChangeNotifier {
 
       setLoading(true, loadingFor);
       final response = await http.post(
-        Uri.parse("${Api.myRentalsEndpoint}"),
+        Uri.parse(Api.myRentalsEndpoint),
         body: {'search': search, "uid": userId},
       );
 

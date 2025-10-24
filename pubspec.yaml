@@ -55,6 +55,8 @@ dependencies:
   ## for app icon by package
   icons_launcher: ^3.0.2
   fl_html_editor: ^0.0.3
+  quick_widgets: ^0.0.1
+  carousel_slider: ^5.1.1
 
 
 

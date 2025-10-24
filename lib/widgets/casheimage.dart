@@ -10,6 +10,7 @@ class CacheImageWidget extends StatelessWidget {
   bool isCircle;
   double radius;
   BoxFit fit;
+  Function? onTap;
   CacheImageWidget({
     super.key,
     this.url = "http://via.placeholder.com/350x150",
@@ -18,35 +19,41 @@ class CacheImageWidget extends StatelessWidget {
     this.radius = 100,
     this.isCircle = true,
     this.fit = BoxFit.cover,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     // print(url);
     // return Text("${url}");
-    return SizedBox(
-      width: width.toDouble(),
-      height: height.toDouble(),
-      child: isCircle
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: CachedNetworkImage(
+    return GestureDetector(
+      onTap: () {
+        onTap?.call();
+      },
+      child: SizedBox(
+        width: width.toDouble(),
+        height: height.toDouble(),
+        child: isCircle
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(radius),
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  fit: fit,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      DotLoader(showDots: 1),
+                  errorWidget: (context, url, error) =>
+                      Image.asset(ImgAssets.noImg),
+                ),
+              )
+            : CachedNetworkImage(
                 imageUrl: url,
                 fit: fit,
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    DotLoader(showDots: 1),
+                    DotLoader(),
                 errorWidget: (context, url, error) =>
                     Image.asset(ImgAssets.noImg),
               ),
-            )
-          : CachedNetworkImage(
-              imageUrl: url,
-              fit: fit,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  DotLoader(),
-              errorWidget: (context, url, error) =>
-                  Image.asset(ImgAssets.noImg),
-            ),
+      ),
     );
   }
 }

@@ -30,9 +30,7 @@ class Allitemdetailspage extends StatelessWidget {
                     height: ScreenSize.height * 0.4,
                     isCircle: false,
                     fit: BoxFit.contain,
-                    url: item.primaryImageUrl.isNotEmpty
-                        ? item.primaryImageUrl
-                        : ImgLinks.profileImage,
+                    url: item.images.first,
                   ),
                 ],
               ),

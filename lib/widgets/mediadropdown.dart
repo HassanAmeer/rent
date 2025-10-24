@@ -44,6 +44,7 @@ class MediaDropdown extends StatefulWidget {
   final double? elevation;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final int? initalSelectedValue;
 
   const MediaDropdown({
     super.key,
@@ -72,6 +73,7 @@ class MediaDropdown extends StatefulWidget {
     this.padding,
     this.margin,
     this.isLoading = false,
+    this.initalSelectedValue,
   });
 
   @override
@@ -328,7 +330,11 @@ class MediaDropdownState extends State<MediaDropdown> {
     }
 
     // Selected item or hint
-    final selectedItem = _selectedIndex != null
+    final selectedItem =
+        widget.initalSelectedValue != null &&
+            widget.initalSelectedValue! < widget.items.length
+        ? widget.items[widget.initalSelectedValue!]
+        : _selectedIndex != null
         ? widget.items[_selectedIndex!]
         : null;
 

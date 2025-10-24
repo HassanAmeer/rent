@@ -21,6 +21,8 @@ class ImgLinks {
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQi50zTLuADwdCHUNWNkOxgIh05Uo3ma8euw&s";
   static const String product =
       "https://cdn-icons-png.flaticon.com/128/2674/2674486.png";
+  static const String noItem =
+      "https://static.thenounproject.com/png/4440881-200.png";
   static const String defaultAvatar =
       "https://via.placeholder.com/150/00BCD4/FFFFFF?text=User";
 

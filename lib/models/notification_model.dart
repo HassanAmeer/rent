@@ -1,4 +1,6 @@
 /// Notification Model for user notifications
+library;
+
 import 'user_model.dart';
 
 class NotificationModel {

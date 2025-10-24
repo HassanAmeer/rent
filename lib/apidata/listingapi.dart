@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:rent/Auth/login.dart';
 import 'package:rent/Auth/profile_update_page.dart';
 import 'package:rent/Auth/profile_details_page.dart';
-import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
@@ -23,22 +23,22 @@ final listingDataProvider = ChangeNotifierProvider<ListingData>(
 );
 
 class ListingData with ChangeNotifier {
-  List<ItemModel> listings = [];
-
   //////
   String loadingfor = "";
   setLoading([String value = ""]) {
     loadingfor = value;
-
     notifyListeners();
   }
 
+  List<ItemModel> listings = [];
   fetchMyItems({
     required String uid,
     var loadingfor = "",
     var search = "",
+    bool isRefresh = false,
   }) async {
     try {
+      if (listings.isNotEmpty && isRefresh == false) return;
       if (await checkInternet() == false) return;
 
       setLoading(loadingfor);
@@ -49,23 +49,25 @@ class ListingData with ChangeNotifier {
       );
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
       if (response.statusCode == 200) {
         final itemsData = data['items'] ?? [];
         listings = itemsData
             .map<ItemModel>((item) => ItemModel.fromJson(item))
             .toList();
         // listings =  [];
+        // debugPrint("👉 listings: $listings");
+
         setLoading("");
         notifyListeners();
       } else {
         toast(data['msg']);
         setLoading("");
       }
-    } catch (e) {
+    } catch (e, st) {
       setLoading("");
-      print("Error fetching my items: $e");
+      debugPrint("💥Error fetching my items: $e, st:$st");
     }
   }
 
@@ -73,9 +75,11 @@ class ListingData with ChangeNotifier {
     required String itemId,
     required String uid,
     required Map newItemData,
+    String loadingFor = "",
   }) async {
     try {
       if (await checkInternet() == false) return;
+      setLoading(loadingFor);
 
       var req = http.MultipartRequest(
         "PUT",
@@ -92,8 +96,10 @@ class ListingData with ChangeNotifier {
       req.fields['dailyrate'] = newItemData['dailyrate'];
       req.fields['weeklyrate'] = newItemData['weeklyrate'];
       req.fields['monthlyrate'] = newItemData['monthlyrate'];
-      req.fields['category'] = newItemData['category'];
-      req.fields['existingImages'] = jsonEncode(newItemData['existingImages']);
+      req.fields['catg_id'] = newItemData['category'].toString();
+      req.fields['existingImages'] = jsonEncode(
+        newItemData['existingImages'],
+      ); // list of string example like : ['image1.png','image2.jpeg'];
 
       for (var image in newItemData['newImages']) {
         if (await image.exists()) {
@@ -108,37 +114,39 @@ class ListingData with ChangeNotifier {
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Updated", backgroundColor: Colors.green);
-        fetchMyItems(uid: uid);
+        fetchMyItems(uid: uid, loadingfor: "refresh");
       } else {
         toast("Failed to update", backgroundColor: Colors.red);
       }
-    } catch (e) {
-      debugPrint("Error updating listing: $e");
-      toast("Network error: Please check your connection");
+      setLoading("");
+    } catch (e, st) {
+      setLoading("");
+      debugPrint("💥Error editing my items: $e, st:$st");
+      toast("error:$e");
     }
   }
 
-  Future deleteNotifications({
-    required String notificationId,
+  Future deleteItemById({
+    required String itemId,
     required String uid,
     var loadingfor = "",
   }) async {
     if (await checkInternet() == false) return;
 
-    // print("$loadingfor");
     setLoading(loadingfor);
-    debugPrint("notificationId : $notificationId");
     // debugPrint("uid : $uid");
+    debugPrint("itemId : $itemId");
 
     final respnse = await http.delete(
-      Uri.parse("${Api.deleteItemEndpoint}/$notificationId"),
+      Uri.parse("${Api.deleteItemEndpoint}$itemId"),
     );
     setLoading("");
+
     // debugPrint("Response status: ${respnse.statusCode}");
     final data = jsonDecode(respnse.body);
     if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
       toast(data['msg'], backgroundColor: Colors.green);
-      fetchMyItems(uid: uid);
+      fetchMyItems(uid: uid, loadingfor: "refresh");
     } else {
       toast(data['msg'], backgroundColor: Colors.red);
     }
@@ -201,7 +209,7 @@ class ListingData with ChangeNotifier {
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Added", backgroundColor: Colors.green);
-        fetchMyItems(uid: uid, loadingfor: "123");
+        fetchMyItems(uid: uid, loadingfor: "refresh");
       } else {
         toast("Failed to upload", backgroundColor: Colors.red);
       }

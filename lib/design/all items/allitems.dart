@@ -114,9 +114,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                             fullDataBytIndex: item.toJson(),
                             id: item.id.toString(),
                             title: item.displayTitle,
-                            imageUrl: item.primaryImageUrl.isNotEmpty
-                                ? item.primaryImageUrl
-                                : ImgLinks.product,
+                            imageUrl: item.images.first,
                           ),
                         );
                       },

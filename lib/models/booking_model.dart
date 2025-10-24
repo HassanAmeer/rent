@@ -1,4 +1,6 @@
 /// Booking/Order Model for rental bookings
+library;
+
 import 'dart:convert';
 import 'user_model.dart';
 import 'item_model.dart';

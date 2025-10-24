@@ -1,5 +1,10 @@
 /// Item/Product Model for listings and items
+library;
+
 import 'dart:convert';
+import 'package:rent/constants/api_endpoints.dart';
+
+import '../constants/images.dart';
 import 'user_model.dart';
 
 class ItemModel {
@@ -7,7 +12,7 @@ class ItemModel {
   final int userId;
   final String title;
   final String? description;
-  final int? categoryName;
+  final int? categoryId;
   final double dailyRate;
   final double weeklyRate;
   final double monthlyRate;
@@ -19,17 +24,17 @@ class ItemModel {
   final UserModel? user; // Owner of the item
 
   ItemModel({
-    required this.id,
-    required this.userId,
-    required this.title,
+    this.id = 0,
+    this.userId = 0,
+    this.title = "",
     this.description,
-    this.categoryName,
-    required this.dailyRate,
-    required this.weeklyRate,
-    required this.monthlyRate,
+    this.categoryId,
+    this.dailyRate = 0.0,
+    this.weeklyRate = 0.0,
+    this.monthlyRate = 0.0,
     this.availabilityDays,
     this.availabilityRange,
-    required this.images,
+    this.images = const [ImgLinks.noItem],
     this.createdAt,
     this.updatedAt,
     this.user,
@@ -39,13 +44,13 @@ class ItemModel {
     List<String> parseImages(dynamic imagesData) {
       if (imagesData == null) return [];
       if (imagesData is List) {
-        return imagesData.map((img) => img?.toString() ?? '').toList();
+        return imagesData.map((img) => Api.imgPath + img).toList();
       }
       if (imagesData is String) {
         try {
           final decoded = jsonDecode(imagesData);
           if (decoded is List) {
-            return decoded.map((img) => img?.toString() ?? '').toList();
+            return decoded.map((img) => Api.imgPath + img).toList();
           }
         } catch (_) {}
         return [imagesData];
@@ -55,39 +60,16 @@ class ItemModel {
 
     return ItemModel(
       id: json['id'] ?? 0,
-      userId: json['userId'] ?? json['user_id'] ?? 0,
+      userId: json['productBy'] ?? 0,
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString(),
-      categoryName: int.tryParse(
-        json['categoryName']?.toString() ??
-            json['catgname']?.toString() ??
-            '00',
-      ),
-      dailyRate:
-          double.tryParse(
-            json['dailyRate']?.toString() ??
-                json['dailyrate']?.toString() ??
-                '0',
-          ) ??
-          0.0,
-      weeklyRate:
-          double.tryParse(
-            json['weeklyRate']?.toString() ??
-                json['weeklyrate']?.toString() ??
-                '0',
-          ) ??
-          0.0,
+      categoryId: int.tryParse(json['category']?.toString() ?? '0'),
+      dailyRate: double.tryParse(json['dailyrate']?.toString() ?? '0') ?? 0.0,
+      weeklyRate: double.tryParse(json['weeklyrate']?.toString() ?? '0') ?? 0.0,
       monthlyRate:
-          double.tryParse(
-            json['monthlyRate']?.toString() ??
-                json['monthlyrate']?.toString() ??
-                '0',
-          ) ??
-          0.0,
+          double.tryParse(json['monthlyrate']?.toString() ?? '0') ?? 0.0,
       availabilityDays: json['availabilityDays']?.toString(),
-      availabilityRange:
-          json['availabilityRange']?.toString() ??
-          json['availabilityrange']?.toString(),
+      availabilityRange: json['pickupDateRange']?.toString(),
       images: parseImages(json['images']),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
@@ -95,7 +77,9 @@ class ItemModel {
       updatedAt: json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'].toString())
           : null,
-      user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
+      user: json['rentalusers'] != null
+          ? UserModel.fromJson(json['rentalusers'])
+          : null,
     );
   }
 
@@ -105,7 +89,7 @@ class ItemModel {
       'userId': userId,
       'title': title,
       'description': description,
-      'categoryName': categoryName,
+      'categoryId': categoryId,
       'dailyRate': dailyRate,
       'weeklyRate': weeklyRate,
       'monthlyRate': monthlyRate,
@@ -116,28 +100,6 @@ class ItemModel {
       'updated_at': updatedAt?.toIso8601String(),
       'user': user?.toJson(),
     };
-  }
-
-  /// Get primary image URL with null safety
-  String get primaryImageUrl {
-    if (images.isEmpty || images.first.isEmpty) return '';
-    return 'https://thelocalrent.com/uploads/${images.first}';
-  }
-
-  /// Get all image URLs with null safety
-  List<String> get imageUrls {
-    return images
-        .where((img) => img.isNotEmpty)
-        .map((img) => 'https://thelocalrent.com/uploads/$img')
-        .toList();
-  }
-
-  /// Get valid image URLs only (filter out empty/null)
-  List<String> get validImageUrls {
-    return images
-        .where((img) => img != null && img.isNotEmpty)
-        .map((img) => 'https://thelocalrent.com/uploads/$img')
-        .toList();
   }
 
   /// Check if item has images
