@@ -310,11 +310,12 @@ class _ItemsBoxState extends ConsumerState<ItemsBox> {
                                         (widget.fullDataBytIndex.dailyRate *
                                                 daysCount)
                                             .toString(),
-                                    product_by: widget
-                                        .fullDataBytIndex
-                                        .dailyRate
+                                    product_by: widget.fullDataBytIndex.user!.id
                                         .toString(),
-                                    userId: ref.watch(userDataClass).userId,
+                                    userId: ref
+                                        .watch(userDataClass)
+                                        .userData["id"]
+                                        .toString(),
                                     loadingFor: "${widget.id}order",
                                     context: context,
                                   );

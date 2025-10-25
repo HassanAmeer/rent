@@ -1,12 +1,17 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/screensizes.dart';
+import '../../apidata/allitemsapi.dart';
 import '../../apidata/categoryapi.dart';
+import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../constants/toast.dart';
 import '../../widgets/casheimage.dart';
 
 import '../../models/item_model.dart';
@@ -87,7 +92,6 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
         title: FadeTransition(
           opacity: _fadeAnimation,
           child: const Text(
@@ -115,6 +119,94 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            backgroundColor: Colors.black,
+            onPressed: () {},
+            child: const Icon(
+              Icons.chat_outlined,
+              size: 22,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 10),
+
+          FloatingActionButton(
+            onPressed: () async {
+              try {
+                List<DateTime?> dates = [];
+
+                var results = await showCalendarDatePicker2Dialog(
+                  context: context,
+                  config: CalendarDatePicker2WithActionButtonsConfig(
+                    calendarType: CalendarDatePicker2Type.range,
+                  ),
+                  dialogSize: const Size(325, 400),
+                  value: dates,
+                  borderRadius: BorderRadius.circular(15),
+                );
+
+                if (results!.isEmpty) {
+                  toast("Please Pickup date range");
+                }
+
+                // print(results.toString());
+                var startDate = results.first; // DateTime
+                var endDate = results.last; // DateTime
+
+                // Formatter
+                var formatter = DateFormat("d MMMM yyyy");
+
+                // Convert to string
+                var finalDateRange =
+                    "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                // print(finalDateRange.toString());
+                var daysCount = endDate.difference(startDate).inDays + 1;
+                debugPrint(
+                  (widget.item.products!.dailyrate * daysCount).toString(),
+                );
+                ref
+                    .read(getAllItems)
+                    .orderitems(
+                      userCanPickupInDateRange: finalDateRange,
+                      productId: widget.item.products!.id.toString(),
+                      totalprice_by:
+                          (widget.item.products!.dailyrate * daysCount)
+                              .toString(),
+                      product_by: widget.item.rentalusers!.id.toString(),
+                      userId: ref
+                          .watch(userDataClass)
+                          .userData["id"]
+                          .toString(),
+                      loadingFor: "${widget.item.id}order",
+                      context: context,
+                    );
+              } catch (e) {
+                toast("Try later! $e");
+              }
+            },
+
+            child: ref.watch(getAllItems).loadingFor == "${widget.item.id}order"
+                ? Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Icon(
+                    ref.watch(getAllItems).orderedItems.contains(widget.item.id)
+                        ? Icons
+                              .shopping_cart // Filled cart
+                        : Icons.shopping_cart_outlined, // Outlined cart
+                    size: 22,
+                    color: Colors.white,
+                  ),
           ),
         ],
       ),

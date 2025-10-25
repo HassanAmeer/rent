@@ -35,10 +35,10 @@ class ListingData with ChangeNotifier {
     required String uid,
     var loadingfor = "",
     var search = "",
-    bool isRefresh = false,
+    bool refresh = false,
   }) async {
     try {
-      if (listings.isNotEmpty && isRefresh == false) return;
+      if (listings.isNotEmpty && refresh == false) return;
       if (await checkInternet() == false) return;
 
       setLoading(loadingfor);
@@ -116,7 +116,7 @@ class ListingData with ChangeNotifier {
       setLoading();
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Updated", backgroundColor: Colors.green);
-        fetchMyItems(uid: uid, loadingfor: "refresh");
+        fetchMyItems(uid: uid, loadingfor: "refresh", refresh: true);
         goBack();
         goBack();
       } else {
@@ -151,7 +151,7 @@ class ListingData with ChangeNotifier {
 
       if ((respnse.statusCode == 200 || respnse.statusCode == 201)) {
         toast(data['msg'], backgroundColor: Colors.green);
-        fetchMyItems(uid: uid, loadingfor: "refresh");
+        fetchMyItems(uid: uid, loadingfor: "refresh", refresh: true);
       } else {
         toast(data['msg'], backgroundColor: Colors.red);
       }
@@ -187,8 +187,6 @@ class ListingData with ChangeNotifier {
 
       req.headers['Content-Type'] = 'application/json';
 
-      debugPrint("dailyRate:$dailyRate");
-
       //// for fields
       req.fields['uid'] = uid;
       req.fields['title'] = title;
@@ -221,7 +219,7 @@ class ListingData with ChangeNotifier {
 
       if (sendedRequest.statusCode == 200 || sendedRequest.statusCode == 201) {
         toast("Successfully Added", backgroundColor: Colors.green);
-        fetchMyItems(uid: uid, loadingfor: "refresh");
+        fetchMyItems(uid: uid, loadingfor: "refresh", refresh: true);
       } else {
         toast("Failed to upload", backgroundColor: Colors.red);
       }
@@ -230,7 +228,7 @@ class ListingData with ChangeNotifier {
     } catch (e) {
       debugPrint("💥 Error adding listing: $e");
       toast("Error to upload item: $e");
-      fetchMyItems(uid: uid, loadingfor: "refresh");
+      fetchMyItems(uid: uid, loadingfor: "refresh", refresh: true);
     } finally {
       setLoading();
     }

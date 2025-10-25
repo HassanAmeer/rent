@@ -82,12 +82,13 @@ class GetAllItems with ChangeNotifier {
     required String productId,
     required String product_by,
     required String totalprice_by,
-
     String loadingFor = "",
     required BuildContext context,
   }) async {
     if (await checkInternet() == false) return;
 
+    // print("userId:$userId");
+    // return;
     setLoading(loadingFor);
 
     final response = await http.post(
@@ -96,7 +97,7 @@ class GetAllItems with ChangeNotifier {
         "uid": userId,
         'userCanPickupInDateRange': userCanPickupInDateRange,
         'productId': productId.toString(),
-        'product_by': product_by,
+        'product_by': product_by, // user id who listed a product
         'totalPriceByUser': totalprice_by,
       },
     );
@@ -108,7 +109,7 @@ class GetAllItems with ChangeNotifier {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       toast(data['msg'].toString());
-      goto(const RentInPage());
+      goto(const RentInPage(refresh: true));
     } else {
       toast(data['msg'] ?? "Failed to place order ❌");
     }

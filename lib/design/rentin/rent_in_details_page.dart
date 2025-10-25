@@ -35,6 +35,67 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
         onPressed: () {},
         child: Icon(Icons.chat_outlined),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black38,
+              offset: Offset(1, 1),
+              blurRadius: 5,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(widget.renting.deliverd.toString()),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _getStatusIcon(widget.renting.deliverd.toString()),
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _getStatusText(widget.renting.deliverd.toString()),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Total Price   ", style: TextStyle(color: Colors.grey)),
+                  Text(
+                    "\$${widget.renting.totalPriceByUser}",
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,63 +136,21 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title and Status Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.renting.productTitle,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(
-                            widget.renting.deliverd.toString(),
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _getStatusIcon(
-                                widget.renting.deliverd.toString(),
-                              ),
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              _getStatusText(
-                                widget.renting.deliverd.toString(),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  // const SizedBox(height: 5),
+                  Text(
+                    widget.renting.productTitle,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 5),
 
                   // Description Section
-                  if (widget.renting.productTitle.isNotEmpty) ...[
+                  if (widget.renting.productDesc.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    // Text(widget.renting.),
+                    Text(widget.renting.productDesc),
                     const SizedBox(height: 24),
                   ],
 
@@ -182,29 +201,16 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                             widget.renting.availability,
                           ),
                         SizedBox(height: 20),
-                        Divider(color: Colors.grey.shade200),
+                        Divider(color: Colors.grey.shade400),
                         if (widget.renting.productPickupDate != null)
                           _buildInfoRow(
                             "Pickup Date",
-                            widget.renting.productPickupDate?.toString() ??
+                            widget.renting.userCanPickupInDateRange
+                                    ?.toString() ??
                                 'N/A',
                           ),
-                        Divider(color: Colors.green.shade50),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          // mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Total Price ",
-                              style: TextStyle(color: Colors.green.shade900),
-                            ),
-                            Text(
-                              "\$${widget.renting.totalPriceByUser}",
-                              style: TextStyle(color: Colors.green),
-                            ),
-                          ],
-                        ),
+
+                        // Divider(color: Colors.green.shade50),
                       ],
                     ),
                   ),
@@ -229,7 +235,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "Rented By",
+                          "Listing By",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -303,7 +309,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
 
   // Helper method to get status icon
   IconData _getStatusIcon(String? status) {
-    return status == "1" ? Icons.check_circle : Icons.pending;
+    return status == "1" ? Icons.check_circle : Icons.history;
   }
 
   // Helper method to get status text

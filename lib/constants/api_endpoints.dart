@@ -27,7 +27,7 @@ class Api {
   static const String orderRejectionEndpoint = "${apiUrl}orderrejection/";
   static const String updateRentalStatusEndpoint =
       "${apiUrl}updaterentalstatus";
-  static const String myRentalsEndpoint = "${apiUrl}myrentals/";
+  static const String rentInEndpoint = "${apiUrl}rentin/";
   static const String rentalDetailsEndpoint = "${apiUrl}rentaldetails/";
   static const String allBlogsEndpoint = "${apiUrl}allblogs";
   static const String blogDetailsEndpoint = "${apiUrl}blogdetails/";

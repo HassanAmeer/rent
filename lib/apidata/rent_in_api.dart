@@ -38,7 +38,7 @@ class RentalData with ChangeNotifier {
 
       setLoading(loadingFor);
       final response = await http.post(
-        Uri.parse(Api.myRentalsEndpoint),
+        Uri.parse(Api.rentInEndpoint),
         body: {'search': search, "uid": userId},
       );
 
@@ -52,6 +52,8 @@ class RentalData with ChangeNotifier {
         List rentalsData = data['rentals'] ?? [];
         rentInListData = rentalsData
             .map<RentInModel>((e) => RentInModel.fromJson(e))
+            .toList()
+            .reversed
             .toList();
 
         debugPrint("👉 Rentals loaded: ${rentInListData.length} items");

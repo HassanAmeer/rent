@@ -65,7 +65,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                       .watch(listingDataProvider)
                       .fetchMyItems(
                         uid: ref.watch(userDataClass).userData["id"].toString(),
-                        isRefresh: true,
+                        refresh: true,
                         loadingfor: "refresh",
                       );
                 });
@@ -100,78 +100,92 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        controller: ScrollController(),
-        child: Column(
-          children: [
-            ref.watch(listingDataProvider).loadingfor == "refresh"
-                ? const QuickTikTokLoader(
-                    progressColor: Colors.black,
-                    backgroundColor: Colors.grey,
-                  )
-                : SizedBox.shrink(),
-            SizedBox(height: 10),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref
+              .watch(listingDataProvider)
+              .fetchMyItems(
+                uid: ref.watch(userDataClass).userData["id"].toString(),
+                refresh: true,
+                loadingfor: "refresh",
+              );
+        },
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+            children: [
+              ref.watch(listingDataProvider).loadingfor == "refresh"
+                  ? const QuickTikTokLoader(
+                      progressColor: Colors.black,
+                      backgroundColor: Colors.grey,
+                    )
+                  : SizedBox.shrink(),
+              SizedBox(height: 10),
 
-            /// Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SearchFeildWidget(
-                searchFieldController: searchfieldcontroller,
-                hint: "Search Listings...",
-                onSearchIconTap: () {
-                  if (searchfieldcontroller.text.isEmpty) {
-                    toast("Write Someting");
-                    return;
-                  }
-                  ref
-                      .watch(listingDataProvider)
-                      .fetchMyItems(
-                        uid: ref.watch(userDataClass).userData["id"].toString(),
-                        search: searchfieldcontroller.text,
-                        loadingfor: "refresh",
-                      );
-                },
-              ),
-            ),
-            SizedBox(height: 10),
-            ref.watch(listingDataProvider).loadingfor == "getlistings"
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 250),
-                      child: DotLoader(),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.1,
-                            mainAxisSpacing: 15,
-                            crossAxisSpacing: 10,
-                          ),
-                      shrinkWrap: true,
-                      controller: ScrollController(),
-                      itemCount: listingProvider.listings.length,
-                      itemBuilder: (context, index) {
-                        final item = listingProvider.listings[index];
-                        return GestureDetector(
-                          onTap: () {
-                            goto(ListingDetailPage(item: item));
-                          },
-                          child: ListingBox(
-                            ref: ref, // ✅ ref pass kar diya constructor se
-                            id: item.id.toString(),
-                            productBy: item.userId.toString(),
-                            title: item.displayTitle,
-                            imageUrl: item.images.first,
-                          ),
+              /// Search Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SearchFeildWidget(
+                  searchFieldController: searchfieldcontroller,
+                  hint: "Search Listings...",
+                  onSearchIconTap: () {
+                    if (searchfieldcontroller.text.isEmpty) {
+                      toast("Write Someting");
+                      return;
+                    }
+                    ref
+                        .watch(listingDataProvider)
+                        .fetchMyItems(
+                          uid: ref
+                              .watch(userDataClass)
+                              .userData["id"]
+                              .toString(),
+                          search: searchfieldcontroller.text,
+                          loadingfor: "refresh",
                         );
-                      },
+                  },
+                ),
+              ),
+              SizedBox(height: 10),
+              ref.watch(listingDataProvider).loadingfor == "getlistings"
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 250),
+                        child: DotLoader(),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 1.1,
+                              mainAxisSpacing: 15,
+                              crossAxisSpacing: 10,
+                            ),
+                        shrinkWrap: true,
+                        controller: ScrollController(),
+                        itemCount: listingProvider.listings.length,
+                        itemBuilder: (context, index) {
+                          final item = listingProvider.listings[index];
+                          return GestureDetector(
+                            onTap: () {
+                              goto(ListingDetailPage(item: item));
+                            },
+                            child: ListingBox(
+                              ref: ref, // ✅ ref pass kar diya constructor se
+                              id: item.id.toString(),
+                              productBy: item.userId.toString(),
+                              title: item.displayTitle,
+                              imageUrl: item.images.first,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
 

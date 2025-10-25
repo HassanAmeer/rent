@@ -35,6 +35,17 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
+            backgroundColor: Colors.black,
+            onPressed: () {},
+            child: const Icon(
+              Icons.chat_outlined,
+              size: 22,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 15),
+
+          FloatingActionButton(
             onPressed: () async {
               try {
                 List<DateTime?> dates = [];
@@ -73,13 +84,16 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                       productId: widget.item.id.toString(),
                       totalprice_by: (widget.item.dailyRate * daysCount)
                           .toString(),
-                      product_by: widget.item.dailyRate.toString(),
-                      userId: ref.watch(userDataClass).userId,
+                      product_by: widget.item.user!.id.toString(),
+                      userId: ref
+                          .watch(userDataClass)
+                          .userData["id"]
+                          .toString(),
                       loadingFor: "${widget.item.id}order",
                       context: context,
                     );
               } catch (e) {
-                toast("Please Pickup date range!");
+                toast("Try later! $e");
               }
             },
 
@@ -102,7 +116,7 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
           ),
           SizedBox(height: 15),
           FloatingActionButton.small(
-            backgroundColor: Colors.black54,
+            backgroundColor: Colors.black,
             onPressed: () {
               ref
                   .watch(favProvider)

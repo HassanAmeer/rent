@@ -24,6 +24,11 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("  Rent Out Details")),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        onPressed: () {},
+        child: const Icon(Icons.chat_outlined, size: 22, color: Colors.white),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(

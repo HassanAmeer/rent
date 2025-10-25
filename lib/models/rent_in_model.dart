@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/images.dart';
 
 class RentInModel {
@@ -10,6 +13,7 @@ class RentInModel {
   int productId;
   int productBy;
   String productTitle;
+  String productDesc;
   List<String> productImage;
   dynamic dailyrate;
   dynamic weeklyrate;
@@ -32,6 +36,7 @@ class RentInModel {
     this.productId = 0,
     this.productBy = 0,
     this.productTitle = "",
+    this.productDesc = "",
     this.productImage = const [ImgLinks.noItem, ImgLinks.noItem],
     this.dailyrate = 0,
     this.weeklyrate = 0,
@@ -55,10 +60,15 @@ class RentInModel {
     productId: json["productId"] ?? 0,
     productBy: json["product_by"] ?? 0,
     productTitle: json["productTitle"] ?? "",
-    productImage: json["productImage"] is List
-        ? List<String>.from(json["productImage"].map((x) => x.toString()))
-        : json["productImage"] is String
-        ? [json["productImage"]]
+    productDesc: json["productDesc"] ?? "",
+    productImage: jsonDecode(json["productImage"]) is List
+        ? List<String>.from(
+            jsonDecode(
+              json["productImage"],
+            ).map((x) => Api.imgPath + x.toString()),
+          )
+        : jsonDecode(json["productImage"]) is String
+        ? [Api.imgPath + jsonDecode(json["productImage"])]
         : [ImgLinks.noItem, ImgLinks.noItem],
     dailyrate: json["dailyrate"] ?? '',
     weeklyrate: json["weeklyrate"] ?? '',
@@ -84,6 +94,7 @@ class RentInModel {
     "productId": productId,
     "product_by": productBy,
     "productTitle": productTitle,
+    "productDesc": productDesc,
     "productImage": List<dynamic>.from(productImage.map((x) => x)),
     "dailyrate": dailyrate,
     "weeklyrate": weeklyrate,

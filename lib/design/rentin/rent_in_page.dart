@@ -21,7 +21,8 @@ import '../../models/rent_in_model.dart';
 import '../../widgets/btmnavbar.dart';
 
 class RentInPage extends ConsumerStatefulWidget {
-  const RentInPage({super.key});
+  final bool refresh;
+  const RentInPage({super.key, this.refresh = false});
 
   @override
   ConsumerState<RentInPage> createState() => _RentInPageState();
@@ -36,7 +37,12 @@ class _RentInPageState extends ConsumerState<RentInPage> {
       final userId = ref.read(userDataClass).userId;
       ref
           .read(rentalDataProvider)
-          .fetchRentIn(userId: userId, loadingFor: "fetchRentIn", search: "");
+          .fetchRentIn(
+            userId: userId,
+            loadingFor: widget.refresh ? "refresh" : "fetchRentIn",
+            search: "",
+            refresh: widget.refresh,
+          );
     });
   }
 

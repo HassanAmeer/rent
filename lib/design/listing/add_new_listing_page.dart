@@ -967,6 +967,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                     end: Offset(1, 1),
                     duration: 300.ms,
                   ),
+              SizedBox(height: 70),
             ],
           ),
         ),
