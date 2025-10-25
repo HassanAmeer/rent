@@ -4,9 +4,11 @@ import 'package:rent/message/chatedUsersPage.dart';
 
 import '../constants/appColors.dart';
 import '../constants/goto.dart';
+import '../design/all items/allitems.dart';
 import '../design/home_page.dart';
 import '../design/listing/listing_page.dart';
-import '../design/booking/my_booking_page.dart';
+import '../design/rentin/rent_in_page.dart';
+import '../design/rentout/rent_out_page.dart';
 import '../Auth/profile_details_page.dart';
 
 /// Enhanced Bottom Navigation Bar Widget with better error handling and customization
@@ -36,10 +38,11 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
   /// Default navigation items if none provided
   static const List<BottomNavigationBarItem> _defaultItems = [
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-    BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My Listings'),
+    BottomNavigationBarItem(icon: Icon(Icons.list), label: 'All Items'),
+    // BottomNavigationBarItem(icon: Icon(Icons.insights), label: 'My Listings'),
     BottomNavigationBarItem(
-      icon: Icon(Icons.calendar_today),
-      label: 'My Bookings',
+      icon: Icon(Icons.shopping_cart_checkout_sharp),
+      label: 'Rent In',
     ),
     BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
@@ -53,10 +56,10 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
           goto(const HomePage(), canBack: false);
           break;
         case 1:
-          goto(const ListingPage(), canBack: false);
+          goto(const AllItemsPage(), canBack: false);
           break;
         case 2:
-          goto(const MyBookingPage(), canBack: false);
+          goto(const RentInPage(), canBack: false);
           break;
         case 3:
           goto(const ChatedUsersPage(), canBack: false);

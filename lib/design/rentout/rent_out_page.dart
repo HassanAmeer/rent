@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/toast.dart';
 // import 'package:rent/apidata/bookingapi.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
-import 'package:rent/design/booking/booking_details.dart';
+import 'package:rent/design/rentout/rent_out_details.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/screensizes.dart';
@@ -19,14 +19,14 @@ import '../../constants/api_endpoints.dart';
 import '../../widgets/searchfield.dart';
 import '../../models/booking_model.dart';
 
-class MyBookingPage extends ConsumerStatefulWidget {
-  const MyBookingPage({super.key});
+class RentOutPage extends ConsumerStatefulWidget {
+  const RentOutPage({super.key});
 
   @override
-  ConsumerState<MyBookingPage> createState() => _MyBookingPageState();
+  ConsumerState<RentOutPage> createState() => _RentOutPageState();
 }
 
-class _MyBookingPageState extends ConsumerState<MyBookingPage> {
+class _RentOutPageState extends ConsumerState<RentOutPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
@@ -47,16 +47,15 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: const Text(
-          "My Bookings",
+          "  Rent Out",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.cyan,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
-      bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
       body: SingleChildScrollView(
         controller: ScrollController(),
         physics: BouncingScrollPhysics(),
@@ -140,7 +139,7 @@ class _MyBookingPageState extends ConsumerState<MyBookingPage> {
         children: [
           InkWell(
             onTap: () {
-              goto(Bookindetails(data: booking));
+              goto(RentOutDetailsPage(data: booking));
             },
             child: Padding(
               padding: const EdgeInsets.only(top: 0),

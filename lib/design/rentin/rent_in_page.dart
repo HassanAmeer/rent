@@ -9,22 +9,23 @@ import 'package:rent/constants/images.dart';
 import 'package:rent/constants/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
-import 'package:rent/design/myrentals/rentaldetails.dart';
+import 'package:rent/design/rentin/rent_in_details_page.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 import '../../apidata/myrentalapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../widgets/btmnavbar.dart';
 
-class MyRentalPage extends ConsumerStatefulWidget {
-  const MyRentalPage({super.key});
+class RentInPage extends ConsumerStatefulWidget {
+  const RentInPage({super.key});
 
   @override
-  ConsumerState<MyRentalPage> createState() => _MyRentalPageState();
+  ConsumerState<RentInPage> createState() => _RentInPageState();
 }
 
-class _MyRentalPageState extends ConsumerState<MyRentalPage> {
+class _RentInPageState extends ConsumerState<RentInPage> {
   var searchfeildcontroller = TextEditingController();
   @override
   void initState() {
@@ -48,15 +49,18 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         titleSpacing: 0,
         title: const Text(
-          "My Rentals",
+          "  Rent In",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.cyan,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
+
       body: Column(
         children: [
           // Search bar just below AppBar (with grey background)
@@ -195,7 +199,7 @@ class _MyRentalPageState extends ConsumerState<MyRentalPage> {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    goto(Rentaldetails(renting: rental));
+                    goto(RentInDetailsPage(renting: rental));
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 12),

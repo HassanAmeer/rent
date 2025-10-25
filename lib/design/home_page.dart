@@ -16,9 +16,9 @@ import 'package:rent/constants/goto.dart';
 import 'package:rent/design/fav/fav_items.dart';
 import 'package:rent/design/help.dart';
 import 'package:rent/design/listing/listing_page.dart' hide AllItemsPage;
-import 'package:rent/design/booking/my_booking_page.dart';
+import 'package:rent/design/rentout/rent_out_page.dart';
 import 'package:rent/design/notify/notificationpage.dart';
-import 'package:rent/design/myrentals/myrentalpage.dart';
+import 'package:rent/design/rentin/rent_in_page.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
@@ -220,9 +220,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                           icon: Icons.bookmark_border,
                         ),
                         homeMenuBoxWidget(
-                          label: "My Rentals",
-                          pageName: MyRentalPage(),
-                          icon: Icons.shopping_cart_outlined,
+                          label: "Rent Outs",
+                          pageName: RentOutPage(),
+                          icon: Icons.calendar_month_outlined,
                         ),
                         homeMenuBoxWidget(
                           label: "Blogs",
@@ -252,7 +252,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               // ✅ All Items Button
               InkWell(
                     onTap: () {
-                      goto(AllItemsPage());
+                      goto(ListingPage());
                     },
                     child:
                         Container(
@@ -265,7 +265,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 padding: EdgeInsets.all(14),
                                 child: Center(
                                   child: Text(
-                                    "All Items",
+                                    "My Items",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -365,7 +365,7 @@ class _HomeChartState extends ConsumerState<HomeChart> {
               children: [
                 Container(width: 20, height: 3, color: Colors.orange),
                 const SizedBox(width: 5),
-                const Text("My Bookings"),
+                const Text("Rent Outs"),
               ],
             ),
             const SizedBox(width: 20),
@@ -373,7 +373,7 @@ class _HomeChartState extends ConsumerState<HomeChart> {
               children: [
                 Container(width: 20, height: 3, color: Colors.blue),
                 const SizedBox(width: 5),
-                const Text("My Rentals"),
+                const Text("Rent In"),
               ],
             ),
           ],

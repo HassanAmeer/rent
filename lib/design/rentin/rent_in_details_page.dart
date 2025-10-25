@@ -9,15 +9,15 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/api_endpoints.dart';
 
-class Rentaldetails extends ConsumerStatefulWidget {
+class RentInDetailsPage extends ConsumerStatefulWidget {
   final dynamic renting;
-  const Rentaldetails({super.key, this.renting});
+  const RentInDetailsPage({super.key, this.renting});
 
   @override
-  ConsumerState<Rentaldetails> createState() => _RentaldetailsState();
+  ConsumerState<RentInDetailsPage> createState() => _RentInDetailsPageState();
 }
 
-class _RentaldetailsState extends ConsumerState<Rentaldetails> {
+class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   bool isLoading = true;
 
   @override
@@ -42,7 +42,7 @@ class _RentaldetailsState extends ConsumerState<Rentaldetails> {
     final rentalData = widget.renting ?? {};
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Rental Details")),
+      appBar: AppBar(title: const Text("Rent In Details")),
       body: isLoading
           ? const Center(child: DotLoader())
           : Padding(

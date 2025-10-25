@@ -10,11 +10,12 @@ import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
 import 'package:rent/constants/goto.dart';
 import 'package:rent/constants/toast.dart';
-import 'package:rent/design/booking/my_booking_page.dart';
+import 'package:rent/design/rentout/rent_out_page.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/item_model.dart';
 import 'package:rent/models/api_response.dart';
 
+import '../design/rentin/rent_in_page.dart';
 import '../models/favorite_model.dart';
 
 // import '../main.dart';
@@ -42,6 +43,8 @@ class GetAllItems with ChangeNotifier {
       if (allItems.isNotEmpty && !refresh) return;
 
       setLoading(loadingfor);
+      debugPrint("👉 search: $search");
+
       final response = await http.get(
         Uri.parse("${Api.allItemsEndpoint}$search"),
         // body: {"search": search, "uid": uid},
@@ -105,7 +108,7 @@ class GetAllItems with ChangeNotifier {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       toast(data['msg'].toString());
-      goto(const MyBookingPage());
+      goto(const RentInPage());
     } else {
       toast(data['msg'] ?? "Failed to place order ❌");
     }

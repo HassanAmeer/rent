@@ -11,19 +11,19 @@ import '../../constants/images.dart';
 import '../../models/booking_model.dart';
 import '../../widgets/casheimage.dart';
 
-class Bookindetails extends ConsumerStatefulWidget {
+class RentOutDetailsPage extends ConsumerStatefulWidget {
   BookingModel data;
-  Bookindetails({super.key, required this.data});
+  RentOutDetailsPage({super.key, required this.data});
 
   @override
-  ConsumerState<Bookindetails> createState() => _BookindetailsState();
+  ConsumerState<RentOutDetailsPage> createState() => _RentOutDetailsPageState();
 }
 
-class _BookindetailsState extends ConsumerState<Bookindetails> {
+class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Booking Details")),
+      appBar: AppBar(title: const Text("  Rent Out Details")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(

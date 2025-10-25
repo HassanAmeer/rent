@@ -21,7 +21,7 @@ import '../../apidata/user.dart';
 import '../../models/item_model.dart';
 // import '../../design/orders/mybooking.dart';
 import '../../widgets/searchfield.dart';
-import '../booking/my_booking_page.dart'; // ✅ Import MyBooking page
+import '../rentout/rent_out_page.dart'; // ✅ Import MyBooking page
 
 class AllItemsPage extends ConsumerStatefulWidget {
   const AllItemsPage({super.key});
@@ -48,17 +48,15 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(Icons.arrow_back, size: 20, color: Colors.black),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text(
           "All Items",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
+
+      /// Bottom Navigation
+      bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: RefreshIndicator(
@@ -74,11 +72,15 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
           child: Column(
             children: [
               ref.watch(getAllItems).loadingFor == "refresh"
-                  ? QuickTikTokLoader(
-                      progressColor: Colors.black,
-                      backgroundColor: Colors.grey,
+                  ? Transform.scale(
+                      scale: 1.2,
+                      child: QuickTikTokLoader(
+                        progressColor: Colors.black,
+                        backgroundColor: Colors.grey,
+                      ),
                     )
                   : SizedBox.shrink(),
+              SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8.0,
@@ -95,7 +97,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                     ref
                         .read(getAllItems)
                         .fetchAllItems(
-                          loadingfor: "loadFullData",
+                          refresh: true,
+                          loadingfor: "refresh",
                           search: searchfieldcontroller.text,
                         );
                   },
@@ -144,7 +147,6 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
     );
   }
 }

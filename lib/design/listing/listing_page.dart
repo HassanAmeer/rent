@@ -48,7 +48,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: const Text(
           "My Listings",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
@@ -187,9 +187,6 @@ class _ListingPageState extends ConsumerState<ListingPage> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
-      /// Bottom Navigation
-      bottomNavigationBar: BottomNavBarWidget(currentIndex: 1),
     );
   }
 }
