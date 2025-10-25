@@ -1,333 +1,299 @@
 import 'dart:convert';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/imageview.dart';
 
 import '../../constants/api_endpoints.dart';
+import '../../constants/screensizes.dart';
 import '../../models/rent_in_model.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
-  final dynamic renting;
-  const RentInDetailsPage({super.key, this.renting});
+  final RentInModel renting;
+  const RentInDetailsPage({super.key, required this.renting});
 
   @override
   ConsumerState<RentInDetailsPage> createState() => _RentInDetailsPageState();
 }
 
 class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    // Simulate loading time
-    _loadData();
-  }
-
-  void _loadData() async {
-    // Simulate loading delay
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final rentalData = widget.renting is RentInModel ? widget.renting : {};
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Rent In Details")),
-      body: isLoading
-          ? const Center(child: DotLoader())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text("${widget.renting}"),
-                    Stack(
-                      children: [
-                        CacheImageWidget(
-                          width: 300,
-                          height: 150,
-                          isCircle: false,
-                          radius: 0,
-                          url: _getImageUrl(rentalData),
+      appBar: AppBar(
+        title: const Text("Rent In Details"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.chat_outlined),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CarouselSlider.builder(
+              itemCount: widget.renting.productImage.length,
+              itemBuilder: (context, index, realIndex) {
+                final imageUrl = widget.renting.productImage[index];
+                return CacheImageWidget(
+                  onTap: () {
+                    showImageView(context, imageUrl);
+                  },
+                  width: double.infinity,
+                  height: ScreenSize.height * 0.3,
+                  isCircle: false,
+                  fit: BoxFit.contain,
+                  radius: 0,
+                  url: imageUrl,
+                );
+              },
+              options: CarouselOptions(
+                height: ScreenSize.height * 0.35,
+                viewportFraction: 0.68,
+                enlargeCenterPage: true,
+                autoPlay: widget.renting.productImage.length > 1,
+                autoPlayInterval: const Duration(seconds: 2),
+                autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                autoPlayCurve: Curves.fastOutSlowIn,
+                enableInfiniteScroll: widget.renting.productImage.length > 1,
+                scrollDirection: Axis.horizontal,
+              ),
+            ),
+            const SizedBox(height: 5),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title and Status Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          widget.renting.productTitle,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(
+                            widget.renting.deliverd.toString(),
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getStatusIcon(
+                                widget.renting.deliverd.toString(),
+                              ),
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _getStatusText(
+                                widget.renting.deliverd.toString(),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Description Section
+                  if (widget.renting.productTitle.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    // Text(widget.renting.),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Rental Information Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-
-                    const SizedBox(height: 10),
-
-                    Text(
-                      widget.renting is RentInModel
-                          ? widget.renting.productTitle
-                          : rentalData['productTitle']?.toString() ??
-                                'Title.......',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Description - No Container
-                    if ((widget.renting is RentInModel &&
-                            widget.renting.productTitle.isNotEmpty) ||
-                        (rentalData['productDescription'] != null &&
-                            rentalData['productDescription']
-                                .toString()
-                                .isNotEmpty)) ...[
-                      const Text(
-                        "Description",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        widget.renting is RentInModel
-                            ? widget.renting.productTitle
-                            : rentalData['productDescription'].toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black87,
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Status Card - Properly sized
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(
-                          widget.renting is RentInModel
-                              ? widget.renting.deliverd.toString()
-                              : rentalData['deliverd']?.toString(),
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _getStatusIcon(
-                              widget.renting is RentInModel
-                                  ? widget.renting.deliverd.toString()
-                                  : rentalData['deliverd']?.toString(),
-                            ),
-                            color: Colors.white,
-                            size: 18,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Rental Information",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black38,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _getStatusText(
-                              widget.renting is RentInModel
-                                  ? widget.renting.deliverd.toString()
-                                  : rentalData['deliverd']?.toString(),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildInfoRow(
+                          "Daily Rate",
+                          "\$${widget.renting.dailyrate ?? '0'}",
+                        ),
+                        _buildInfoRow(
+                          "Weekly Rate",
+                          "\$${widget.renting.weeklyrate ?? '0'}",
+                        ),
+                        _buildInfoRow(
+                          "Monthly Rate",
+                          "\$${widget.renting.monthlyrate ?? '0'}",
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        if (widget.renting.availability.isNotEmpty)
+                          _buildInfoRow(
+                            "Availability",
+                            widget.renting.availability,
+                          ),
+                        SizedBox(height: 20),
+                        Divider(color: Colors.grey.shade200),
+                        if (widget.renting.productPickupDate != null)
+                          _buildInfoRow(
+                            "Pickup Date",
+                            widget.renting.productPickupDate?.toString() ??
+                                'N/A',
+                          ),
+                        Divider(color: Colors.green.shade50),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Total Price ",
+                              style: TextStyle(color: Colors.green.shade900),
                             ),
+                            Text(
+                              "\$${widget.renting.totalPriceByUser}",
+                              style: TextStyle(color: Colors.green),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // User Information Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Rented By",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black38,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                width: 2,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: CacheImageWidget(
+                                width: 50,
+                                height: 40,
+                                isCircle: true,
+                                radius: 0,
+                                url: widget.renting.productby!.image,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          title: Text(
+                            widget.renting.productby?.name ?? '',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
                             ),
                           ),
-                        ],
-                      ),
+                          subtitle: Text(
+                            widget.renting.productby?.email ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ),
+                        Divider(),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(
+                          "Listing Date",
+                          _formatDate(widget.renting.createdAt),
+                        ),
+                      ],
                     ),
+                  ),
 
-                    const SizedBox(height: 16),
-
-                    // Rental Information - No Container
-                    const Text(
-                      "Rental Information",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildInfoRow(
-                      "Daily Rate",
-                      widget.renting is RentInModel
-                          ? "\$${widget.renting.dailyrate ?? '0'}"
-                          : "\$${rentalData['dailyrate'] ?? '0'}",
-                    ),
-                    _buildInfoRow(
-                      "Weekly Rate",
-                      widget.renting is RentInModel
-                          ? "\$${widget.renting.weeklyrate ?? '0'}"
-                          : "\$${rentalData['weeklyrate'] ?? '0'}",
-                    ),
-                    _buildInfoRow(
-                      "Monthly Rate",
-                      widget.renting is RentInModel
-                          ? "\$${widget.renting.monthlyrate ?? '0'}"
-                          : "\$${rentalData['monthlyrate'] ?? '0'}",
-                    ),
-                    _buildInfoRow(
-                      "Created",
-                      widget.renting is RentInModel
-                          ? _formatDate(widget.renting.createdAt)
-                          : _formatDate(rentalData['created_at']),
-                    ),
-                    _buildInfoRow(
-                      "Updated",
-                      widget.renting is RentInModel
-                          ? _formatDate(widget.renting.updatedAt)
-                          : _formatDate(rentalData['updated_at']),
-                    ),
-                    if (widget.renting is RentInModel
-                        ? widget.renting.availability.isNotEmpty
-                        : rentalData['availabilityDays'] != null)
-                      _buildInfoRow(
-                        "Availability",
-                        widget.renting is RentInModel
-                            ? widget.renting.availability
-                            : rentalData['availabilityDays'].toString(),
-                      ),
-                    if (widget.renting is RentInModel
-                        ? widget.renting.productPickupDate != null
-                        : rentalData['productPickupDate'] != null)
-                      _buildInfoRow(
-                        "Pickup Date",
-                        widget.renting is RentInModel
-                            ? widget.renting.productPickupDate?.toString() ??
-                                  'N/A'
-                            : rentalData['productPickupDate'].toString(),
-                      ),
-                    _buildInfoRow(
-                      "Total Price",
-                      widget.renting is RentInModel
-                          ? "\$${widget.renting.totalPriceByUser}"
-                          : "\$${rentalData['totalPriceByUser'] ?? '0'}",
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // User Information - No Container
-                    const Text(
-                      "Rented By",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ListTile(
-                      leading: CacheImageWidget(
-                        width: 50,
-                        height: 50,
-                        isCircle: true,
-                        radius: 200,
-                        url: _getUserImageUrl(rentalData),
-                      ),
-                      title: Text(_getUserName(rentalData)),
-                      subtitle: Text(_getUserEmail(rentalData)),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-
-                    //
-                  ],
-                ),
+                  const SizedBox(height: 70),
+                ],
               ),
             ),
+          ],
+        ),
+      ),
     );
-  }
-
-  // Helper method to safely get image URL
-  String _getImageUrl(dynamic rental) {
-    try {
-      if (rental is RentInModel) {
-        if (rental.productImage.isNotEmpty) {
-          return Api.imgPath + rental.productImage[0];
-        }
-      } else if (rental['productImage'] != null) {
-        var images = jsonDecode(rental['productImage']);
-        if (images is List && images.isNotEmpty) {
-          return Api.imgPath + images[0];
-        }
-      }
-    } catch (e) {
-      print("Error parsing image: $e");
-    }
-    return ImgLinks.product;
-  }
-
-  // Helper method to get user image URL
-  String _getUserImageUrl(dynamic rental) {
-    try {
-      if (rental is RentInModel) {
-        return rental.fullImageUrl;
-      } else {
-        if (rental['orderby'] != null && rental['orderby']['image'] != null) {
-          return Api.imgPath + rental['orderby']['image'];
-        }
-        if (rental['productby'] != null &&
-            rental['productby']['image'] != null) {
-          return Api.imgPath + rental['productby']['image'];
-        }
-      }
-    } catch (e) {
-      print("Error getting user image: $e");
-    }
-    return ImgLinks.profileImage;
-  }
-
-  // Helper method to get user name
-  String _getUserName(dynamic rental) {
-    try {
-      if (rental is RentInModel) {
-        return rental.displayName;
-      } else {
-        if (rental['orderby'] != null && rental['orderby']['name'] != null) {
-          return rental['orderby']['name'].toString();
-        }
-        if (rental['productby'] != null &&
-            rental['productby']['name'] != null) {
-          return rental['productby']['name'].toString();
-        }
-      }
-    } catch (e) {
-      print("Error getting user name: $e");
-    }
-    return "Unknown User";
-  }
-
-  // Helper method to get user email
-  String _getUserEmail(dynamic rental) {
-    try {
-      if (rental is RentInModel) {
-        return rental.productby?.email ?? "Unknown Email";
-      } else {
-        if (rental['orderby'] != null && rental['orderby']['email'] != null) {
-          return rental['orderby']['email'].toString();
-        }
-        if (rental['productby'] != null &&
-            rental['productby']['email'] != null) {
-          return rental['productby']['email'].toString();
-        }
-      }
-    } catch (e) {
-      print("Error getting user email: $e");
-    }
-    return "Unknown Email";
   }
 
   // Helper method to get status color

@@ -223,7 +223,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                               fit: BoxFit.cover, // ✅ hamesha container me fit
                               child: CacheImageWidget(
                                 isCircle: false,
-                                url: _getImageUrl(rental),
+                                url: rental.productImage.first,
                                 height: 90,
                                 width: 130,
                               ),
@@ -232,7 +232,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _getProductTitle(rental),
+                          rental.productTitle,
                           style: const TextStyle(
                             fontSize: 13,
                             color: Colors.blue,
@@ -244,7 +244,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          _getUserName(rental),
+                          rental.productby?.name ?? '',
                           style: const TextStyle(
                             fontSize: 13,
                             color: Colors.grey,
@@ -299,56 +299,5 @@ class _RentInPageState extends ConsumerState<RentInPage> {
         ),
       ),
     );
-  }
-
-  // Helper method to safely get image URL
-  String _getImageUrl(dynamic rental) {
-    try {
-      if (rental['productImage'] != null) {
-        var images = jsonDecode(rental['productImage']);
-        if (images is List && images.isNotEmpty) {
-          return Api.imgPath + images[0];
-        }
-      }
-    } catch (e) {
-      print("Error parsing image: $e");
-    }
-    return ImgLinks.product;
-  }
-
-  // Helper method to safely get user name
-  String _getUserName(dynamic rental) {
-    try {
-      if (rental['orderby'] != null && rental['orderby']['name'] != null) {
-        return rental['orderby']['name'].toString();
-      }
-      if (rental['user'] != null && rental['user']['name'] != null) {
-        return rental['user']['name'].toString();
-      }
-      if (rental['productby']?["name"] != null) {
-        return rental['productby']["name"].toString();
-      }
-    } catch (e) {
-      print("Error getting user name: $e");
-    }
-    return "Unknown User";
-  }
-
-  // Helper method to safely get product title
-  String _getProductTitle(dynamic rental) {
-    try {
-      if (rental['productTitle'] != null) {
-        return rental['productTitle'].toString();
-      }
-      if (rental['title'] != null) {
-        return rental['title'].toString();
-      }
-      if (rental['name'] != null) {
-        return rental['name'].toString();
-      }
-    } catch (e) {
-      print("Error getting product title: $e");
-    }
-    return "Unknown Product";
   }
 }

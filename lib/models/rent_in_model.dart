@@ -1,3 +1,5 @@
+import 'package:rent/constants/images.dart';
+
 class RentInModel {
   int id;
   int orderbyuid;
@@ -15,58 +17,58 @@ class RentInModel {
   String availability;
   dynamic productPickupDate;
   String ipAddress;
-  DateTime createdAt;
-  DateTime updatedAt;
+  dynamic createdAt;
+  dynamic updatedAt;
   dynamic deletedAt;
   Productby? productby;
 
   RentInModel({
-    required this.id,
-    required this.orderbyuid,
-    required this.userCanPickupInDateRange,
-    required this.totalPriceByUser,
-    required this.deliverd,
-    required this.isRejected,
-    required this.productId,
-    required this.productBy,
-    required this.productTitle,
-    required this.productImage,
-    required this.dailyrate,
-    required this.weeklyrate,
-    required this.monthlyrate,
-    required this.availability,
-    required this.productPickupDate,
-    required this.ipAddress,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
+    this.id = 0,
+    this.orderbyuid = 0,
+    this.userCanPickupInDateRange = 0,
+    this.totalPriceByUser = 0,
+    this.deliverd = 0,
+    this.isRejected = 0,
+    this.productId = 0,
+    this.productBy = 0,
+    this.productTitle = "",
+    this.productImage = const [ImgLinks.noItem, ImgLinks.noItem],
+    this.dailyrate = 0,
+    this.weeklyrate = 0,
+    this.monthlyrate = 0,
+    this.availability = "",
+    this.productPickupDate = 0,
+    this.ipAddress = "",
+    this.createdAt = "",
+    this.updatedAt = "",
+    this.deletedAt = "",
     this.productby,
   });
 
   factory RentInModel.fromJson(Map<String, dynamic> json) => RentInModel(
-    id: json["id"],
-    orderbyuid: json["orderbyuid"],
-    userCanPickupInDateRange: json["userCanPickupInDateRange"],
-    totalPriceByUser: json["totalPriceByUser"],
-    deliverd: json["deliverd"],
-    isRejected: json["isRejected"],
-    productId: json["productId"],
-    productBy: json["product_by"],
-    productTitle: json["productTitle"],
+    id: json["id"] ?? 0,
+    orderbyuid: json["orderbyuid"] ?? 0,
+    userCanPickupInDateRange: json["userCanPickupInDateRange"] ?? 0,
+    totalPriceByUser: json["totalPriceByUser"] ?? 0,
+    deliverd: json["deliverd"] ?? 0,
+    isRejected: json["isRejected"] ?? 0,
+    productId: json["productId"] ?? 0,
+    productBy: json["product_by"] ?? 0,
+    productTitle: json["productTitle"] ?? "",
     productImage: json["productImage"] is List
         ? List<String>.from(json["productImage"].map((x) => x.toString()))
         : json["productImage"] is String
         ? [json["productImage"]]
-        : [],
-    dailyrate: json["dailyrate"],
-    weeklyrate: json["weeklyrate"],
-    monthlyrate: json["monthlyrate"],
-    availability: json["availability"],
-    productPickupDate: json["productPickupDate"],
-    ipAddress: json["ipAddress"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
-    deletedAt: json["deleted_at"],
+        : [ImgLinks.noItem, ImgLinks.noItem],
+    dailyrate: json["dailyrate"] ?? '',
+    weeklyrate: json["weeklyrate"] ?? '',
+    monthlyrate: json["monthlyrate"] ?? '',
+    availability: json["availability"] ?? '',
+    productPickupDate: json["productPickupDate"] ?? '',
+    ipAddress: json["ipAddress"] ?? '',
+    createdAt: DateTime.parse(json["created_at"]) ?? '',
+    updatedAt: DateTime.parse(json["updated_at"]) ?? '',
+    deletedAt: json["deleted_at"] ?? '',
     productby: json["productby"] == null
         ? null
         : Productby.fromJson(json["productby"]),
@@ -94,15 +96,6 @@ class RentInModel {
     "deleted_at": deletedAt,
     "productby": productby?.toJson(),
   };
-
-  /// Get display name with fallback
-  String get displayName => productby?.name ?? 'Unknown User';
-
-  /// Get user image with fallback
-  String get fullImageUrl =>
-      productby?.image != null && productby!.image.isNotEmpty
-      ? 'images/' + productby!.image
-      : 'assets/noimg.png';
 }
 
 class Productby {
