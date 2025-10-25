@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart';
+import 'package:rent/models/rent_in_model.dart';
 
 // Provider for rentals
 final rentalDataProvider = ChangeNotifierProvider<RentalData>(
@@ -13,30 +15,28 @@ final rentalDataProvider = ChangeNotifierProvider<RentalData>(
 );
 
 class RentalData with ChangeNotifier {
-  List<dynamic> rentals = [];
   Map<String, dynamic> rentalDetails = {};
 
   // Loading state management
   String loadingFor = "";
-  bool isLoading = false;
-
-  void setLoading(bool value, [String loadingName = ""]) {
+  void setLoading([String loadingName = ""]) {
     loadingFor = loadingName;
-    isLoading = value;
     notifyListeners();
   }
 
-  Future<void> fetchMyRentals({
+  List<RentInModel> rentInListData = [];
+  Future<void> fetchRentIn({
     required String userId,
     String loadingFor = "",
     required String search,
+    bool refresh = false,
   }) async {
     try {
       if (await checkInternet() == false) return;
+      if (rentInListData.isNotEmpty && !refresh) return;
+      debugPrint("Fetching my rentals for user ID: $userId");
 
-      print("Fetching my rentals for user ID: $userId");
-
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.post(
         Uri.parse(Api.myRentalsEndpoint),
         body: {'search': search, "uid": userId},
@@ -44,61 +44,63 @@ class RentalData with ChangeNotifier {
 
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      // debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
-        rentals.clear();
-        // Try different possible field names for rental data
-        rentals = data['rentals'] ?? [];
-        print("👉 Rentals loaded: ${rentals.length} items");
-        setLoading(false);
+        rentInListData.clear();
+        List rentalsData = data['rentals'] ?? [];
+        rentInListData = rentalsData
+            .map<RentInModel>((e) => RentInModel.fromJson(e))
+            .toList();
+
+        debugPrint("👉 Rentals loaded: ${rentInListData.length} items");
+        setLoading();
         notifyListeners();
       } else {
-        toast(data['message'] ?? data['msg'] ?? 'Failed to fetch rentals');
-        setLoading(false);
+        toast(data['msg'] ?? 'Failed to fetch rentals');
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
-      debugPrint("Error fetching rental items: $e");
-      toast("Error fetching rentals: ${e.toString()}");
+      setLoading();
+      debugPrint(" 💥 Error fetching rental items: $e");
+      toast("Error Fetching Rentals: ${e.toString()}");
+    } finally {
+      setLoading();
     }
   }
 
-  Future<void> fetchRentalDetails({
+  Future<void> fetchRentInDetails({
     required String rentalId,
     String loadingFor = "",
   }) async {
     try {
       if (await checkInternet() == false) return;
-
-      print("Fetching rental details for ID: $rentalId");
-
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.get(
         Uri.parse("${Api.rentalDetailsEndpoint}$rentalId"),
       );
 
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
         rentalDetails =
             data['rental'] ?? data['rentalDetails'] ?? data['data'] ?? {};
-        print("👉 Rental details loaded");
-        setLoading(false);
+        debugPrint("👉 Rental details loaded");
+        setLoading();
         notifyListeners();
       } else {
         toast(
           data['message'] ?? data['msg'] ?? 'Failed to fetch rental details',
         );
-        setLoading(false);
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
-      print("Error fetching rental details: $e");
+      setLoading();
+      debugPrint("Error fetching rental details: $e");
       toast("Error fetching rental details: ${e.toString()}");
     }
   }
@@ -112,9 +114,9 @@ class RentalData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
-      print("Updating rental status for ID: $rentalId to $status");
+      debugPrint("Updating rental status for ID: $rentalId to $status");
 
-      setLoading(true, loadingFor);
+      setLoading(loadingFor);
       final response = await http.post(
         Uri.parse(Api.updateRentalStatusEndpoint),
         body: {'rentalId': rentalId, 'delivered': status},
@@ -122,21 +124,21 @@ class RentalData with ChangeNotifier {
 
       final data = jsonDecode(response.body);
 
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
         toast(data['message'] ?? data['msg'] ?? 'Status updated successfully');
         // Refresh rental details
-        await fetchRentalDetails(rentalId: rentalId);
-        setLoading(false);
+        await fetchRentInDetails(rentalId: rentalId);
+        setLoading();
       } else {
         toast(data['message'] ?? data['msg'] ?? 'Failed to update status');
-        setLoading(false);
+        setLoading();
       }
     } catch (e) {
-      setLoading(false);
-      print("Error updating rental status: $e");
+      setLoading();
+      debugPrint("Error updating rental status: $e");
       toast("Error updating status: ${e.toString()}");
     }
   }

@@ -8,6 +8,7 @@ import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/api_endpoints.dart';
+import '../../models/rent_in_model.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
   final dynamic renting;
@@ -39,7 +40,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final rentalData = widget.renting ?? {};
+    final rentalData = widget.renting is RentInModel ? widget.renting : {};
 
     return Scaffold(
       appBar: AppBar(title: const Text("Rent In Details")),
@@ -68,7 +69,10 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     const SizedBox(height: 10),
 
                     Text(
-                      rentalData['productTitle']?.toString() ?? 'Title.......',
+                      widget.renting is RentInModel
+                          ? widget.renting.productTitle
+                          : rentalData['productTitle']?.toString() ??
+                                'Title.......',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -78,10 +82,12 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     const SizedBox(height: 12),
 
                     // Description - No Container
-                    if (rentalData['productDescription'] != null &&
-                        rentalData['productDescription']
-                            .toString()
-                            .isNotEmpty) ...[
+                    if ((widget.renting is RentInModel &&
+                            widget.renting.productTitle.isNotEmpty) ||
+                        (rentalData['productDescription'] != null &&
+                            rentalData['productDescription']
+                                .toString()
+                                .isNotEmpty)) ...[
                       const Text(
                         "Description",
                         style: TextStyle(
@@ -91,7 +97,9 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        rentalData['productDescription'].toString(),
+                        widget.renting is RentInModel
+                            ? widget.renting.productTitle
+                            : rentalData['productDescription'].toString(),
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
@@ -109,7 +117,9 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                       ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(
-                          rentalData['deliverd']?.toString(),
+                          widget.renting is RentInModel
+                              ? widget.renting.deliverd.toString()
+                              : rentalData['deliverd']?.toString(),
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -117,13 +127,21 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _getStatusIcon(rentalData['deliverd']?.toString()),
+                            _getStatusIcon(
+                              widget.renting is RentInModel
+                                  ? widget.renting.deliverd.toString()
+                                  : rentalData['deliverd']?.toString(),
+                            ),
                             color: Colors.white,
                             size: 18,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _getStatusText(rentalData['deliverd']?.toString()),
+                            _getStatusText(
+                              widget.renting is RentInModel
+                                  ? widget.renting.deliverd.toString()
+                                  : rentalData['deliverd']?.toString(),
+                            ),
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -147,39 +165,59 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     const SizedBox(height: 12),
                     _buildInfoRow(
                       "Daily Rate",
-                      "\$${rentalData['dailyrate'] ?? '0'}",
+                      widget.renting is RentInModel
+                          ? "\$${widget.renting.dailyrate ?? '0'}"
+                          : "\$${rentalData['dailyrate'] ?? '0'}",
                     ),
                     _buildInfoRow(
                       "Weekly Rate",
-                      "\$${rentalData['weeklyrate'] ?? '0'}",
+                      widget.renting is RentInModel
+                          ? "\$${widget.renting.weeklyrate ?? '0'}"
+                          : "\$${rentalData['weeklyrate'] ?? '0'}",
                     ),
                     _buildInfoRow(
                       "Monthly Rate",
-                      "\$${rentalData['monthlyrate'] ?? '0'}",
+                      widget.renting is RentInModel
+                          ? "\$${widget.renting.monthlyrate ?? '0'}"
+                          : "\$${rentalData['monthlyrate'] ?? '0'}",
                     ),
                     _buildInfoRow(
                       "Created",
-                      _formatDate(rentalData['created_at']),
+                      widget.renting is RentInModel
+                          ? _formatDate(widget.renting.createdAt)
+                          : _formatDate(rentalData['created_at']),
                     ),
                     _buildInfoRow(
                       "Updated",
-                      _formatDate(rentalData['updated_at']),
+                      widget.renting is RentInModel
+                          ? _formatDate(widget.renting.updatedAt)
+                          : _formatDate(rentalData['updated_at']),
                     ),
-                    if (rentalData['availabilityDays'] != null)
+                    if (widget.renting is RentInModel
+                        ? widget.renting.availability.isNotEmpty
+                        : rentalData['availabilityDays'] != null)
                       _buildInfoRow(
                         "Availability",
-                        rentalData['availabilityDays'].toString(),
+                        widget.renting is RentInModel
+                            ? widget.renting.availability
+                            : rentalData['availabilityDays'].toString(),
                       ),
-                    if (rentalData['productPickupDate'] != null)
+                    if (widget.renting is RentInModel
+                        ? widget.renting.productPickupDate != null
+                        : rentalData['productPickupDate'] != null)
                       _buildInfoRow(
                         "Pickup Date",
-                        rentalData['productPickupDate'].toString(),
+                        widget.renting is RentInModel
+                            ? widget.renting.productPickupDate?.toString() ??
+                                  'N/A'
+                            : rentalData['productPickupDate'].toString(),
                       ),
-                    if (rentalData['totalPriceByUser'] != null)
-                      _buildInfoRow(
-                        "Total Price",
-                        "\$${rentalData['totalPriceByUser']}",
-                      ),
+                    _buildInfoRow(
+                      "Total Price",
+                      widget.renting is RentInModel
+                          ? "\$${widget.renting.totalPriceByUser}"
+                          : "\$${rentalData['totalPriceByUser'] ?? '0'}",
+                    ),
 
                     const SizedBox(height: 16),
 
@@ -216,7 +254,11 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   // Helper method to safely get image URL
   String _getImageUrl(dynamic rental) {
     try {
-      if (rental['productImage'] != null) {
+      if (rental is RentInModel) {
+        if (rental.productImage.isNotEmpty) {
+          return Api.imgPath + rental.productImage[0];
+        }
+      } else if (rental['productImage'] != null) {
         var images = jsonDecode(rental['productImage']);
         if (images is List && images.isNotEmpty) {
           return Api.imgPath + images[0];
@@ -231,11 +273,16 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   // Helper method to get user image URL
   String _getUserImageUrl(dynamic rental) {
     try {
-      if (rental['orderby'] != null && rental['orderby']['image'] != null) {
-        return Api.imgPath + rental['orderby']['image'];
-      }
-      if (rental['productby'] != null && rental['productby']['image'] != null) {
-        return Api.imgPath + rental['productby']['image'];
+      if (rental is RentInModel) {
+        return rental.fullImageUrl;
+      } else {
+        if (rental['orderby'] != null && rental['orderby']['image'] != null) {
+          return Api.imgPath + rental['orderby']['image'];
+        }
+        if (rental['productby'] != null &&
+            rental['productby']['image'] != null) {
+          return Api.imgPath + rental['productby']['image'];
+        }
       }
     } catch (e) {
       print("Error getting user image: $e");
@@ -246,11 +293,16 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   // Helper method to get user name
   String _getUserName(dynamic rental) {
     try {
-      if (rental['orderby'] != null && rental['orderby']['name'] != null) {
-        return rental['orderby']['name'].toString();
-      }
-      if (rental['productby'] != null && rental['productby']['name'] != null) {
-        return rental['productby']['name'].toString();
+      if (rental is RentInModel) {
+        return rental.displayName;
+      } else {
+        if (rental['orderby'] != null && rental['orderby']['name'] != null) {
+          return rental['orderby']['name'].toString();
+        }
+        if (rental['productby'] != null &&
+            rental['productby']['name'] != null) {
+          return rental['productby']['name'].toString();
+        }
       }
     } catch (e) {
       print("Error getting user name: $e");
@@ -261,11 +313,16 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   // Helper method to get user email
   String _getUserEmail(dynamic rental) {
     try {
-      if (rental['orderby'] != null && rental['orderby']['email'] != null) {
-        return rental['orderby']['email'].toString();
-      }
-      if (rental['productby'] != null && rental['productby']['email'] != null) {
-        return rental['productby']['email'].toString();
+      if (rental is RentInModel) {
+        return rental.productby?.email ?? "Unknown Email";
+      } else {
+        if (rental['orderby'] != null && rental['orderby']['email'] != null) {
+          return rental['orderby']['email'].toString();
+        }
+        if (rental['productby'] != null &&
+            rental['productby']['email'] != null) {
+          return rental['productby']['email'].toString();
+        }
       }
     } catch (e) {
       print("Error getting user email: $e");

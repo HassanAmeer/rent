@@ -13,11 +13,11 @@ import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../apidata/bookingapi.dart';
+import '../../apidata/rent_out_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../widgets/searchfield.dart';
-import '../../models/booking_model.dart';
+import '../../models/rent_out_model.dart';
 
 class RentOutPage extends ConsumerStatefulWidget {
   const RentOutPage({super.key});

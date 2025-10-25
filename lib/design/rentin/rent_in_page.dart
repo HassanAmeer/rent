@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:quick_widgets/widgets/tiktok.dart';
 // import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 // import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
@@ -13,9 +14,10 @@ import 'package:rent/design/rentin/rent_in_details_page.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../../apidata/myrentalapi.dart';
+import '../../apidata/rent_in_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../models/rent_in_model.dart';
 import '../../widgets/btmnavbar.dart';
 
 class RentInPage extends ConsumerStatefulWidget {
@@ -34,11 +36,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
       final userId = ref.read(userDataClass).userId;
       ref
           .read(rentalDataProvider)
-          .fetchMyRentals(
-            userId: userId,
-            loadingFor: "fetchMyRentals",
-            search: "",
-          );
+          .fetchRentIn(userId: userId, loadingFor: "fetchRentIn", search: "");
     });
   }
 
@@ -63,6 +61,13 @@ class _RentInPageState extends ConsumerState<RentInPage> {
 
       body: Column(
         children: [
+          rentalData.loadingFor == "refresh"
+              ? QuickTikTokLoader(
+                  progressColor: Colors.black,
+                  backgroundColor: Colors.grey,
+                )
+              : SizedBox.shrink(),
+
           // Search bar just below AppBar (with grey background)
           Container(
             color: Colors.grey[300],
@@ -75,7 +80,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                     final userId = ref.read(userDataClass).userId;
                     ref
                         .watch(rentalDataProvider)
-                        .fetchMyRentals(
+                        .fetchRentIn(
                           userId: userId,
                           search: searchfeildcontroller.text,
                         );
@@ -101,14 +106,14 @@ class _RentInPageState extends ConsumerState<RentInPage> {
 
           // Rentals content with loading and empty states
           Expanded(
-            child: rentalData.isLoading
+            child: rentalData.loadingFor == "fetchRentIn"
                 ? const Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: 100),
                       child: DotLoader(),
                     ),
                   )
-                : rentalData.rentals.isEmpty
+                : rentalData.rentInListData.isEmpty
                 ? const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -140,10 +145,11 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                       final userId = ref.read(userDataClass).userId;
                       await ref
                           .read(rentalDataProvider)
-                          .fetchMyRentals(
+                          .fetchRentIn(
                             userId: userId,
-                            loadingFor: "refreshRentals",
+                            loadingFor: "refresh",
                             search: "",
+                            refresh: true,
                           );
                     },
                     child: GridView.builder(
@@ -151,7 +157,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                         horizontal: 16,
                         vertical: 16,
                       ),
-                      itemCount: rentalData.rentals.length,
+                      itemCount: rentalData.rentInListData.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2, // Mobile 2 columns
@@ -159,8 +165,10 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                             crossAxisSpacing: 18,
                             childAspectRatio: 0.85,
                           ),
-                      itemBuilder: (context, index) =>
-                          _buildRentalItem(context, rentalData.rentals[index]),
+                      itemBuilder: (context, index) => _buildRentalItem(
+                        context,
+                        rentalData.rentInListData[index],
+                      ),
                     ),
                   ),
           ),
@@ -176,7 +184,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
     );
   }
 
-  Widget _buildRentalItem(BuildContext context, dynamic rental) {
+  Widget _buildRentalItem(BuildContext context, RentInModel rental) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -258,7 +266,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
           Positioned(
             right: 8,
             top: 8,
-            child: _statusLabel(rental["deliverd"].toString()),
+            child: _statusLabel(rental.deliverd.toString()),
           ),
         ],
       ),

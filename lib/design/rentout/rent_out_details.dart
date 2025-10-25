@@ -8,7 +8,7 @@ import 'package:rent/constants/screensizes.dart';
 
 import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
-import '../../models/booking_model.dart';
+import '../../models/rent_out_model.dart';
 import '../../widgets/casheimage.dart';
 
 class RentOutDetailsPage extends ConsumerStatefulWidget {

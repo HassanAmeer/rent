@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/toast.dart'; // Apne toast function ke liye import
-import 'package:rent/models/booking_model.dart';
+import 'package:rent/models/rent_out_model.dart';
 
 final bookingDataProvider = ChangeNotifierProvider<BookingData>(
   (ref) => BookingData(),
@@ -17,7 +17,6 @@ class BookingData with ChangeNotifier {
   String loadingfor = "";
   setLoading([String value = ""]) {
     loadingfor = value;
-
     notifyListeners();
   }
 
