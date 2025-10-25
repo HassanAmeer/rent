@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/constants/screensizes.dart';
 
 import '../../constants/api_endpoints.dart';

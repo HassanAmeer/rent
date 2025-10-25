@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 
 /// 🔹 Internet connection check karega
 /// Agar net nahi hoga to false return karega

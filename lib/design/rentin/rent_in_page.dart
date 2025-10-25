@@ -7,7 +7,7 @@ import 'package:quick_widgets/widgets/tiktok.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/design/rentin/rent_in_details_page.dart';

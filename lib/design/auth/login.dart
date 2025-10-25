@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/user.dart';
-import 'package:rent/constants/toast.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/toast.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../apidata/user.dart';
+import '../../apidata/user.dart';
 import 'signup.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -20,8 +20,6 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
- 
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,7 @@ import 'package:rent/apidata/listingapi.dart';
 import 'package:rent/apidata/categoryapi.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/apidata/user.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../constants/appColors.dart';
 import '../main.dart';
-import 'appColors.dart';
 
 /// Enhanced toast function with better styling and options
 void toast(

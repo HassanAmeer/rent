@@ -9,10 +9,10 @@ import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/screensizes.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 import 'package:rent/design/all%20items/allitems.dart' show AllItemsPage;
 import 'package:rent/design/blogs/blogs.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/design/fav/fav_items.dart';
 import 'package:rent/design/help.dart';
 import 'package:rent/design/listing/listing_page.dart' hide AllItemsPage;
@@ -22,9 +22,9 @@ import 'package:rent/design/rentin/rent_in_page.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
-import '../Auth/profile_details_page.dart';
 import '../widgets/btmnavbar.dart';
 import '../constants/checkInternet.dart';
+import 'auth/profile_details_page.dart';
 
 /// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {

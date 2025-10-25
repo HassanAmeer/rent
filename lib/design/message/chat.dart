@@ -3,11 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/messegeapi.dart';
 import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/images.dart';
-import 'package:rent/constants/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../constants/api_endpoints.dart';
+import '../../constants/api_endpoints.dart';
+import '../../services/toast.dart';
 
 class Chats extends ConsumerStatefulWidget {
   var msgdata;

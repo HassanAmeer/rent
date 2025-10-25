@@ -5,8 +5,8 @@ import 'package:rent/apidata/user.dart' show userDataClass;
 // import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/appColors.dart';
 import 'dart:convert';
-import 'package:rent/constants/goto.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/goto.dart';
+import 'package:rent/services/toast.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 import 'login.dart'; // ✅ Update path if needed

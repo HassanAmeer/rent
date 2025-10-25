@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
 import 'package:rent/design/fav/favdetails.dart';
 import 'package:rent/widgets/casheimage.dart';

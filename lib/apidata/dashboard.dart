@@ -8,8 +8,8 @@
 // import 'package:rent/Auth/profile_update_page.dart';
 // import 'package:rent/Auth/profile_details_page.dart';
 // import 'package:rent/constants/checkInternet.dart';
-// import 'package:rent/constants/goto.dart';
-// import 'package:rent/constants/toast.dart';
+// import 'package:rent/services/goto.dart';
+// import 'package:rent/services/toast.dart';
 // import 'package:rent/design/home_page.dart';
 
 // // import '../main.dart';
@@ -70,4 +70,3 @@
 // }
 
 //   //
-

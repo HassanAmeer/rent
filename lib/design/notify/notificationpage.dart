@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/constants/screensizes.dart';
 import 'package:rent/design/notify/notificationsdetails.dart';
-import 'package:rent/Auth/profile_details_page.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 // import 'package:rent/temp/data.dart';
@@ -13,6 +12,7 @@ import '../../constants/images.dart';
 import '../../apidata/notifyData.dart';
 import '../../apidata/user.dart';
 import '../../models/notification_model.dart';
+import '../auth/profile_details_page.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});

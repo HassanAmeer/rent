@@ -4,13 +4,13 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/images.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rent/message/chat.dart';
+import 'package:rent/design/message/chat.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../constants/api_endpoints.dart';
-import '../constants/goto.dart';
+import '../../constants/api_endpoints.dart';
+import '../../services/goto.dart';
 
 class ChatedUsersPage extends ConsumerStatefulWidget {
   const ChatedUsersPage({super.key});

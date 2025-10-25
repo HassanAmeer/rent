@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:rent/main.dart';
-import 'package:rent/message/chatedUsersPage.dart';
+import 'package:rent/design/message/chatedUsersPage.dart';
 
 import '../constants/appColors.dart';
-import '../constants/goto.dart';
 import '../design/all items/allitems.dart';
+import '../design/auth/profile_details_page.dart';
 import '../design/home_page.dart';
 import '../design/listing/listing_page.dart';
 import '../design/rentin/rent_in_page.dart';
 import '../design/rentout/rent_out_page.dart';
-import '../Auth/profile_details_page.dart';
+import '../services/goto.dart';
 
 /// Enhanced Bottom Navigation Bar Widget with better error handling and customization
 class BottomNavBarWidget extends StatefulWidget {

@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent/apidata/user.dart' show userDataClass;
-import 'package:rent/auth/termsPage.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/constants/images.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
-import '../constants/api_endpoints.dart';
+import '../../constants/api_endpoints.dart';
 import 'privacyPolicyPage.dart';
+import 'termsPage.dart';
 
 class ProfileUpdatePage extends ConsumerStatefulWidget {
   const ProfileUpdatePage({super.key});

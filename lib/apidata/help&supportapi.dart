@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart' show checkInternet;
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 import 'package:rent/models/settings_model.dart';
 
 // ✅ Provider for Blogs

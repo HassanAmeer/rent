@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 
 var chatClass = ChangeNotifierProvider<ChatApi>((ref) => ChatApi());
 

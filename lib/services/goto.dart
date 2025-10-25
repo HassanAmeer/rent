@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rent/main.dart';
-import 'package:rent/message/chat.dart';
-import 'appColors.dart';
+import 'package:rent/design/message/chat.dart';
 
 /// Enhanced navigation function with better error handling and animations
 void navigateTo(

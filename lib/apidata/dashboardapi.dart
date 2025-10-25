@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
-import 'package:rent/constants/toast.dart';
+import 'package:rent/services/toast.dart';
 
 import '../constants/checkInternet.dart';
 

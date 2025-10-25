@@ -4,20 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:rent/Auth/profile_update_page.dart' hide ProfileUpdatePage;
 import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/images.dart';
-import 'package:rent/Auth/login.dart';
-import 'package:rent/constants/goto.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:transparent_route/transparent_route.dart';
-import '../Auth/profile_details_page.dart';
-import '../constants/api_endpoints.dart';
-import '../widgets/btmnavbar.dart';
-import '../design/home_page.dart';
-import '../widgets/imageview.dart';
+import '../../constants/api_endpoints.dart';
+import '../../widgets/btmnavbar.dart';
+import '../home_page.dart';
+import '../../widgets/imageview.dart';
 import 'profile_update_page.dart';
 
 class ProfileDetailsPage extends ConsumerStatefulWidget {
