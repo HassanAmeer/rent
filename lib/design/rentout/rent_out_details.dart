@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide StepValue;
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -61,18 +61,19 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                   )
                 : SizedBox.shrink(),
             const SizedBox(height: 5),
+
             ProRentStatusStepper(
               initialStatus: widget.data.isRejected.toString() == '1'
-                  ? "reject"
-                  : widget.data.delivered.toString() == 0
-                  ? "pending"
-                  : widget.data.delivered.toString() == 1
-                  ? "rented"
-                  : 'rented',
+                  ? "0"
+                  : widget.data.delivered.toString() == '0'
+                  ? "1"
+                  : widget.data.delivered.toString() == '1'
+                  ? "2"
+                  : widget.data.delivered.toString() == '2'
+                  ? "3"
+                  : '2',
               onStatusChanged: (status) {
                 // print("Status → $status");
-                // toast("$status");
-
                 ref
                     .watch(rentOutProvider)
                     .updateOrderStatus(
@@ -80,65 +81,57 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                           .watch(userDataClass)
                           .userData["id"]
                           .toString(),
-                      orderId: widget.data.id,
-                      statusId: status == "pending"
-                          ? 0
-                          : status == "rented"
-                          ? 1
-                          : status == "closed"
-                          ? 2
-                          : 0,
+                      orderId: widget.data.id.toString(),
+                      statusId: status == "0"
+                          ? '3'
+                          : status == "1"
+                          ? '0'
+                          : status == "2"
+                          ? '1'
+                          : status == "3"
+                          ? '2'
+                          : '0',
                       loadingFor: 'status',
                     );
               },
+
               height: 30,
-              spacing: 10,
-              stepWidth: 90,
               cornerRadius: 20,
-              activeScale: 1,
-              progressColor: AppColors.mainColor,
-              activeColor: AppColors.mainColor,
-              completedColor: AppColors.mainColor.shade700,
-              inactiveColor: Colors.grey.shade300,
-              inactiveTextColor: Colors.grey.shade600,
-              fontSize: 12,
-              iconSize: 15,
             ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  statuswidget()
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(duration: 2.seconds),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Total Price  ",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      Text(
-                            "\$ ${widget.data.totalPriceByUser}",
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                          .animate(onPlay: (controller) => controller.repeat())
-                          .shimmer(
-                            color: AppColors.mainColor,
-                            duration: Duration(seconds: 2),
-                          ),
-                    ],
-                  ),
-                ],
+            Divider(height: 2),
+            CupertinoListTile(
+              // minVerticalPadding: 0,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              title: Text(
+                "Pickup Date Range From User:",
+                style: TextStyle(color: Colors.grey),
               ),
+              subtitle:
+                  Text(
+                        widget.data.userCanPickupInDateRange,
+                        style: TextStyle(color: Colors.black),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        color: AppColors.mainColor,
+                        duration: Duration(seconds: 2),
+                      ),
+
+              trailing:
+                  Text(
+                        "\$ ${widget.data.totalPriceByUser}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        color: AppColors.mainColor,
+                        duration: Duration(seconds: 2),
+                      ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 5),
           ],
         ),
       ).animate().fade(duration: 1.seconds).slideY(begin: 1),
@@ -258,30 +251,30 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
-                    Divider(),
-                    ListTile(
-                      title: Text(
-                        "Pickup Date Range From User:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      subtitle:
-                          Text(
-                                widget.data.userCanPickupInDateRange,
-                                style: TextStyle(color: Colors.black),
-                              )
-                              .animate(
-                                onPlay: (controller) => controller.repeat(),
-                              )
-                              .shimmer(
-                                color: Colors.red,
-                                duration: Duration(seconds: 2),
-                              ),
-                    ),
+                    // Divider(),
+                    // ListTile(
+                    //   title: Text(
+                    //     "Pickup Date Range From User:",
+                    //     style: TextStyle(color: Colors.grey),
+                    //   ),
+                    //   subtitle:
+                    //       Text(
+                    //             widget.data.userCanPickupInDateRange,
+                    //             style: TextStyle(color: Colors.black),
+                    //           )
+                    //           .animate(
+                    //             onPlay: (controller) => controller.repeat(),
+                    //           )
+                    //           .shimmer(
+                    //             color: Colors.red,
+                    //             duration: Duration(seconds: 2),
+                    //           ),
+                    // ),
                     Divider(),
                     ListTile(
                       title: Text(
                         "Order Date:",
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: Colors.cyan),
                       ),
                       subtitle: Text(
                         "${widget.data.createdAt}",
@@ -305,7 +298,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                     child: Text("Order From User")
                         .animate(onPlay: (controller) => controller.repeat())
                         .shimmer(
-                          color: Colors.red,
+                          color: Colors.cyan,
                           duration: Duration(seconds: 2),
                         ),
                   ),
@@ -368,49 +361,49 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
     );
   }
 
-  Container statuswidget() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: _getStatusColor(widget.data.delivered.toString()),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _getStatusIcon(widget.data.delivered.toString()),
-            color: Colors.white,
-            size: 16,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            _getStatusText(widget.data.delivered.toString()),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Container statuswidget() {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  //     decoration: BoxDecoration(
+  //       color: _getStatusColor(widget.data.delivered.toString()),
+  //       borderRadius: BorderRadius.circular(20),
+  //     ),
+  //     child: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(
+  //           _getStatusIcon(widget.data.delivered.toString()),
+  //           color: Colors.white,
+  //           size: 16,
+  //         ),
+  //         const SizedBox(width: 6),
+  //         Text(
+  //           _getStatusText(widget.data.delivered.toString()),
+  //           style: const TextStyle(
+  //             color: Colors.white,
+  //             fontWeight: FontWeight.w600,
+  //             fontSize: 12,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   // Helper method to get status color
-  Color _getStatusColor(String? status) {
-    return status == "1" ? Colors.green : Colors.orange;
-  }
+  // Color _getStatusColor(String? status) {
+  //   return status == "1" ? Colors.green : Colors.orange;
+  // }
 
-  // Helper method to get status icon
-  IconData _getStatusIcon(String? status) {
-    return status == "1" ? Icons.check_circle : Icons.history;
-  }
+  // // Helper method to get status icon
+  // IconData _getStatusIcon(String? status) {
+  //   return status == "1" ? Icons.check_circle : Icons.history;
+  // }
 
-  // Helper method to get status text
-  String _getStatusText(String? status) {
-    return status == "1" ? "Delivered" : "Not Delivered";
-  }
+  // // Helper method to get status text
+  // String _getStatusText(String? status) {
+  //   return status == "1" ? "Delivered" : "Not Delivered";
+  // }
 
   // Helper method to format date
   String _formatDate(dynamic date) {

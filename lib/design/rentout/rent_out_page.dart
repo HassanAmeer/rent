@@ -14,6 +14,7 @@ import 'package:quick_widgets/widgets/tiktok.dart';
 import '../../apidata/rent_out_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../constants/appColors.dart';
 import '../../services/goto.dart';
 import '../../services/toast.dart';
 import '../../widgets/searchfield.dart';
@@ -251,16 +252,20 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
 
     if (status.toString() == "0") {
       bgColor = Colors.orange.withOpacity(0.5);
-      label = "Not delivered";
+      label = "Pending";
+    } else if (status.toString() == "1") {
+      bgColor = AppColors.mainColor.withOpacity(0.7);
+      label = "Rented";
     } else {
       bgColor = Colors.green.withOpacity(0.7);
-      label = "Delivered";
+      label = "Closed";
     }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,

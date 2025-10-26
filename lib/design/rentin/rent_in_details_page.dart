@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 import 'package:rent/constants/images.dart';
@@ -10,8 +12,10 @@ import 'package:rent/widgets/dotloader.dart';
 import 'package:rent/widgets/imageview.dart';
 
 import '../../constants/api_endpoints.dart';
+import '../../constants/appColors.dart';
 import '../../constants/screensizes.dart';
 import '../../models/rent_in_model.dart';
+import '../../widgets/rentStepperWidget.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
   final RentInModel renting;
@@ -27,7 +31,6 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Rent In Details"),
-        backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
@@ -36,7 +39,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
         child: Icon(Icons.chat_outlined),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.only(top: 2, bottom: 10),
+        padding: EdgeInsets.only(top: 0, bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -48,55 +51,63 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(widget.renting.deliverd.toString()),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _getStatusIcon(widget.renting.deliverd.toString()),
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _getStatusText(widget.renting.deliverd.toString()),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 5),
+
+            ProRentStatusStepper(
+              initialStatus: widget.renting.isRejected.toString() == '1'
+                  ? "0"
+                  : widget.renting.deliverd.toString() == '0'
+                  ? "1"
+                  : widget.renting.deliverd.toString() == '1'
+                  ? "2"
+                  : widget.renting.deliverd.toString() == '2'
+                  ? "3"
+                  : '2',
+              onStatusChanged: (status) {},
+              selectAble: false,
+              height: 30,
+              cornerRadius: 20,
+            ),
+            Divider(height: 2),
+            CupertinoListTile(
+              // minVerticalPadding: 0,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+              title: Text(
+                "My Pickup Date:",
+                style: TextStyle(color: Colors.grey),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Total Price   ", style: TextStyle(color: Colors.grey)),
+              subtitle:
                   Text(
-                    "\$${widget.renting.totalPriceByUser}",
-                    style: TextStyle(color: Colors.green),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                        widget.renting.userCanPickupInDateRange,
+                        style: TextStyle(color: Colors.black),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        color: Colors.cyan,
+                        duration: Duration(seconds: 2),
+                      ),
+
+              trailing:
+                  Text(
+                        "\$ ${widget.renting.totalPriceByUser}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        color: AppColors.mainColor,
+                        duration: Duration(seconds: 2),
+                      ),
+            ),
+            SizedBox(height: 5),
+          ],
         ),
-      ),
+      ).animate().fade(duration: 1.seconds).slideY(begin: 1),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,6 +166,15 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     const SizedBox(height: 24),
                   ],
 
+                  SizedBox(height: 20),
+                  const Text(
+                    "  Rates",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black38,
+                    ),
+                  ),
                   // Rental Information Card
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -172,15 +192,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Rental Information",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black38,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 5),
                         _buildInfoRow(
                           "Daily Rate",
                           "\$${widget.renting.dailyrate ?? '0'}",
@@ -193,23 +205,101 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                           "Monthly Rate",
                           "\$${widget.renting.monthlyrate ?? '0'}",
                         ),
+                      ],
+                    ),
+                  ),
 
-                        const SizedBox(height: 16),
+                  SizedBox(height: 20),
+                  const Text(
+                    "  Calender",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black38,
+                    ),
+                  ),
+                  // Rental Information Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          minTileHeight: 0,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                          minLeadingWidth: 50,
+                          leading: Text(
+                            "Order Date",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          title:
+                              Text(
+                                    "${widget.renting.userCanPickupInDateRange}",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 13,
+                                    ),
+                                  )
+                                  .animate(
+                                    onPlay: (controller) => controller.repeat(),
+                                  )
+                                  .shimmer(
+                                    color: AppColors.mainColor,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                        ),
+                        Divider(color: Colors.grey.shade300),
 
-                        if (widget.renting.availability.isNotEmpty)
-                          _buildInfoRow(
+                        ListTile(
+                          minTileHeight: 0,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                          minLeadingWidth: 50,
+                          leading: Text(
                             "Availability",
-                            widget.renting.availability,
+                            style: TextStyle(color: Colors.grey),
                           ),
-                        SizedBox(height: 20),
-                        Divider(color: Colors.grey.shade400),
-                        if (widget.renting.productPickupDate != null)
-                          _buildInfoRow(
-                            "Pickup Date",
-                            widget.renting.userCanPickupInDateRange
-                                    ?.toString() ??
-                                'N/A',
+                          title:
+                              Text(
+                                    widget.renting.availability,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 13,
+                                    ),
+                                  )
+                                  .animate(
+                                    onPlay: (controller) => controller.repeat(),
+                                  )
+                                  .shimmer(
+                                    color: Colors.black,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                        ),
+
+                        Divider(color: Colors.grey.shade300),
+                        ListTile(
+                          minTileHeight: 0,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                          minLeadingWidth: 50,
+                          leading: Text(
+                            "Listing Date",
+                            style: TextStyle(color: Colors.grey),
                           ),
+                          title: Text(
+                            "${widget.renting.productby?.createdAt}",
+                            style: TextStyle(color: Colors.black, fontSize: 13),
+                          ),
+                        ),
 
                         // Divider(color: Colors.green.shade50),
                       ],
@@ -218,6 +308,15 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
 
                   const SizedBox(height: 24),
 
+                  SizedBox(height: 20),
+                  const Text(
+                    "  Listing By",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black38,
+                    ),
+                  ),
                   // User Information Card
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -235,20 +334,11 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Listing By",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black38,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: Container(
                             width: 60,
-                            height: 60,
+                            height: 50,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
@@ -283,11 +373,23 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                             ),
                           ),
                         ),
-                        Divider(),
+                        Divider(color: Colors.grey.shade200),
                         const SizedBox(height: 10),
                         _buildInfoRow(
-                          "Listing Date",
-                          _formatDate(widget.renting.createdAt),
+                          "Phone Number",
+                          widget.renting.productby?.phone ?? '',
+                        ),
+                        Divider(color: Colors.grey.shade200),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(
+                          "Address",
+                          widget.renting.productby?.address ?? '',
+                        ),
+                        Divider(color: Colors.grey.shade200),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(
+                          "About",
+                          widget.renting.productby?.aboutUs ?? '',
                         ),
                       ],
                     ),
@@ -301,21 +403,6 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
         ),
       ),
     );
-  }
-
-  // Helper method to get status color
-  Color _getStatusColor(String? status) {
-    return status == "1" ? Colors.green : Colors.orange;
-  }
-
-  // Helper method to get status icon
-  IconData _getStatusIcon(String? status) {
-    return status == "1" ? Icons.check_circle : Icons.history;
-  }
-
-  // Helper method to get status text
-  String _getStatusText(String? status) {
-    return status == "1" ? "Delivered" : "Not Delivered";
   }
 
   // Helper method to format date
@@ -376,19 +463,4 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
       ),
     );
   }
-
-  // Method to toggle rental status
-  // void _toggleStatus(dynamic rental) {
-  //   if (rental['id'] == null) return;
-
-  //   final currentStatus = rental['deliverd']?.toString() ?? "0";
-  //   final newStatus = currentStatus == "1" ? "0" : "1";
-
-  //   ref
-  //       .read(rentalDataProvider)
-  //       .updateRentalStatus(
-  //         rentalId: rental['id'].toString(),
-  //         status: newStatus,
-  //         loadingFor: "updateStatus",
-  //       );
 }

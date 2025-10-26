@@ -282,19 +282,21 @@ class _RentInPageState extends ConsumerState<RentInPage> {
   Widget _statusLabel(String? status) {
     Color bgColor = Colors.orange;
     String label = "Delivered";
-
     if (status.toString() == "0") {
       bgColor = Colors.orange.withOpacity(0.5);
-      label = "Not delivered";
+      label = "Pending";
+    } else if (status.toString() == "1") {
+      bgColor = AppColors.mainColor.withOpacity(0.7);
+      label = "Rented";
     } else {
       bgColor = Colors.green.withOpacity(0.7);
-      label = "Delivered";
+      label = "Closed";
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,

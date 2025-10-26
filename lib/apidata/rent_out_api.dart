@@ -68,8 +68,8 @@ class RentOutProvider with ChangeNotifier {
   Future<void> updateOrderStatus({
     String loadingFor = "",
     required String userId,
-    required int orderId,
-    required int statusId,
+    required String orderId,
+    required String statusId,
   }) async {
     setLoading("");
     try {
@@ -85,15 +85,15 @@ class RentOutProvider with ChangeNotifier {
       debugPrint("👉 updateOrderStatus Response: $data");
 
       if (response.statusCode == 200) {
-        toast(data['msg'] ?? "Status Updated!", backgroundColor: Colors.green);
+        toast(data['msg'] ?? "Status Updated!", backgroundColor: Colors.black);
       } else {
         toast(
           data['msg'] ?? "Failed to Status Updates!",
           backgroundColor: Colors.red,
         );
       }
-    } catch (e) {
-      debugPrint("updateOrderStatus Error: $e");
+    } catch (e, st) {
+      debugPrint("updateOrderStatus Error: $e, st:$st");
       toast("Status Updation Failed!", backgroundColor: Colors.red);
     } finally {
       setLoading("");
