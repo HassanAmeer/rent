@@ -10,7 +10,7 @@ import 'package:rent/widgets/btmnavbar.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
-
+import 'package:quick_widgets/widgets/tiktok.dart';
 import '../../apidata/rent_out_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
@@ -20,7 +20,8 @@ import '../../widgets/searchfield.dart';
 import '../../models/rent_out_model.dart';
 
 class RentOutPage extends ConsumerStatefulWidget {
-  const RentOutPage({super.key});
+  final bool refresh;
+  const RentOutPage({super.key, this.refresh = false});
 
   @override
   ConsumerState<RentOutPage> createState() => _RentOutPageState();
@@ -31,11 +32,12 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((v) {
       ref
-          .watch(bookingDataProvider)
+          .watch(rentOutProvider)
           .fetchComingOrders(
             uid: ref.watch(userDataClass).userData["id"].toString(),
             search: "",
-            loadingfor: "3421",
+            refresh: widget.refresh,
+            loadingfor: widget.refresh ? "refresh" : "fetchComingOrders",
           );
       super.initState();
     });
@@ -56,67 +58,86 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
-      body: SingleChildScrollView(
-        controller: ScrollController(),
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // Search bar just below AppBar (with grey background)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SearchFeildWidget(
-                searchFieldController: searchfieldcontroller,
-                hint: "Search How to & More",
-                onSearchIconTap: () {
-                  if (searchfieldcontroller.text.isEmpty) {
-                    toast("Write Someting");
-                    return;
-                  }
-                  ref
-                      .watch(bookingDataProvider)
-                      .fetchComingOrders(
-                        uid: ref.watch(userDataClass).userData["id"].toString(),
-                        search: searchfieldcontroller.text,
-                        loadingfor: "3421",
-                      );
-                },
-              ),
-            ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref
+              .watch(rentOutProvider)
+              .fetchComingOrders(
+                uid: ref.watch(userDataClass).userData["id"].toString(),
+                search: "",
+                refresh: true,
+                loadingfor: "refresh",
+              );
+        },
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              ref.watch(rentOutProvider).loadingfor == "refresh"
+                  ? QuickTikTokLoader(
+                      progressColor: Colors.black,
+                      backgroundColor: Colors.grey,
+                    )
+                  : SizedBox.shrink(),
 
-            ref.watch(bookingDataProvider).loadingfor == "3421"
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 250),
-                      child: DotLoader(),
+              // Search bar just below AppBar (with grey background)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SearchFeildWidget(
+                  searchFieldController: searchfieldcontroller,
+                  hint: "Search How to & More",
+                  onSearchIconTap: () {
+                    // if (searchfieldcontroller.text.isEmpty) {
+                    //   toast("Write Someting");
+                    //   return;
+                    // }
+                    ref
+                        .watch(rentOutProvider)
+                        .fetchComingOrders(
+                          uid: ref
+                              .watch(userDataClass)
+                              .userData["id"]
+                              .toString(),
+                          refresh: true,
+                          search: searchfieldcontroller.text,
+                          loadingfor: "refresh",
+                        );
+                  },
+                ),
+              ),
+
+              ref.watch(rentOutProvider).loadingfor == "fetchComingOrders"
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 250),
+                        child: DotLoader(),
+                      ),
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      controller: ScrollController(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
+                      itemCount: ref.watch(rentOutProvider).comingOrders.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, // Mobile 2 columns
+                            mainAxisSpacing: 15,
+                            crossAxisSpacing: 15,
+                            childAspectRatio: 0.85,
+                          ),
+                      itemBuilder: (context, index) => _bookingCard(
+                        context,
+                        ref.watch(rentOutProvider).comingOrders[index],
+                      ),
                     ),
-                  )
-                : GridView.builder(
-                    shrinkWrap: true,
-                    controller: ScrollController(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 10,
-                    ),
-                    itemCount: ref
-                        .watch(bookingDataProvider)
-                        .comingOrders
-                        .length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // Mobile 2 columns
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 15,
-                          childAspectRatio: 0.85,
-                        ),
-                    itemBuilder: (context, index) => _bookingCard(
-                      context,
-                      ref.watch(bookingDataProvider).comingOrders[index],
-                    ),
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
-
       // Floating Action Button for Add New Booking
       // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );

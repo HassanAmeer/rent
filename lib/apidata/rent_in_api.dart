@@ -108,40 +108,40 @@ class RentalData with ChangeNotifier {
   }
 
   // Method to update rental status (delivered/not delivered)
-  Future<void> updateRentalStatus({
-    required String rentalId,
-    required String status, // "1" for delivered, "0" for not delivered
-    String loadingFor = "",
-  }) async {
-    try {
-      if (await checkInternet() == false) return;
+  // Future<void> updateRentalStatus({
+  //   required String rentalId,
+  //   required String status, // "1" for delivered, "0" for not delivered
+  //   String loadingFor = "",
+  // }) async {
+  //   try {
+  //     if (await checkInternet() == false) return;
 
-      debugPrint("Updating rental status for ID: $rentalId to $status");
+  //     debugPrint("Updating rental status for ID: $rentalId to $status");
 
-      setLoading(loadingFor);
-      final response = await http.post(
-        Uri.parse(Api.updateRentalStatusEndpoint),
-        body: {'rentalId': rentalId, 'delivered': status},
-      );
+  //     setLoading(loadingFor);
+  //     final response = await http.post(
+  //       Uri.parse(Api.updateRentalStatusEndpoint),
+  //       body: {'rentalId': rentalId, 'delivered': status},
+  //     );
 
-      final data = jsonDecode(response.body);
+  //     final data = jsonDecode(response.body);
 
-      debugPrint("👉Response status: ${response.statusCode}");
-      debugPrint("👉 data: $data");
+  //     debugPrint("👉Response status: ${response.statusCode}");
+  //     debugPrint("👉 data: $data");
 
-      if (response.statusCode == 200) {
-        toast(data['message'] ?? data['msg'] ?? 'Status updated successfully');
-        // Refresh rental details
-        await fetchRentInDetails(rentalId: rentalId);
-        setLoading();
-      } else {
-        toast(data['message'] ?? data['msg'] ?? 'Failed to update status');
-        setLoading();
-      }
-    } catch (e) {
-      setLoading();
-      debugPrint("Error updating rental status: $e");
-      toast("Error updating status: ${e.toString()}");
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       toast(data['message'] ?? data['msg'] ?? 'Status updated successfully');
+  //       // Refresh rental details
+  //       await fetchRentInDetails(rentalId: rentalId);
+  //       setLoading();
+  //     } else {
+  //       toast(data['message'] ?? data['msg'] ?? 'Failed to update status');
+  //       setLoading();
+  //     }
+  //   } catch (e) {
+  //     setLoading();
+  //     debugPrint("Error updating rental status: $e");
+  //     toast("Error updating status: ${e.toString()}");
+  //   }
+  // }
 }

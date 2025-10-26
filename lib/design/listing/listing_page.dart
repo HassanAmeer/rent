@@ -129,10 +129,10 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                   searchFieldController: searchfieldcontroller,
                   hint: "Search Listings...",
                   onSearchIconTap: () {
-                    if (searchfieldcontroller.text.isEmpty) {
-                      toast("Write Someting");
-                      return;
-                    }
+                    // if (searchfieldcontroller.text.isEmpty) {
+                    //   toast("Write Someting");
+                    //   return;
+                    // }
                     ref
                         .watch(listingDataProvider)
                         .fetchMyItems(

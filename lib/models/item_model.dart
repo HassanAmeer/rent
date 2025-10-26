@@ -126,8 +126,9 @@ class ItemModel {
 
   /// Get short description for previews
   String get shortDescription {
-    if (description == null || description!.isEmpty)
+    if (description == null || description!.isEmpty) {
       return 'No description available';
+    }
     return description!.length > 100
         ? '${description!.substring(0, 100)}...'
         : description!;

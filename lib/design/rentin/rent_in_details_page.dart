@@ -36,6 +36,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
         child: Icon(Icons.chat_outlined),
       ),
       bottomNavigationBar: Container(
+        padding: EdgeInsets.only(top: 2, bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [

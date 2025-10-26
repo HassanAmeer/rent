@@ -16,6 +16,7 @@ class BookingModel {
   final int productId;
   final int productBy;
   final String productTitle;
+  final String productDesc;
   final List<String> productImages;
   final double dailyRate;
   final double weeklyRate;
@@ -38,6 +39,7 @@ class BookingModel {
     this.productId = 0,
     this.productBy = 0,
     this.productTitle = '',
+    this.productDesc = '',
     this.productImages = const [ImgLinks.noItem, ImgLinks.noItem],
     this.dailyRate = 0.0,
     this.weeklyRate = 0.0,
@@ -81,6 +83,7 @@ class BookingModel {
       productId: json['productId'] ?? 0,
       productBy: json['product_by'] ?? 0,
       productTitle: json['productTitle']?.toString() ?? '',
+      productDesc: json['productDesc']?.toString() ?? '',
       productImages: parseImages(json['productImage']),
       dailyRate: double.tryParse(json['dailyrate']?.toString() ?? '0') ?? 0.0,
       weeklyRate: double.tryParse(json['weeklyrate']?.toString() ?? '0') ?? 0.0,
@@ -115,6 +118,7 @@ class BookingModel {
       'productId': productId,
       'product_by': productBy,
       'productTitle': productTitle,
+      'productDesc': productDesc,
       'productImage': productImages,
       'dailyrate': dailyRate,
       'weeklyrate': weeklyRate,

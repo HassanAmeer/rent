@@ -7,11 +7,11 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart'; // Apne toast function ke liye import
 import 'package:rent/models/rent_out_model.dart';
 
-final bookingDataProvider = ChangeNotifierProvider<BookingData>(
-  (ref) => BookingData(),
+final rentOutProvider = ChangeNotifierProvider<RentOutProvider>(
+  (ref) => RentOutProvider(),
 );
 
-class BookingData with ChangeNotifier {
+class RentOutProvider with ChangeNotifier {
   List<BookingModel> comingOrders = [];
   // bool isLoading = false;
   String loadingfor = "";
@@ -25,10 +25,12 @@ class BookingData with ChangeNotifier {
     required String uid,
     var search = "",
     var loadingfor = "",
+    bool refresh = false,
   }) async {
     setLoading(loadingfor);
     try {
       if (await checkInternet() == false) return;
+      if (comingOrders.isNotEmpty && !refresh) return;
 
       setLoading(loadingfor);
       final response = await http.post(
@@ -37,8 +39,8 @@ class BookingData with ChangeNotifier {
       );
 
       final data = jsonDecode(response.body);
-      print("👉 Coming Orders Status: ${response.statusCode}");
-      print("👉 Coming Orders Data: $data");
+      debugPrint("👉 Coming Orders Status: ${response.statusCode}");
+      debugPrint("👉 Coming Orders Data: $data");
 
       if (response.statusCode == 200 && data['success'] == true) {
         final ordersData = data['commingOrders'] ?? [];
@@ -54,7 +56,7 @@ class BookingData with ChangeNotifier {
         );
       }
     } catch (e) {
-      print("Error fetching coming orders: $e");
+      debugPrint("Error fetching coming orders: $e");
       toast("Error fetching coming orders", backgroundColor: Colors.red);
     } finally {
       setLoading("");
@@ -63,41 +65,36 @@ class BookingData with ChangeNotifier {
 
   // 2. Order Rejection API - Assuming it's a POST or PUT request
   // Please confirm HTTP method and required parameters; here assumed POST with orderId and userId
-  Future<void> rejectOrder({
-    required String orderId,
-    required Map<String, dynamic> rejectionData,
+  Future<void> updateOrderStatus({
+    String loadingFor = "",
+    required String userId,
+    required int orderId,
+    required int statusId,
   }) async {
     setLoading("");
     try {
       if (await checkInternet() == false) return;
+      setLoading(loadingFor);
 
       final response = await http.post(
-        Uri.parse(Api.orderRejectionEndpoint),
-        body: {
-          'orderId': orderId,
-          ...rejectionData, // Additional details if any
-        },
+        Uri.parse(Api.updateOrderStatus),
+        body: {'uid': userId, 'order_id': orderId, 'status_id': statusId},
       );
 
       final data = jsonDecode(response.body);
-      print("👉 Order Rejection Response: $data");
+      debugPrint("👉 updateOrderStatus Response: $data");
 
       if (response.statusCode == 200) {
-        toast(
-          data['msg'] ?? "Order rejected successfully",
-          backgroundColor: Colors.green,
-        );
-        // Optionally refresh coming orders after rejection
-        // notifyListeners(); if required
+        toast(data['msg'] ?? "Status Updated!", backgroundColor: Colors.green);
       } else {
         toast(
-          data['msg'] ?? "Failed to reject order",
+          data['msg'] ?? "Failed to Status Updates!",
           backgroundColor: Colors.red,
         );
       }
     } catch (e) {
-      print("Error rejecting order: $e");
-      toast("Error rejecting order", backgroundColor: Colors.red);
+      debugPrint("updateOrderStatus Error: $e");
+      toast("Status Updation Failed!", backgroundColor: Colors.red);
     } finally {
       setLoading("");
     }

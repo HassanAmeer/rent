@@ -24,9 +24,10 @@ class Api {
   static const String getFavEndpoint = "${apiUrl}getfav";
   static const String addOrderEndpoint = "${apiUrl}addorder";
   static const String comingOrdersEndpoint = "${apiUrl}getcommingorders";
-  static const String orderRejectionEndpoint = "${apiUrl}orderrejection/";
-  static const String updateRentalStatusEndpoint =
-      "${apiUrl}updaterentalstatus";
+  // static const String orderRejectionEndpoint = "${apiUrl}orderrejection/"; deprecated
+  // static const String updateRentalStatusEndpoint =
+  //     "${apiUrl}updaterentalstatus";
+  static const String updateOrderStatus = "${apiUrl}updateorderstatus";
   static const String rentInEndpoint = "${apiUrl}rentin/";
   static const String rentalDetailsEndpoint = "${apiUrl}rentaldetails/";
   static const String allBlogsEndpoint = "${apiUrl}allblogs";

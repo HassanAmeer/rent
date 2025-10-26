@@ -419,7 +419,15 @@ class _HomeChartState extends ConsumerState<HomeChart> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    interval: 20,
+                    interval: maxYValue < 10
+                        ? 1
+                        : maxYValue < 50
+                        ? 5
+                        : maxYValue < 100
+                        ? 10
+                        : maxYValue < 150
+                        ? 15
+                        : 20,
                     getTitlesWidget: (value, meta) {
                       return Text(
                         value.toStringAsFixed(1),
