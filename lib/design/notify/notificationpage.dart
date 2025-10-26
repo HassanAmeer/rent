@@ -82,7 +82,11 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
         elevation: 0,
         centerTitle: false,
         titleSpacing: 0,
-        title: Image.asset(ImgAssets.logoShadow, width: 80),
+        // title: Image.asset(ImgAssets.logoShadow, width: 80),
+        title: Text(
+          "Notifications Users",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         actions: [
           InkWell(
             onTap: () {
@@ -104,14 +108,6 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 10),
-          const Padding(
-            padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
-            child: Text(
-              "Notifications Users",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
           const SizedBox(height: 10),
           ref.watch(notifyData).loadingFor == "fetchNotifyData"
               ? const Center(

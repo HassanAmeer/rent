@@ -119,7 +119,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                 );
               },
-              icon: const Icon(Icons.notifications, size: 30),
+              icon:
+                  const Icon(
+                        Icons.notifications,
+                        color: Colors.white60,
+                        size: 30,
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(color: Colors.black26, duration: 2.seconds),
             ),
             InkWell(
               onTap: () {
@@ -133,8 +140,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   color: Colors.cyan.shade700,
                   borderRadius: BorderRadius.circular(25),
                 ),
-                width: 47,
-                height: 47,
+                width: 35,
+                height: 35,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
                   url: Api.imgPath + ref.watch(userDataClass).userImage,
