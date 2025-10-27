@@ -77,7 +77,7 @@ class Favrt with ChangeNotifier {
       setLoading(loadingFor);
 
       final response = await http.post(
-        Uri.parse(Api.addFavEndpoint),
+        Uri.parse(Api.togglefavEndpoint),
         body: {"uid": uid, "itemid": itemId},
       );
 

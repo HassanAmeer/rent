@@ -34,7 +34,7 @@ class RentOutProvider with ChangeNotifier {
 
       setLoading(loadingfor);
       final response = await http.post(
-        Uri.parse(Api.comingOrdersEndpoint),
+        Uri.parse(Api.getRentOutOrdersEndpoint),
         body: {"uid": uid, "search": search},
       );
 
@@ -99,7 +99,45 @@ class RentOutProvider with ChangeNotifier {
       setLoading("");
     }
   }
+
+  Future<void> deleteOrder({
+    required String orderId,
+    String loadingFor = "",
+  }) async {
+    try {
+      if (await checkInternet() == false) return;
+      setLoading(loadingFor);
+
+      final response = await http.delete(
+        Uri.parse(Api.deleteRentInOrderEndpoint + orderId),
+      );
+
+      final data = jsonDecode(response.body);
+
+      // debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
+
+      if (response.statusCode == 200) {
+        toast(data['msg'] ?? 'Order Deleted!');
+
+        // Refresh rental details
+        // await fetchRentInDetails(rentalId: rentalId);
+        setLoading();
+      } else {
+        toast(data['msg'] ?? 'Failed to Delet Order!');
+        setLoading();
+      }
+    } catch (e) {
+      setLoading();
+      debugPrint("updateRentalStatus Error: $e");
+      toast("Try Later: ${e.toString()}");
+    } finally {
+      setLoading();
+    }
+  }
 }
+
+
 
 
 

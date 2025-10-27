@@ -27,9 +27,14 @@ class SettingsDataClass with ChangeNotifier {
   }
 
   List settingsData = [];
-  Future getSettingsData({required String uid, String loadingFor = ""}) async {
+  Future getSettingsData({
+    required String uid,
+    String loadingFor = "",
+    bool refresh = false,
+  }) async {
     try {
       if (await checkInternet() == false) return;
+      if (settingsData.isNotEmpty && refresh == false) return;
       setLoading(loadingFor);
 
       final response = await http.get(Uri.parse(Api.settingsEndpoint));
