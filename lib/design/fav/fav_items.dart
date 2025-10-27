@@ -166,7 +166,7 @@ class _FavouriteState extends ConsumerState<Favourite> {
                       // return Text(item.displayTitle.toString());
                       return GestureDetector(
                         onTap: () {
-                          goto(FavDetailsPage(item: item));
+                          goto(FavDetailsPage(index: index));
                         },
                         child: Column(
                           children: [

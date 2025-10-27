@@ -171,7 +171,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
                           final item = listingProvider.listings[index];
                           return GestureDetector(
                             onTap: () {
-                              goto(ListingDetailPage(item: item));
+                              goto(ListingDetailPage(index: index));
                             },
                             child: ListingBox(
                               ref: ref, // ✅ ref pass kar diya constructor se

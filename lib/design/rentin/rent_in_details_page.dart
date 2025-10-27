@@ -23,8 +23,8 @@ import '../../services/toast.dart';
 import '../../widgets/rentStepperWidget.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
-  final RentInModel renting;
-  const RentInDetailsPage({super.key, required this.renting});
+  final int index;
+  const RentInDetailsPage({super.key, required this.index});
 
   @override
   ConsumerState<RentInDetailsPage> createState() => _RentInDetailsPageState();
@@ -33,6 +33,7 @@ class RentInDetailsPage extends ConsumerStatefulWidget {
 class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    final renting = ref.watch(rentInProvider).rentInListData[widget.index];
     return Scaffold(
       appBar: AppBar(
         title: const Text("Rent In Details"),
@@ -69,8 +70,8 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         ref
                             .watch(rentInProvider)
                             .deleteOrder(
-                              orderId: widget.renting.id.toString(),
-                              loadingFor: "delete${widget.renting.id}",
+                              orderId: renting.id.toString(),
+                              loadingFor: "delete${renting.id}",
                             );
                         Navigator.pop(context);
                       },
@@ -89,9 +90,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                 ),
               );
             },
-            icon:
-                ref.watch(rentInProvider).loadingFor ==
-                    "delete${widget.renting.id}"
+            icon: ref.watch(rentInProvider).loadingFor == "delete${renting.id}"
                 ? CircleAvatar(
                     radius: 10,
                     backgroundColor: Colors.black,
@@ -124,13 +123,13 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
             const SizedBox(height: 5),
 
             ProRentStatusStepper(
-              initialStatus: widget.renting.isRejected.toString() == '1'
+              initialStatus: renting.isRejected.toString() == '1'
                   ? "0"
-                  : widget.renting.deliverd.toString() == '0'
+                  : renting.deliverd.toString() == '0'
                   ? "1"
-                  : widget.renting.deliverd.toString() == '1'
+                  : renting.deliverd.toString() == '1'
                   ? "2"
-                  : widget.renting.deliverd.toString() == '2'
+                  : renting.deliverd.toString() == '2'
                   ? "3"
                   : '2',
               onStatusChanged: (status) {},
@@ -172,9 +171,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     // print(finalDateRange.toString());
                     var daysCount = endDate.difference(startDate).inDays + 1;
                     ////
-                    debugPrint(
-                      (widget.renting.dailyrate * daysCount).toString(),
-                    );
+                    debugPrint((renting.dailyrate * daysCount).toString());
                     // return;
 
                     ref
@@ -184,10 +181,10 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                               .watch(userDataClass)
                               .userData["id"]
                               .toString(),
-                          orderId: widget.renting.id.toString(),
+                          orderId: renting.id.toString(),
                           loadingFor: "updateRentnPickupTime",
                           pickup_date_range: finalDateRange,
-                          total_price: (widget.renting.dailyrate * daysCount)
+                          total_price: (renting.dailyrate * daysCount)
                               .toString(),
                         );
                   } catch (e) {
@@ -208,7 +205,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
               ),
               subtitle:
                   Text(
-                        widget.renting.userCanPickupInDateRange,
+                        renting.userCanPickupInDateRange,
                         style: TextStyle(color: Colors.black),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
@@ -219,7 +216,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
 
               trailing:
                   Text(
-                        "\$ ${widget.renting.totalPriceByUser}",
+                        "\$ ${renting.totalPriceByUser}",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
@@ -241,9 +238,9 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CarouselSlider.builder(
-              itemCount: widget.renting.productImage.length,
+              itemCount: renting.productImage.length,
               itemBuilder: (context, index, realIndex) {
-                final imageUrl = widget.renting.productImage[index];
+                final imageUrl = renting.productImage[index];
                 return CacheImageWidget(
                   onTap: () {
                     showImageView(context, imageUrl);
@@ -260,11 +257,11 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                 height: ScreenSize.height * 0.35,
                 viewportFraction: 0.68,
                 enlargeCenterPage: true,
-                autoPlay: widget.renting.productImage.length > 1,
+                autoPlay: renting.productImage.length > 1,
                 autoPlayInterval: const Duration(seconds: 2),
                 autoPlayAnimationDuration: const Duration(milliseconds: 800),
                 autoPlayCurve: Curves.fastOutSlowIn,
-                enableInfiniteScroll: widget.renting.productImage.length > 1,
+                enableInfiniteScroll: renting.productImage.length > 1,
                 scrollDirection: Axis.horizontal,
               ),
             ),
@@ -278,7 +275,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                   // Title and Status Row
                   // const SizedBox(height: 5),
                   Text(
-                    widget.renting.productTitle,
+                    renting.productTitle,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -288,9 +285,9 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                   const SizedBox(height: 5),
 
                   // Description Section
-                  if (widget.renting.productDesc.isNotEmpty) ...[
+                  if (renting.productDesc.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Text(widget.renting.productDesc),
+                    Text(renting.productDesc),
                     const SizedBox(height: 24),
                   ],
 
@@ -323,15 +320,15 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         const SizedBox(height: 5),
                         _buildInfoRow(
                           "Daily Rate",
-                          "\$${widget.renting.dailyrate ?? '0'}",
+                          "\$${renting.dailyrate ?? '0'}",
                         ),
                         _buildInfoRow(
                           "Weekly Rate",
-                          "\$${widget.renting.weeklyrate ?? '0'}",
+                          "\$${renting.weeklyrate ?? '0'}",
                         ),
                         _buildInfoRow(
                           "Monthly Rate",
-                          "\$${widget.renting.monthlyrate ?? '0'}",
+                          "\$${renting.monthlyrate ?? '0'}",
                         ),
                       ],
                     ),
@@ -373,7 +370,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                           ),
                           title:
                               Text(
-                                    "${widget.renting.userCanPickupInDateRange}",
+                                    "${renting.userCanPickupInDateRange}",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 13,
@@ -399,7 +396,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                           ),
                           title:
                               Text(
-                                    widget.renting.availability,
+                                    renting.availability,
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontSize: 13,
@@ -424,7 +421,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                             style: TextStyle(color: Colors.grey),
                           ),
                           title: Text(
-                            "${widget.renting.productby?.createdAt}",
+                            "${renting.productby?.createdAt}",
                             style: TextStyle(color: Colors.black, fontSize: 13),
                           ),
                         ),
@@ -480,13 +477,13 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                                 height: 40,
                                 isCircle: true,
                                 radius: 0,
-                                url: widget.renting.productby!.image,
+                                url: renting.productby!.image,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
                           title: Text(
-                            widget.renting.productby?.name ?? '',
+                            renting.productby?.name ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -494,7 +491,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                             ),
                           ),
                           subtitle: Text(
-                            widget.renting.productby?.email ?? '',
+                            renting.productby?.email ?? '',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -505,19 +502,19 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         const SizedBox(height: 10),
                         _buildInfoRow(
                           "Phone Number",
-                          widget.renting.productby?.phone ?? '',
+                          renting.productby?.phone ?? '',
                         ),
                         Divider(color: Colors.grey.shade200),
                         const SizedBox(height: 10),
                         _buildInfoRow(
                           "Address",
-                          widget.renting.productby?.address ?? '',
+                          renting.productby?.address ?? '',
                         ),
                         Divider(color: Colors.grey.shade200),
                         const SizedBox(height: 10),
                         _buildInfoRow(
                           "About",
-                          widget.renting.productby?.aboutUs ?? '',
+                          renting.productby?.aboutUs ?? '',
                         ),
                       ],
                     ),

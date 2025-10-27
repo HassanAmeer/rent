@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/apidata/notifyData.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../constants/api_endpoints.dart';
 import '../../widgets/casheimage.dart';
 
-class NotificationsDetails extends StatelessWidget {
-  final Map<String, dynamic> fullData;
+class NotificationsDetails extends ConsumerStatefulWidget {
+  final int index;
 
-  const NotificationsDetails({super.key, required this.fullData});
+  const NotificationsDetails({super.key, required this.index});
 
   @override
+  ConsumerState<NotificationsDetails> createState() =>
+      _NotificationsDetailsState();
+}
+
+class _NotificationsDetailsState extends ConsumerState<NotificationsDetails> {
+  @override
   Widget build(BuildContext context) {
+    var notify = ref.watch(notifyData).notify[widget.index];
     return Scaffold(
       appBar: AppBar(title: const Text("Notification Details")),
       body: Padding(
@@ -20,16 +29,16 @@ class NotificationsDetails extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${fullData['title'] ?? 'Title.......'}",
+              notify.title,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
             // Text(
-            //   "${fullData['desc'] ?? 'Description.......'}",
+            //   "${notify['desc'] ?? 'Description.......'}",
             //   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
             // ),
-            HtmlWidget(fullData['desc'] ?? 'Description.......'),
+            HtmlWidget(notify.description),
 
             Divider(),
             ListTile(title: Text("From User")),
@@ -39,12 +48,10 @@ class NotificationsDetails extends StatelessWidget {
                 height: 50,
                 isCircle: true,
                 radius: 200,
-                url:
-                    Api.imgPath + fullData['fromuid']['image'] ??
-                    ImgLinks.profileImage,
+                url: notify.fromUser!.image!,
               ),
-              title: Text(fullData['fromuid']['name'] ?? 'Unknown'),
-              subtitle: Text(fullData['fromuid']['email'] ?? 'Unknown'),
+              title: Text(notify.fromUser!.name),
+              subtitle: Text(notify.fromUser!.email),
             ),
           ],
         ),

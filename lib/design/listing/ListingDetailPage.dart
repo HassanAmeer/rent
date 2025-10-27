@@ -8,14 +8,15 @@ import 'package:rent/models/item_model.dart';
 import 'package:transparent_route/transparent_route.dart';
 
 import '../../apidata/categoryapi.dart';
+import '../../apidata/listingapi.dart';
 import '../../widgets/casheimage.dart';
 import '../../widgets/imageview.dart' show showImageView;
 import 'listing_edit_page.dart'; // ✅ Edit page import
 
 class ListingDetailPage extends ConsumerStatefulWidget {
-  final ItemModel item;
+  final int index;
 
-  const ListingDetailPage({super.key, required this.item});
+  const ListingDetailPage({super.key, required this.index});
 
   @override
   ConsumerState<ListingDetailPage> createState() => _ListingDetailPageState();
@@ -24,6 +25,7 @@ class ListingDetailPage extends ConsumerStatefulWidget {
 class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
   @override
   Widget build(BuildContext context) {
+    final item = ref.watch(listingDataProvider).listings[widget.index];
     return Scaffold(
       appBar: AppBar(title: const Text("listing Details")),
       body: Padding(
@@ -34,9 +36,9 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarouselSlider.builder(
-                itemCount: widget.item.images.length,
+                itemCount: item.images.length,
                 itemBuilder: (context, index, realIndex) {
-                  final imageUrl = widget.item.images[index];
+                  final imageUrl = item.images[index];
                   return CacheImageWidget(
                     onTap: () {
                       showImageView(context, imageUrl);
@@ -53,18 +55,18 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
                   height: ScreenSize.height * 0.35,
                   viewportFraction: 0.68,
                   enlargeCenterPage: true,
-                  autoPlay: widget.item.images.length > 1,
+                  autoPlay: item.images.length > 1,
                   autoPlayInterval: const Duration(seconds: 2),
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: widget.item.images.length > 1,
+                  enableInfiniteScroll: item.images.length > 1,
                   scrollDirection: Axis.horizontal,
                 ),
               ),
               const SizedBox(height: 15),
 
               Text(
-                widget.item.displayTitle,
+                item.displayTitle,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -72,7 +74,7 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
               ),
 
               const SizedBox(height: 8),
-              HtmlWidget(widget.item.description ?? 'No description available'),
+              HtmlWidget(item.description ?? 'No description available'),
               const SizedBox(height: 15),
 
               ListTile(
@@ -85,16 +87,16 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
                   isCircle: true,
                   radius: 5,
                   url:
-                      "${widget.item.categoryId != null
-                          ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
-                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).image
+                      "${item.categoryId != null
+                          ? ref.watch(categoryProvider).categories.where((e) => e.id == item.categoryId).isNotEmpty
+                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == item.categoryId).image
                                 : null
                           : null}",
                 ),
                 title: Text(
-                  "${widget.item.categoryId != null
-                      ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.categoryId).isNotEmpty
-                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.categoryId).name
+                  "${item.categoryId != null
+                      ? ref.watch(categoryProvider).categories.where((e) => e.id == item.categoryId).isNotEmpty
+                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == item.categoryId).name
                             : null
                       : null}",
                 ),
@@ -109,41 +111,35 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
                 ),
                 subtitle: Text(
                   style: TextStyle(color: Colors.grey),
-                  widget.item.availabilityDays ?? 'Not specified',
+                  item.availabilityDays ?? 'Not specified',
                 ),
               ),
               Divider(),
 
-              ListTile(
-                title: Text("Daily Rate: ${widget.item.formattedDailyRate}"),
-              ),
+              ListTile(title: Text("Daily Rate: ${item.formattedDailyRate}")),
+              Divider(),
+              ListTile(title: Text("Weekly Rate: ${item.formattedWeeklyRate}")),
               Divider(),
               ListTile(
-                title: Text("Weekly Rate: ${widget.item.formattedWeeklyRate}"),
-              ),
-              Divider(),
-              ListTile(
-                title: Text(
-                  "Monthly Rate: ${widget.item.formattedMonthlyRate}",
-                ),
+                title: Text("Monthly Rate: ${item.formattedMonthlyRate}"),
               ),
 
               Divider(),
 
               const ListTile(title: Text("Listing By")),
-              if (widget.item.user != null) ...[
+              if (item.user != null) ...[
                 ListTile(
                   leading: CacheImageWidget(
                     width: 50,
                     height: 50,
                     isCircle: true,
                     radius: 200,
-                    url: widget.item.user!.fullImageUrl.isNotEmpty
-                        ? widget.item.user!.fullImageUrl
+                    url: item.user!.fullImageUrl.isNotEmpty
+                        ? item.user!.fullImageUrl
                         : ImgLinks.profileImage,
                   ),
-                  title: Text(widget.item.user!.displayName),
-                  subtitle: Text(widget.item.user!.email),
+                  title: Text(item.user!.displayName),
+                  subtitle: Text(item.user!.email),
                 ),
               ] else ...[
                 const ListTile(
@@ -155,7 +151,7 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
               ListTile(
                 minVerticalPadding: 2,
                 title: Text(
-                  "Listing At: ${widget.item.createdAt?.toString() ?? 'N/A'}",
+                  "Listing At: ${item.createdAt?.toString() ?? 'N/A'}",
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
@@ -173,7 +169,7 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditListingPage(item: widget.item),
+              builder: (context) => EditListingPage(item: item),
             ),
           );
         },

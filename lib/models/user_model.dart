@@ -1,3 +1,7 @@
+import 'package:rent/constants/api_endpoints.dart';
+import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
+
 /// User Model for API responses and data handling
 class UserModel {
   final int id;
@@ -17,16 +21,16 @@ class UserModel {
 
   UserModel({
     required this.id,
-    this.image,
-    required this.activeUser,
-    required this.name,
+    this.image = ImgLinks.profileImage,
+    this.activeUser = 0,
+    this.name = "",
     this.phone,
-    required this.email,
+    this.email = "empty@gmail.com",
     this.address,
     this.aboutUs,
-    required this.verifiedBy,
-    required this.sendEmail,
-    required this.password,
+    this.verifiedBy = "google",
+    this.sendEmail = 1,
+    this.password = "12345678",
     this.createdAt,
     this.updatedAt,
     this.deletedAt,
@@ -35,7 +39,9 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] ?? 0,
-      image: json['image']?.toString(),
+      image: json['image']!.toString().toNullString().isEmpty
+          ? ImgLinks.profileImage
+          : Api.imgPath + json['image'].toString().toNullString(),
       activeUser: json['activeUser'] ?? 0,
       name: json['name']?.toString() ?? '',
       phone: json['phone']?.toString(),

@@ -22,8 +22,8 @@ import '../../widgets/imageview.dart';
 import '../../widgets/rentStepperWidget.dart';
 
 class RentOutDetailsPage extends ConsumerStatefulWidget {
-  BookingModel data;
-  RentOutDetailsPage({super.key, required this.data});
+  final int index;
+  RentOutDetailsPage({super.key, required this.index});
 
   @override
   ConsumerState<RentOutDetailsPage> createState() => _RentOutDetailsPageState();
@@ -32,6 +32,7 @@ class RentOutDetailsPage extends ConsumerStatefulWidget {
 class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   @override
   Widget build(BuildContext context) {
+    final data = ref.watch(rentOutProvider).comingOrders[widget.index];
     return Scaffold(
       appBar: AppBar(
         title: const Text("  Rent Out Details"),
@@ -65,8 +66,8 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         ref
                             .watch(rentOutProvider)
                             .deleteOrder(
-                              orderId: widget.data.id.toString(),
-                              loadingFor: "delete${widget.data.id}",
+                              orderId: data.id.toString(),
+                              loadingFor: "delete${data.id}",
                             );
                         Navigator.pop(context);
                       },
@@ -85,9 +86,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                 ),
               );
             },
-            icon:
-                ref.watch(rentOutProvider).loadingfor ==
-                    "delete${widget.data.id}"
+            icon: ref.watch(rentOutProvider).loadingfor == "delete${data.id}"
                 ? CircleAvatar(
                     radius: 10,
                     backgroundColor: Colors.black,
@@ -127,13 +126,13 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
             const SizedBox(height: 5),
 
             ProRentStatusStepper(
-              initialStatus: widget.data.isRejected.toString() == '1'
+              initialStatus: data.isRejected.toString() == '1'
                   ? "0"
-                  : widget.data.delivered.toString() == '0'
+                  : data.delivered.toString() == '0'
                   ? "1"
-                  : widget.data.delivered.toString() == '1'
+                  : data.delivered.toString() == '1'
                   ? "2"
-                  : widget.data.delivered.toString() == '2'
+                  : data.delivered.toString() == '2'
                   ? "3"
                   : '2',
               onStatusChanged: (status) {
@@ -145,7 +144,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                           .watch(userDataClass)
                           .userData["id"]
                           .toString(),
-                      orderId: widget.data.id.toString(),
+                      orderId: data.id.toString(),
                       statusId: status == "0"
                           ? '3'
                           : status == "1"
@@ -172,7 +171,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
               ),
               subtitle:
                   Text(
-                        widget.data.userCanPickupInDateRange,
+                        data.userCanPickupInDateRange,
                         style: TextStyle(color: Colors.black),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
@@ -183,7 +182,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
 
               trailing:
                   Text(
-                        "\$ ${widget.data.totalPriceByUser}",
+                        "\$ ${data.totalPriceByUser}",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
@@ -208,9 +207,9 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarouselSlider.builder(
-                    itemCount: widget.data.productImages.length,
+                    itemCount: data.productImages.length,
                     itemBuilder: (context, index, realIndex) {
-                      final imageUrl = widget.data.productImages[index];
+                      final imageUrl = data.productImages[index];
                       return CacheImageWidget(
                         onTap: () {
                           showImageView(context, imageUrl);
@@ -227,14 +226,13 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                       height: ScreenSize.height * 0.35,
                       viewportFraction: 0.68,
                       enlargeCenterPage: true,
-                      autoPlay: widget.data.productImages.length > 1,
+                      autoPlay: data.productImages.length > 1,
                       autoPlayInterval: const Duration(seconds: 2),
                       autoPlayAnimationDuration: const Duration(
                         milliseconds: 800,
                       ),
                       autoPlayCurve: Curves.fastOutSlowIn,
-                      enableInfiniteScroll:
-                          widget.data.productImages.length > 1,
+                      enableInfiniteScroll: data.productImages.length > 1,
                       scrollDirection: Axis.horizontal,
                     ),
                   )
@@ -245,7 +243,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
               const SizedBox(height: 10),
 
               Text(
-                widget.data.productTitle,
+                data.productTitle,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -253,7 +251,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
               ),
 
               Text(
-                widget.data.productDesc ?? "",
+                data.productDesc ?? "",
                 style: const TextStyle(fontSize: 18),
               ),
 
@@ -275,21 +273,21 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         "daily rate:",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("\$ ${widget.data.dailyRate}"),
+                      trailing: Text("\$ ${data.dailyRate}"),
                     ),
                     CupertinoListTile(
                       title: Text(
                         "weekly rate:",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("\$ ${widget.data.weeklyRate}"),
+                      trailing: Text("\$ ${data.weeklyRate}"),
                     ),
                     CupertinoListTile(
                       title: Text(
                         "monthly rate:",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("\$ ${widget.data.monthlyRate}"),
+                      trailing: Text("\$ ${data.monthlyRate}"),
                     ),
                   ],
                 ),
@@ -312,7 +310,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       subtitle: Text(
-                        widget.data.availability,
+                        data.availability,
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -324,7 +322,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                     //   ),
                     //   subtitle:
                     //       Text(
-                    //             widget.data.userCanPickupInDateRange,
+                    //             data.userCanPickupInDateRange,
                     //             style: TextStyle(color: Colors.black),
                     //           )
                     //           .animate(
@@ -342,7 +340,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         style: TextStyle(color: Colors.cyan),
                       ),
                       subtitle: Text(
-                        "${widget.data.createdAt}",
+                        "${data.createdAt}",
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -384,10 +382,10 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         height: 50,
                         isCircle: true,
                         radius: 200,
-                        url: widget.data.orderByUser!.fullImageUrl,
+                        url: data.orderByUser!.fullImageUrl,
                       ),
-                      title: Text(widget.data.orderByUser!.name),
-                      subtitle: Text(widget.data.orderByUser!.email),
+                      title: Text(data.orderByUser!.name),
+                      subtitle: Text(data.orderByUser!.email),
                     ),
                     Divider(),
                     CupertinoListTile(
@@ -395,7 +393,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         "Phone Number: ",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("${widget.data.orderByUser?.phone}"),
+                      trailing: Text("${data.orderByUser?.phone}"),
                     ),
                     Divider(),
                     CupertinoListTile(
@@ -403,7 +401,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         "Address: ",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("${widget.data.orderByUser?.address}"),
+                      trailing: Text("${data.orderByUser?.address}"),
                     ),
                     Divider(),
                     CupertinoListTile(
@@ -411,7 +409,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         "About: ",
                         style: TextStyle(color: Colors.grey),
                       ),
-                      trailing: Text("${widget.data.orderByUser?.aboutUs}"),
+                      trailing: Text("${data.orderByUser?.aboutUs}"),
                     ),
                     SizedBox(height: 15),
                   ],
@@ -430,20 +428,20 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   //   return Container(
   //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
   //     decoration: BoxDecoration(
-  //       color: _getStatusColor(widget.data.delivered.toString()),
+  //       color: _getStatusColor(data.delivered.toString()),
   //       borderRadius: BorderRadius.circular(20),
   //     ),
   //     child: Row(
   //       mainAxisSize: MainAxisSize.min,
   //       children: [
   //         Icon(
-  //           _getStatusIcon(widget.data.delivered.toString()),
+  //           _getStatusIcon(data.delivered.toString()),
   //           color: Colors.white,
   //           size: 16,
   //         ),
   //         const SizedBox(width: 6),
   //         Text(
-  //           _getStatusText(widget.data.delivered.toString()),
+  //           _getStatusText(data.delivered.toString()),
   //           style: const TextStyle(
   //             color: Colors.white,
   //             fontWeight: FontWeight.w600,

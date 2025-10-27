@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -176,6 +174,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                       itemBuilder: (context, index) => _buildRentalItem(
                         context,
                         rentalData.rentInListData[index],
+                        index,
                       ),
                     ),
                   ),
@@ -192,7 +191,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
     );
   }
 
-  Widget _buildRentalItem(BuildContext context, RentInModel rental) {
+  Widget _buildRentalItem(BuildContext context, RentInModel rental, int index) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -215,7 +214,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
               Expanded(
                 child: InkWell(
                   onTap: () {
-                    goto(RentInDetailsPage(renting: rental));
+                    goto(RentInDetailsPage(index: index));
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 12),

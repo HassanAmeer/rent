@@ -88,7 +88,7 @@ class _BlogsState extends ConsumerState<Blogs> {
 
                         return GestureDetector(
                           onTap: () {
-                            goto(Blogsdetails(blog: blog));
+                            goto(Blogsdetails(index: index));
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +98,7 @@ class _BlogsState extends ConsumerState<Blogs> {
                                 borderRadius: BorderRadius.circular(12),
                                 child: CacheImageWidget(
                                   onTap: () {
-                                    goto(Blogsdetails(blog: blog));
+                                    goto(Blogsdetails(index: index));
                                   },
                                   isCircle: false,
                                   url: blog.image,

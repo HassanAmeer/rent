@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -7,16 +8,17 @@ import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/api_endpoints.dart';
 import '../../models/blog_model.dart';
+import '../../apidata/blogapi.dart';
 
-class Blogsdetails extends StatefulWidget {
-  final BlogModel blog;
-  const Blogsdetails({super.key, required this.blog});
+class Blogsdetails extends ConsumerStatefulWidget {
+  final int index;
+  const Blogsdetails({super.key, required this.index});
 
   @override
-  State<Blogsdetails> createState() => _BlogsdetailsState();
+  ConsumerState<Blogsdetails> createState() => _BlogsdetailsState();
 }
 
-class _BlogsdetailsState extends State<Blogsdetails> {
+class _BlogsdetailsState extends ConsumerState<Blogsdetails> {
   bool isLoading = true;
 
   @override
@@ -37,7 +39,7 @@ class _BlogsdetailsState extends State<Blogsdetails> {
 
   @override
   Widget build(BuildContext context) {
-    final blog = widget.blog;
+    final blog = ref.watch(blogDataProvider).blogs[widget.index];
 
     return Scaffold(
       appBar: AppBar(

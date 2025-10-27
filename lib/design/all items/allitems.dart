@@ -131,7 +131,7 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                           // return Text(item.toString());
                           return GestureDetector(
                             onTap: () {
-                              goto(Allitemdetailspage(item: item));
+                              goto(Allitemdetailspage(index: index));
                             },
                             child: ItemsBox(
                               fullDataBytIndex: item,

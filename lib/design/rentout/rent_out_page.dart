@@ -134,6 +134,7 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
                       itemBuilder: (context, index) => _bookingCard(
                         context,
                         ref.watch(rentOutProvider).comingOrders[index],
+                        index,
                       ),
                     ),
             ],
@@ -145,7 +146,7 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
     );
   }
 
-  Widget _bookingCard(BuildContext context, BookingModel booking) {
+  Widget _bookingCard(BuildContext context, BookingModel booking, int index) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -162,7 +163,7 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
         children: [
           InkWell(
             onTap: () {
-              goto(RentOutDetailsPage(data: booking));
+              goto(RentOutDetailsPage(index: index));
             },
             child: Padding(
               padding: const EdgeInsets.only(top: 0),

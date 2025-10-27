@@ -9,6 +9,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/screensizes.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/categoryapi.dart';
+import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../services/toast.dart';
@@ -19,9 +20,9 @@ import '../../models/favorite_model.dart';
 import '../../widgets/imageview.dart';
 
 class FavDetailsPage extends ConsumerStatefulWidget {
-  final FavoriteModel item;
+  final int index;
 
-  const FavDetailsPage({super.key, required this.item});
+  const FavDetailsPage({super.key, required this.index});
 
   @override
   _FavDetailsPageState createState() => _FavDetailsPageState();
@@ -89,6 +90,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    var favitem = ref.watch(favProvider).favouriteItems[widget.index];
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -168,22 +170,21 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                 // print(finalDateRange.toString());
                 var daysCount = endDate.difference(startDate).inDays + 1;
                 debugPrint(
-                  (widget.item.products!.dailyrate * daysCount).toString(),
+                  (favitem.products!.dailyrate * daysCount).toString(),
                 );
                 ref
                     .read(getAllItems)
                     .orderitems(
                       userCanPickupInDateRange: finalDateRange,
-                      productId: widget.item.products!.id.toString(),
-                      totalprice_by:
-                          (widget.item.products!.dailyrate * daysCount)
-                              .toString(),
-                      product_by: widget.item.rentalusers!.id.toString(),
+                      productId: favitem.products!.id.toString(),
+                      totalprice_by: (favitem.products!.dailyrate * daysCount)
+                          .toString(),
+                      product_by: favitem.rentalusers!.id.toString(),
                       userId: ref
                           .watch(userDataClass)
                           .userData["id"]
                           .toString(),
-                      loadingFor: "${widget.item.id}order",
+                      loadingFor: "${favitem.id}order",
                       context: context,
                     );
               } catch (e) {
@@ -191,7 +192,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
               }
             },
 
-            child: ref.watch(getAllItems).loadingFor == "${widget.item.id}order"
+            child: ref.watch(getAllItems).loadingFor == "${favitem.id}order"
                 ? Padding(
                     padding: const EdgeInsets.all(15),
                     child: CircularProgressIndicator(
@@ -200,7 +201,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                     ),
                   )
                 : Icon(
-                    ref.watch(getAllItems).orderedItems.contains(widget.item.id)
+                    ref.watch(getAllItems).orderedItems.contains(favitem.id)
                         ? Icons
                               .shopping_cart // Filled cart
                         : Icons.shopping_cart_outlined, // Outlined cart
@@ -230,9 +231,9 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                   children: [
                     // Hero-wrapped Image with shadow
                     CarouselSlider.builder(
-                      itemCount: widget.item.itemImages.length,
+                      itemCount: favitem.itemImages.length,
                       itemBuilder: (context, index, realIndex) {
-                        final imageUrl = widget.item.itemImages[index];
+                        final imageUrl = favitem.itemImages[index];
                         return CacheImageWidget(
                           onTap: () {
                             showImageView(context, imageUrl);
@@ -249,20 +250,20 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                         height: ScreenSize.height * 0.35,
                         viewportFraction: 0.68,
                         enlargeCenterPage: true,
-                        autoPlay: widget.item.itemImages.length > 1,
+                        autoPlay: favitem.itemImages.length > 1,
                         autoPlayInterval: const Duration(seconds: 2),
                         autoPlayAnimationDuration: const Duration(
                           milliseconds: 800,
                         ),
                         autoPlayCurve: Curves.fastOutSlowIn,
-                        enableInfiniteScroll: widget.item.itemImages.length > 1,
+                        enableInfiniteScroll: favitem.itemImages.length > 1,
                         scrollDirection: Axis.horizontal,
                       ),
                     ),
                     const SizedBox(height: 16),
                     // Title
                     Text(
-                      widget.item.products!.title,
+                      favitem.products!.title,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -272,7 +273,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                     const SizedBox(height: 8),
                     // Description
                     HtmlWidget(
-                      widget.item.products!.description!,
+                      favitem.products!.description!,
                       textStyle: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
@@ -291,16 +292,16 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                         isCircle: true,
                         radius: 5,
                         url:
-                            "${widget.item.products!.category != null
-                                ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.products!.category).isNotEmpty
-                                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.products!.category).image
+                            "${favitem.products!.category != null
+                                ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
+                                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).image
                                       : null
                                 : null}",
                       ),
                       title: Text(
-                        "${widget.item.products!.category != null
-                            ? ref.watch(categoryProvider).categories.where((e) => e.id == widget.item.products!.category).isNotEmpty
-                                  ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == widget.item.products!.category).name
+                        "${favitem.products!.category != null
+                            ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
+                                  ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).name
                                   : null
                             : null}",
                       ),
@@ -309,7 +310,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                     // Rates Section with Staggered Animation
                     RotationTransition(
                       turns: _rotationAnimation,
-                      child: _buildRatesCard(context),
+                      child: _buildRatesCard(context, favitem),
                     ),
                     const SizedBox(height: 5),
                     // Other Details
@@ -325,7 +326,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                           context,
                           "Availability Days",
 
-                          widget.item.products!.availabilityDays ?? 'N/A',
+                          favitem.products!.availabilityDays ?? 'N/A',
                         ),
                       ),
                     ),
@@ -350,14 +351,14 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                           height: 50,
                           isCircle: true,
                           radius: 200,
-                          url: widget.item.rentalusers!.fullImageUrl,
+                          url: favitem.rentalusers!.fullImageUrl,
                         ),
                         title: Text(
-                          widget.item.rentalusers!.name,
+                          favitem.rentalusers!.name,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
-                          widget.item.rentalusers!.email,
+                          favitem.rentalusers!.email,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -368,7 +369,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
                       context,
                       "Listing Date",
 
-                      widget.item.createdAt?.toString() ?? 'N/A',
+                      favitem.createdAt?.toString() ?? 'N/A',
                     ),
                     const Divider(),
                     // _buildDetailRow(
@@ -387,21 +388,21 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage>
     );
   }
 
-  Widget _buildRatesCard(BuildContext context) {
+  Widget _buildRatesCard(BuildContext context, FavoriteModel favitem) {
     final rates = [
       {
         'label': 'Daily Rate',
-        'value': widget.item.formattedDailyRate,
+        'value': favitem.formattedDailyRate,
         'icon': Icons.calendar_today,
       },
       {
         'label': 'Weekly Rate',
-        'value': widget.item.products!.formattedWeeklyRate,
+        'value': favitem.products!.formattedWeeklyRate,
         'icon': Icons.date_range,
       },
       {
         'label': 'Monthly Rate',
-        'value': widget.item.products!.formattedMonthlyRate,
+        'value': favitem.products!.formattedMonthlyRate,
         'icon': Icons.event,
       },
     ];

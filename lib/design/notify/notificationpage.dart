@@ -130,9 +130,7 @@ class _MyWidgetState extends ConsumerState<NotificationPage> {
                         children: [
                           ListTile(
                             onTap: () {
-                              goto(
-                                NotificationsDetails(fullData: item.toJson()),
-                              );
+                              goto(NotificationsDetails(index: index));
                             },
                             leading: Stack(
                               children: [
