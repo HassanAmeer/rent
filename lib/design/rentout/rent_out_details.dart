@@ -17,6 +17,7 @@ import '../../constants/appColors.dart';
 import '../../constants/images.dart';
 import '../../models/rent_out_model.dart';
 import '../../widgets/casheimage.dart';
+import '../../widgets/dotloader.dart';
 import '../../widgets/imageview.dart';
 import '../../widgets/rentStepperWidget.dart';
 
@@ -32,7 +33,70 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("  Rent Out Details")),
+      appBar: AppBar(
+        title: const Text("  Rent Out Details"),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.black,
+                  title: const Text(
+                    'Delete Order',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  content: const Text(
+                    'Are you sure you want to delete this?',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Cancel',
+
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // ✅ delete using ref
+                        ref
+                            .watch(rentOutProvider)
+                            .deleteOrder(
+                              orderId: widget.data.id.toString(),
+                              loadingFor: "delete${widget.data.id}",
+                            );
+                        Navigator.pop(context);
+                      },
+                      child:
+                          const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.grey),
+                              )
+                              .animate(
+                                onPlay: (controller) =>
+                                    controller.repeat(reverse: true),
+                              )
+                              .shimmer(color: Colors.red.shade200),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon:
+                ref.watch(rentOutProvider).loadingfor ==
+                    "delete${widget.data.id}"
+                ? CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Colors.black,
+                    child: DotLoader(showDots: 1),
+                  )
+                : Icon(Icons.delete),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         onPressed: () {},
@@ -122,6 +186,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         "\$ ${widget.data.totalPriceByUser}",
                         style: TextStyle(
                           color: Colors.black,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       )

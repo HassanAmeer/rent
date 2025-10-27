@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
-// import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
+// import 'package:rent/apidata/myrentalapi.dart' show rentInProvider;
 // import 'package:rent/apidata/user.dart' show userDataClass;
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
@@ -36,7 +38,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userId = ref.read(userDataClass).userId;
       ref
-          .read(rentalDataProvider)
+          .read(rentInProvider)
           .fetchRentIn(
             userId: userId,
             loadingFor: widget.refresh ? "refresh" : "fetchRentIn",
@@ -48,7 +50,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
 
   @override
   Widget build(BuildContext context) {
-    final rentalData = ref.watch(rentalDataProvider);
+    final rentalData = ref.watch(rentInProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
@@ -85,7 +87,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                   onPressed: () {
                     final userId = ref.read(userDataClass).userId;
                     ref
-                        .watch(rentalDataProvider)
+                        .watch(rentInProvider)
                         .fetchRentIn(
                           userId: userId,
                           search: searchfeildcontroller.text,
@@ -150,7 +152,7 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                     onRefresh: () async {
                       final userId = ref.read(userDataClass).userId;
                       await ref
-                          .read(rentalDataProvider)
+                          .read(rentInProvider)
                           .fetchRentIn(
                             userId: userId,
                             loadingFor: "refresh",
@@ -267,6 +269,68 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                 ),
               ),
             ],
+          ),
+          Positioned(
+            left: 8,
+            top: 0,
+            child: IconButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.black,
+                    title: const Text(
+                      'Delete Order',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    content: const Text(
+                      'Are you sure you want to delete this?',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          'Cancel',
+
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // ✅ delete using ref
+                          ref
+                              .watch(rentInProvider)
+                              .deleteOrder(
+                                orderId: rental.id.toString(),
+                                loadingFor: "delete+${rental.id}",
+                              );
+                          Navigator.pop(context);
+                        },
+                        child:
+                            const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.grey),
+                                )
+                                .animate(
+                                  onPlay: (controller) =>
+                                      controller.repeat(reverse: true),
+                                )
+                                .shimmer(color: Colors.red.shade200),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon:
+                  ref.watch(rentInProvider).loadingFor == "delete+${rental.id}"
+                  ? CircleAvatar(
+                      radius: 10,
+                      backgroundColor: Colors.black,
+                      child: DotLoader(showDots: 1),
+                    )
+                  : Icon(Icons.delete),
+            ),
           ),
           // Right-top Status Label
           Positioned(

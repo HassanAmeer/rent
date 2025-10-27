@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:rent/apidata/bookingapi.dart';
 // import 'package:rent/apidata/user.dart' show userDataClass;
@@ -218,6 +219,68 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
                   const SizedBox(height: 2),
                 ],
               ),
+            ),
+          ),
+          Positioned(
+            left: 8,
+            top: 0,
+            child: IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.black,
+                    title: const Text(
+                      'Delete Order',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    content: const Text(
+                      'Are you sure you want to delete this?',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          'Cancel',
+
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // ✅ delete using ref
+                          ref
+                              .watch(rentOutProvider)
+                              .deleteOrder(
+                                orderId: booking.id.toString(),
+                                loadingFor: "delete${booking.id}",
+                              );
+                          Navigator.pop(context);
+                        },
+                        child:
+                            const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.grey),
+                                )
+                                .animate(
+                                  onPlay: (controller) =>
+                                      controller.repeat(reverse: true),
+                                )
+                                .shimmer(color: Colors.red.shade200),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon:
+                  ref.watch(rentOutProvider).loadingfor == "delete${booking.id}"
+                  ? CircleAvatar(
+                      radius: 10,
+                      backgroundColor: Colors.black,
+                      child: DotLoader(showDots: 1),
+                    )
+                  : Icon(Icons.delete),
             ),
           ),
           // Right-top Status Label

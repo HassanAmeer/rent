@@ -10,13 +10,11 @@ import 'package:rent/services/toast.dart';
 import 'package:rent/models/rent_in_model.dart';
 
 // Provider for rentals
-final rentalDataProvider = ChangeNotifierProvider<RentalData>(
-  (ref) => RentalData(),
+final rentInProvider = ChangeNotifierProvider<RentInProvider>(
+  (ref) => RentInProvider(),
 );
 
-class RentalData with ChangeNotifier {
-  Map<String, dynamic> rentalDetails = {};
-
+class RentInProvider with ChangeNotifier {
   // Loading state management
   String loadingFor = "";
   void setLoading([String loadingName = ""]) {
@@ -34,7 +32,7 @@ class RentalData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
       if (rentInListData.isNotEmpty && !refresh) return;
-      debugPrint("Fetching my rentals for user ID: $userId");
+      debugPrint("Fetching fetchRentIn for user ID: $userId");
 
       setLoading(loadingFor);
       final response = await http.post(
@@ -56,7 +54,7 @@ class RentalData with ChangeNotifier {
             .reversed
             .toList();
 
-        debugPrint("👉 Rentals loaded: ${rentInListData.length} items");
+        debugPrint("👉 fetchRentIn loaded: ${rentInListData.length} items");
         setLoading();
         notifyListeners();
       } else {
@@ -65,16 +63,17 @@ class RentalData with ChangeNotifier {
       }
     } catch (e) {
       setLoading();
-      debugPrint(" 💥 Error fetching rental items: $e");
-      toast("Error Fetching Rentals: ${e.toString()}");
+      debugPrint(" 💥 Error fetchRentIn: $e");
+      toast("Error fetchRentIn: ${e.toString()}");
     } finally {
       setLoading();
     }
   }
 
   // Method to update rental status (delivered/not delivered)
-  Future<void> updateRentalStatus({
+  Future<void> updateRentnPickupTime({
     required String uid,
+    required String orderId,
     required String pickup_date_range,
     required String total_price,
     String loadingFor = "",
@@ -87,6 +86,7 @@ class RentalData with ChangeNotifier {
         Uri.parse(Api.updateRentInOrderEndpoint),
         body: {
           'uid': uid,
+          'order_id': orderId,
           'pickup_date_range': pickup_date_range,
           'total_price': total_price,
         },
@@ -98,7 +98,13 @@ class RentalData with ChangeNotifier {
       debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
-        toast(data['msg'] ?? 'Status updated successfully');
+        toast(data['msg'] ?? 'updated!');
+
+        rentInListData
+                .where((element) => element.id == int.parse(orderId))
+                .first
+                .userCanPickupInDateRange =
+            pickup_date_range;
 
         // Refresh rental details
         // await fetchRentInDetails(rentalId: rentalId);
@@ -135,17 +141,17 @@ class RentalData with ChangeNotifier {
 
       if (response.statusCode == 200) {
         toast(data['msg'] ?? 'Order Deleted!');
-
+        rentInListData.removeWhere((e) => e.id == int.parse(orderId));
         // Refresh rental details
         // await fetchRentInDetails(rentalId: rentalId);
         setLoading();
       } else {
-        toast(data['msg'] ?? 'Failed to Delet Order!');
+        toast(data['msg'] ?? 'Failed to Delete Order!');
         setLoading();
       }
     } catch (e) {
       setLoading();
-      debugPrint("updateRentalStatus Error: $e");
+      debugPrint("deleteOrder Error: $e");
       toast("Try Later: ${e.toString()}");
     } finally {
       setLoading();

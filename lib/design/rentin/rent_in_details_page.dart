@@ -1,20 +1,25 @@
 import 'dart:convert';
 
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:rent/apidata/rent_in_api.dart';
 // import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:rent/widgets/imageview.dart';
 
+import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
 import '../../constants/screensizes.dart';
 import '../../models/rent_in_model.dart';
+import '../../services/toast.dart';
 import '../../widgets/rentStepperWidget.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
@@ -33,6 +38,68 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
         title: const Text("Rent In Details"),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
+
+        actions: [
+          IconButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.black,
+                  title: const Text(
+                    'Delete Order',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  content: const Text(
+                    'Are you sure you want to delete this?',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Cancel',
+
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // ✅ delete using ref
+                        ref
+                            .watch(rentInProvider)
+                            .deleteOrder(
+                              orderId: widget.renting.id.toString(),
+                              loadingFor: "delete${widget.renting.id}",
+                            );
+                        Navigator.pop(context);
+                      },
+                      child:
+                          const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.grey),
+                              )
+                              .animate(
+                                onPlay: (controller) =>
+                                    controller.repeat(reverse: true),
+                              )
+                              .shimmer(color: Colors.red.shade200),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon:
+                ref.watch(rentInProvider).loadingFor ==
+                    "delete${widget.renting.id}"
+                ? CircleAvatar(
+                    radius: 10,
+                    backgroundColor: Colors.black,
+                    child: DotLoader(showDots: 1),
+                  )
+                : Icon(Icons.delete),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
@@ -74,6 +141,66 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
             Divider(height: 2),
             CupertinoListTile(
               // minVerticalPadding: 0,
+              leading: IconButton(
+                onPressed: () async {
+                  try {
+                    List<DateTime?> dates = [];
+                    var results = await showCalendarDatePicker2Dialog(
+                      context: context,
+                      config: CalendarDatePicker2WithActionButtonsConfig(
+                        calendarType: CalendarDatePicker2Type.range,
+                      ),
+                      dialogSize: const Size(325, 400),
+                      value: dates,
+                      borderRadius: BorderRadius.circular(15),
+                    );
+
+                    if (results!.isEmpty) {
+                      toast("Please Pickup date range");
+                    }
+
+                    // print(results.toString());
+                    var startDate = results.first; // DateTime
+                    var endDate = results.last; // DateTime
+
+                    // Formatter
+                    var formatter = DateFormat("d MMMM yyyy");
+
+                    // Convert to string
+                    var finalDateRange =
+                        "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                    // print(finalDateRange.toString());
+                    var daysCount = endDate.difference(startDate).inDays + 1;
+                    ////
+                    debugPrint(
+                      (widget.renting.dailyrate * daysCount).toString(),
+                    );
+                    // return;
+
+                    ref
+                        .watch(rentInProvider)
+                        .updateRentnPickupTime(
+                          uid: ref
+                              .watch(userDataClass)
+                              .userData["id"]
+                              .toString(),
+                          orderId: widget.renting.id.toString(),
+                          loadingFor: "updateRentnPickupTime",
+                          pickup_date_range: finalDateRange,
+                          total_price: (widget.renting.dailyrate * daysCount)
+                              .toString(),
+                        );
+                  } catch (e) {
+                    debugPrint("error $e");
+                    toast("Try Later! $e");
+                  }
+                },
+                icon:
+                    ref.watch(rentInProvider).loadingFor ==
+                        "updateRentnPickupTime"
+                    ? DotLoader(showDots: 1, size: 20, spacing: 0)
+                    : Icon(Icons.edit_outlined),
+              ),
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               title: Text(
                 "My Pickup Date:",
@@ -95,6 +222,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         "\$ ${widget.renting.totalPriceByUser}",
                         style: TextStyle(
                           color: Colors.black,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       )

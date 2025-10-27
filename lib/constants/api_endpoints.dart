@@ -39,7 +39,7 @@ class Api {
   // rent out start
   static const String getRentOutOrdersEndpoint = "${apiUrl}getrentoutorders";
   static const String updateRentOutOrder = "${apiUrl}editrentouorder";
-  static const String deleteRentOutOrder = "${apiUrl}delrentouorder/";
+  static const String deleteRentOutOrder = "${apiUrl}deleterentouorder/";
   static const String updateRentOutOrderStatus =
       "${apiUrl}updaterentoutorderstatus";
   // rent out end

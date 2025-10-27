@@ -11,8 +11,8 @@ class BookingModel {
   final int orderByUid;
   final String userCanPickupInDateRange;
   final double totalPriceByUser;
-  final int delivered;
-  final int isRejected;
+  int delivered;
+  int isRejected;
   final int productId;
   final int productBy;
   final String productTitle;

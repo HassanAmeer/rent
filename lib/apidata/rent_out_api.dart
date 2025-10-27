@@ -77,7 +77,7 @@ class RentOutProvider with ChangeNotifier {
       setLoading(loadingFor);
 
       final response = await http.post(
-        Uri.parse(Api.updateOrderStatus),
+        Uri.parse(Api.updateRentOutOrderStatus),
         body: {'uid': userId, 'order_id': orderId, 'status_id': statusId},
       );
 
@@ -86,17 +86,33 @@ class RentOutProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         toast(data['msg'] ?? "Status Updated!", backgroundColor: Colors.black);
+        if (statusId == '3') {
+          comingOrders
+                  .where((element) => element.id == int.parse(orderId))
+                  .first
+                  .isRejected =
+              1;
+        } else {
+          comingOrders
+              .where((element) => element.id == int.parse(orderId))
+              .first
+              .delivered = int.parse(
+            statusId,
+          );
+        }
       } else {
         toast(
           data['msg'] ?? "Failed to Status Updates!",
           backgroundColor: Colors.red,
         );
       }
+      setLoading();
     } catch (e, st) {
+      setLoading();
       debugPrint("updateOrderStatus Error: $e, st:$st");
       toast("Status Updation Failed!", backgroundColor: Colors.red);
     } finally {
-      setLoading("");
+      setLoading();
     }
   }
 
@@ -109,7 +125,7 @@ class RentOutProvider with ChangeNotifier {
       setLoading(loadingFor);
 
       final response = await http.delete(
-        Uri.parse(Api.deleteRentInOrderEndpoint + orderId),
+        Uri.parse(Api.deleteRentOutOrder + orderId),
       );
 
       final data = jsonDecode(response.body);
@@ -119,17 +135,18 @@ class RentOutProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         toast(data['msg'] ?? 'Order Deleted!');
+        comingOrders.removeWhere((e) => e.id == int.parse(orderId));
 
         // Refresh rental details
         // await fetchRentInDetails(rentalId: rentalId);
         setLoading();
       } else {
-        toast(data['msg'] ?? 'Failed to Delet Order!');
+        toast(data['msg'] ?? 'Failed to Delete Order!');
         setLoading();
       }
     } catch (e) {
       setLoading();
-      debugPrint("updateRentalStatus Error: $e");
+      debugPrint("deleteOrder Error: $e");
       toast("Try Later: ${e.toString()}");
     } finally {
       setLoading();
