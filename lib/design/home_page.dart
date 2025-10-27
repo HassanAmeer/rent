@@ -323,8 +323,8 @@ class HomeChart extends ConsumerStatefulWidget {
 class _HomeChartState extends ConsumerState<HomeChart> {
   @override
   Widget build(BuildContext context) {
-    debugPrint("👉🏻 Bookings Data: ${widget.bookingsData}");
-    debugPrint("Rentals Data: ${widget.rentalsData}");
+    // debugPrint("👉🏻 Bookings Data: ${widget.bookingsData}");
+    // debugPrint("Rentals Data: ${widget.rentalsData}");
 
     double maxYValue = 0;
     if (widget.bookingsData.isNotEmpty) {

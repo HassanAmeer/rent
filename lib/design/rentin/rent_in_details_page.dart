@@ -184,8 +184,10 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                           orderId: renting.id.toString(),
                           loadingFor: "updateRentnPickupTime",
                           pickup_date_range: finalDateRange,
-                          total_price: (renting.dailyrate * daysCount)
-                              .toString(),
+                          total_price:
+                              (int.tryParse(renting.dailyrate ?? '0')! *
+                                      daysCount)
+                                  .toString(),
                         );
                   } catch (e) {
                     debugPrint("error $e");

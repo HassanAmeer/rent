@@ -29,22 +29,22 @@ class supportData with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
 
-      print("Fetching all blogs...");
+      debugPrint("Fetching all blogs...");
 
       setLoading(loadingFor);
       final response = await http.get(Uri.parse(Api.settingsEndpoint));
 
       final data = jsonDecode(response.body);
 
-      print("👉 Response status: ${response.statusCode}");
-      print("👉 Data: $data");
+      debugPrint("👉 Response status: ${response.statusCode}");
+      debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
         final settingsData = data['settings'] ?? {};
         settings = SettingsModel.fromJson(
           settingsData,
         ); // ✅ API ke response ke hisaab se
-        print("👉 Settings loaded: $settings");
+        debugPrint("👉 Settings loaded: $settings");
         setLoading();
         notifyListeners();
       } else {

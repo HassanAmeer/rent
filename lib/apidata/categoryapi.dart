@@ -25,10 +25,10 @@ class CategoryData with ChangeNotifier {
   List<CategoryModel> categories = [];
   Future<void> fetchCategories({
     String loadingFor = "",
-    bool shouldRefresh = false,
+    bool refresh = false,
   }) async {
     try {
-      if (categories.isNotEmpty && !shouldRefresh) return;
+      if (categories.isNotEmpty && !refresh) return;
       if (await checkInternet() == false) return;
       setLoading(loadingFor);
       final response = await http.get(Uri.parse(Api.getCatgEndpoint));

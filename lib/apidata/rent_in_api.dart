@@ -32,7 +32,7 @@ class RentInProvider with ChangeNotifier {
     try {
       if (await checkInternet() == false) return;
       if (rentInListData.isNotEmpty && !refresh) return;
-      debugPrint("Fetching fetchRentIn for user ID: $userId");
+      // debugPrint("Fetching fetchRentIn for user ID: $userId");
 
       setLoading(loadingFor);
       final response = await http.post(
@@ -105,6 +105,11 @@ class RentInProvider with ChangeNotifier {
                 .first
                 .userCanPickupInDateRange =
             pickup_date_range;
+        rentInListData
+                .where((element) => element.id == int.parse(orderId))
+                .first
+                .totalPriceByUser =
+            int.tryParse(total_price.toString()) ?? 0;
 
         // Refresh rental details
         // await fetchRentInDetails(rentalId: rentalId);

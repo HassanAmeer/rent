@@ -34,17 +34,23 @@ class DashboardService with ChangeNotifier {
     notifyListeners();
   }
 
-  fetchDashboard({String loadingfor = "", required uid}) async {
+  fetchDashboard({
+    String loadingfor = "",
+    required uid,
+    bool refresh = false,
+  }) async {
     try {
       setLoading(loadingfor);
+      if (await checkInternet() == false) return;
+      if (dashboardData.isNotEmpty && refresh == false) return;
 
       final response = await http.get(
         Uri.parse("${Api.dashboardEndpoint}$uid"),
       );
 
       final data = jsonDecode(response.body);
-      print("👉Response status: ${response.statusCode}");
-      print("👉 data: $data");
+      debugPrint("👉Response status: ${response.statusCode}");
+      debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
         dashboardData.clear();
@@ -54,7 +60,7 @@ class DashboardService with ChangeNotifier {
       }
       setLoading("");
     } catch (e) {
-      print("❌ Error fetching dashboard: $e");
+      debugPrint("❌ Error fetching dashboard: $e");
       setLoading("");
     } finally {
       setLoading("");

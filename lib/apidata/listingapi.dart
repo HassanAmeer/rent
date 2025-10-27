@@ -35,8 +35,8 @@ class ListingData with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (listings.isNotEmpty && refresh == false) return;
       if (await checkInternet() == false) return;
+      if (listings.isNotEmpty && refresh == false) return;
 
       setLoading(loadingfor);
       debugPrint("Fetching my items for user ID: $uid");

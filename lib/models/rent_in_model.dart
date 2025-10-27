@@ -70,9 +70,9 @@ class RentInModel {
         : jsonDecode(json["productImage"]) is String
         ? [Api.imgPath + jsonDecode(json["productImage"])]
         : [ImgLinks.noItem, ImgLinks.noItem],
-    dailyrate: json["dailyrate"] ?? '',
-    weeklyrate: json["weeklyrate"] ?? '',
-    monthlyrate: json["monthlyrate"] ?? '',
+    dailyrate: int.tryParse(json["dailyrate"] ?? '0'),
+    weeklyrate: int.tryParse(json["weeklyrate"] ?? '0'),
+    monthlyrate: int.tryParse(json["monthlyrate"] ?? '0'),
     availability: json["availability"] ?? '',
     productPickupDate: json["productPickupDate"] ?? '',
     ipAddress: json["ipAddress"] ?? '',
