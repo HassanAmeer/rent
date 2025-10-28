@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class SearchFeildWidget extends StatelessWidget {
@@ -7,6 +6,8 @@ class SearchFeildWidget extends StatelessWidget {
   final VoidCallback? onSearchIconTap;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onSubmitted;
+  final Color? fillColor;
+
   const SearchFeildWidget({
     super.key,
     required this.searchFieldController,
@@ -14,6 +15,7 @@ class SearchFeildWidget extends StatelessWidget {
     this.onSearchIconTap,
     this.onChanged,
     this.onSubmitted,
+    this.fillColor = const Color.fromARGB(255, 242, 239, 239),
   });
 
   @override
@@ -44,7 +46,7 @@ class SearchFeildWidget extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.grey.shade300,
+        fillColor: fillColor,
         suffixIcon: InkWell(
           onTap: () {
             onSearchIconTap?.call();

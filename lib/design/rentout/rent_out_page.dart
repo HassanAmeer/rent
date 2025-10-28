@@ -19,7 +19,7 @@ import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
 import '../../services/goto.dart';
 import '../../services/toast.dart';
-import '../../widgets/listings_widgets/items_box_widget.dart';
+import '../../widgets/lsitings_widgets/items_box_widget.dart';
 import '../../widgets/searchfield.dart';
 import '../../models/rent_out_model.dart';
 
@@ -50,149 +50,196 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
   var searchfieldcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        automaticallyImplyLeading: true,
-        title: const Text(
-          "  Rent Out",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.white, AppColors.mainColor.shade100],
         ),
-        backgroundColor: Colors.cyan,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 1,
       ),
-      body: RefreshIndicator(
-        color: AppColors.mainColor,
-        backgroundColor: Colors.black87,
-        elevation: 0,
-        onRefresh: () async {
-          ref
-              .watch(rentOutProvider)
-              .fetchComingOrders(
-                uid: ref.watch(userDataClass).userData["id"].toString(),
-                search: "",
-                refresh: true,
-                loadingfor: "refresh",
-              );
-        },
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              ref.watch(rentOutProvider).loadingfor == "refresh"
-                  ? QuickTikTokLoader(
-                      progressColor: Colors.black,
-                      backgroundColor: Colors.grey,
-                    )
-                  : SizedBox.shrink(),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        // appBar: AppBar(
+        //   titleSpacing: 0,
+        //   automaticallyImplyLeading: true,
+        //   leading: IconButton(
+        //     onPressed: () {
+        //       Navigator.pop(context);
+        //     },
+        //     icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+        //   ),
+        //   title: const Text(
+        //     "Rent Out",
+        //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        //   ),
+        //   backgroundColor: Colors.cyan,
+        //   iconTheme: const IconThemeData(color: Colors.black),
+        //   elevation: 1,
+        // ),
+        body: SafeArea(
+          child: RefreshIndicator(
+            color: AppColors.mainColor,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            onRefresh: () async {
+              ref
+                  .watch(rentOutProvider)
+                  .fetchComingOrders(
+                    uid: ref.watch(userDataClass).userData["id"].toString(),
+                    search: "",
+                    refresh: true,
+                    loadingfor: "refresh",
+                  );
+            },
+            child: SingleChildScrollView(
+              controller: ScrollController(),
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  ref.watch(rentOutProvider).loadingfor == "refresh"
+                      ? QuickTikTokLoader(
+                          progressColor: Colors.black,
+                          backgroundColor: Colors.grey,
+                        )
+                      : SizedBox.shrink(),
 
-              // Search bar just below AppBar (with grey background)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SearchFeildWidget(
-                  searchFieldController: searchfieldcontroller,
-                  hint: "Search How to & More",
-                  onSearchIconTap: () {
-                    // if (searchfieldcontroller.text.isEmpty) {
-                    //   toast("Write Someting");
-                    //   return;
-                    // }
-                    ref
-                        .watch(rentOutProvider)
-                        .fetchComingOrders(
-                          uid: ref
-                              .watch(userDataClass)
-                              .userData["id"]
-                              .toString(),
-                          refresh: true,
-                          search: searchfieldcontroller.text,
-                          loadingfor: "refresh",
-                        );
-                  },
-                ),
-              ),
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                      ),
+                      const Text(
+                        "Rent Out",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
 
-              ref.watch(rentOutProvider).loadingfor == "fetchComingOrders"
-                  ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 250),
-                        child: DotLoader(),
-                      ),
-                    )
-                  : GridView.builder(
-                      shrinkWrap: true,
-                      controller: ScrollController(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                      itemCount: ref.watch(rentOutProvider).comingOrders.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount:
-                            ScreenSize.isTablet || ScreenSize.isLandscape
-                            ? 3
-                            : 2,
-                        mainAxisSpacing:
-                            ScreenSize.isTablet || ScreenSize.isLandscape
-                            ? 20
-                            : 15,
-                        crossAxisSpacing:
-                            ScreenSize.isTablet || ScreenSize.isLandscape
-                            ? 20
-                            : 15,
-                        childAspectRatio: 0.9,
-                      ),
-                      itemBuilder: (context, index) {
-                        var item = ref
+                  // Search bar just below AppBar (with grey background)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SearchFeildWidget(
+                      searchFieldController: searchfieldcontroller,
+                      hint: "Search How to & More",
+                      onSearchIconTap: () {
+                        // if (searchfieldcontroller.text.isEmpty) {
+                        //   toast("Write Someting");
+                        //   return;
+                        // }
+                        ref
                             .watch(rentOutProvider)
-                            .comingOrders[index];
-                        return ListingBox(
-                              id: item.id.toString(),
-                              title: item.displayTitle,
-                              showStatusLabel: true,
-                              statusLabelType: item.delivered.toString(),
-                              showDelete: true,
-                              isDeleteLoading:
-                                  ref.watch(rentOutProvider).loadingfor ==
-                                  "delete${item.id}",
-                              onDeleteTap: () {
-                                alertBoxDelete(
-                                  context,
-                                  onDeleteTap: () {
-                                    ref
-                                        .watch(rentOutProvider)
-                                        .deleteOrder(
-                                          orderId: item.id.toString(),
-                                          loadingFor: "delete${item.id}",
-                                        );
-                                  },
-                                );
-                              },
-                              imageUrl: item.productImages.first,
-                              onTap: () =>
-                                  goto(RentOutDetailsPage(index: index)),
-                            )
-                            .animate()
-                            .fadeIn(
-                              delay: Duration(milliseconds: index * 100),
-                              duration: 0.2.seconds,
-                            )
-                            .slideY(begin: 0.2);
+                            .fetchComingOrders(
+                              uid: ref
+                                  .watch(userDataClass)
+                                  .userData["id"]
+                                  .toString(),
+                              refresh: true,
+                              search: searchfieldcontroller.text,
+                              loadingfor: "refresh",
+                            );
                       },
-                      // _bookingCard(
-                      //   context,
-                      //   ref.watch(rentOutProvider).comingOrders[index],
-                      //   index,
-                      // ),
                     ),
-            ],
+                  ),
+
+                  ref.watch(rentOutProvider).loadingfor == "fetchComingOrders"
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 250),
+                            child: DotLoader(),
+                          ),
+                        )
+                      : GridView.builder(
+                          shrinkWrap: true,
+                          controller: ScrollController(),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
+                          itemCount: ref
+                              .watch(rentOutProvider)
+                              .comingOrders
+                              .length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount:
+                                    ScreenSize.isTablet ||
+                                        ScreenSize.isLandscape
+                                    ? 3
+                                    : 2,
+                                mainAxisSpacing:
+                                    ScreenSize.isTablet ||
+                                        ScreenSize.isLandscape
+                                    ? 20
+                                    : 15,
+                                crossAxisSpacing:
+                                    ScreenSize.isTablet ||
+                                        ScreenSize.isLandscape
+                                    ? 20
+                                    : 15,
+                                childAspectRatio: 0.9,
+                              ),
+                          itemBuilder: (context, index) {
+                            var item = ref
+                                .watch(rentOutProvider)
+                                .comingOrders[index];
+                            return ListingBox(
+                                  id: item.id.toString(),
+                                  title: item.displayTitle,
+                                  showStatusLabel: true,
+                                  statusLabelType: item.delivered.toString(),
+                                  showDelete: true,
+                                  isDeleteLoading:
+                                      ref.watch(rentOutProvider).loadingfor ==
+                                      "delete${item.id}",
+                                  onDeleteTap: () {
+                                    alertBoxDelete(
+                                      context,
+                                      onDeleteTap: () {
+                                        ref
+                                            .watch(rentOutProvider)
+                                            .deleteOrder(
+                                              orderId: item.id.toString(),
+                                              loadingFor: "delete${item.id}",
+                                            );
+                                      },
+                                    );
+                                  },
+                                  imageUrl: item.productImages.first,
+                                  onTap: () =>
+                                      goto(RentOutDetailsPage(index: index)),
+                                )
+                                .animate()
+                                .fadeIn(
+                                  delay: Duration(milliseconds: index * 100),
+                                  duration: 0.2.seconds,
+                                )
+                                .slideY(begin: 0.2);
+                          },
+                          // _bookingCard(
+                          //   context,
+                          //   ref.watch(rentOutProvider).comingOrders[index],
+                          //   index,
+                          // ),
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
+        // Floating Action Button for Add New Booking
+        // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
       ),
-      // Floating Action Button for Add New Booking
-      // bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
     );
   }
 

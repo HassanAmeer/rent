@@ -13,11 +13,12 @@ import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
-import 'package:rent/widgets/listings_widgets/items_box_widget.dart';
+
 import 'package:rent/widgets/searchfield.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
 import '../../widgets/delete_alert_box.dart';
+import '../../widgets/lsitings_widgets/items_box_widget.dart';
 
 class ListingPage extends ConsumerStatefulWidget {
   const ListingPage({super.key});
@@ -43,7 +44,7 @@ class _ListingPageState extends ConsumerState<ListingPage> {
     });
   }
 
-  void _fetch(String query, {bool refresh = false}) {
+  void _fetch(String query, {bool refresh = false, String loadingFor = ""}) {
     final uid = ref.read(userDataClass).userData["id"].toString();
     ref
         .read(listingDataProvider)
@@ -51,12 +52,16 @@ class _ListingPageState extends ConsumerState<ListingPage> {
           uid: uid,
           search: query,
           refresh: refresh,
-          loadingfor: refresh ? "refresh" : "getlistings",
+          loadingfor: loadingFor.isNotEmpty
+              ? loadingFor
+              : refresh
+              ? "refresh"
+              : "getlistings",
         );
   }
 
   Future<void> _refresh() async =>
-      _fetch(_searchCtrl.text.trim(), refresh: true);
+      _fetch(_searchCtrl.text.trim(), refresh: true, loadingFor: "refresh");
 
   @override
   void dispose() {
@@ -83,41 +88,58 @@ class _ListingPageState extends ConsumerState<ListingPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        // systemOverlayStyle: const SystemUiOverlayStyle(
+        //   statusBarColor: Colors.transparent,
+        //   statusBarIconBrightness: Brightness.dark,
+        // ),
+        flexibleSpace: prov.loadingfor == "refresh"
+            ? QuickTikTokLoader(
+                height: 5,
+                progressColor: AppColors.mainColor,
+                backgroundColor: Colors.white,
+              ).animate().fadeIn(duration: const Duration(milliseconds: 300))
+            : SizedBox.shrink(),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+        ),
         title: const Text(
           'My Listings',
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            color: Colors.black54,
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'refresh',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.refresh,
-                      color: isRefresh ? AppColors.mainColor : Colors.white,
-                    ).animate().rotate(duration: isRefresh ? 800.ms : 0.ms),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Refresh',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            onSelected: (_) => _refresh(),
-          ),
-        ],
+        // actions: [
+        //   PopupMenuButton<String>(
+        //     icon: const Icon(Icons.more_vert),
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(12),
+        //     ),
+        //     color: Colors.black54,
+        //     itemBuilder: (_) => [
+        //       PopupMenuItem(
+        //         value: 'refresh',
+        //         child: Row(
+        //           children: [
+        //             Icon(
+        //               Icons.refresh,
+        //               color: isRefresh ? AppColors.mainColor : Colors.white,
+        //             ).animate().rotate(duration: isRefresh ? 800.ms : 0.ms),
+        //             const SizedBox(width: 8),
+        //             const Text(
+        //               'Refresh',
+        //               style: TextStyle(color: Colors.white),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ],
+        //     onSelected: (_) => _refresh(),
+        //   ),
+        // ],
       ),
       body: Container(
         decoration: const BoxDecoration(

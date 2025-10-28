@@ -92,7 +92,7 @@ class _ListingBoxState extends State<ListingBox>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(7),
       child:
           MouseRegion(
                 onHover: (_) => _tiltCtrl.forward(),
@@ -111,7 +111,7 @@ class _ListingBoxState extends State<ListingBox>
                                 // ────── GLASS CARD BACKGROUND ──────
                                 Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
+                                    borderRadius: BorderRadius.circular(19),
                                     gradient: const LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -134,7 +134,7 @@ class _ListingBoxState extends State<ListingBox>
                                     ],
                                   ),
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
+                                    borderRadius: BorderRadius.circular(19),
                                     child: BackdropFilter(
                                       filter: ImageFilter.blur(
                                         sigmaX: 12,
@@ -150,7 +150,7 @@ class _ListingBoxState extends State<ListingBox>
                                 // ────── IMAGE WITH ANIMATED GRADIENT OVERLAY ──────
                                 Positioned.fill(
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
+                                    borderRadius: BorderRadius.circular(19),
                                     child: Stack(
                                       fit: StackFit.expand,
                                       children: [

@@ -104,195 +104,227 @@ class _HomePageState extends ConsumerState<HomePage> {
       onWillPop: () {
         return Future.value(false);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Image.asset(ImgAssets.logoShadow, width: 100),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => NotificationPage(),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [Colors.white, AppColors.mainColor.shade100],
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: false,
+            title: Image.asset(ImgAssets.logoShadow, width: 100),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => NotificationPage(),
+                    ),
+                  );
+                },
+                icon:
+                    const Icon(
+                          Icons.notifications,
+                          size: 30,
+                          color: Colors.grey,
+                        )
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .shimmer(
+                          duration: Duration(seconds: 3),
+                          color: Colors.white,
+                        ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileDetailsPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.cyan.shade700,
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                );
-              },
-              icon: const Icon(Icons.notifications, size: 30),
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfileDetailsPage()),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.cyan.shade700,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                width: 47,
-                height: 47,
-                clipBehavior: Clip.antiAlias,
-                child: CacheImageWidget(
-                  url: Api.imgPath + ref.watch(userDataClass).userImage,
+                  width: 47,
+                  height: 47,
+                  clipBehavior: Clip.antiAlias,
+                  child: CacheImageWidget(
+                    url: ref.watch(userDataClass).userImage,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 12),
-          ],
-        ),
+              SizedBox(width: 12),
+            ],
+          ),
 
-        /// ✅ Body
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              SizedBox(height: 0),
+          /// ✅ Body
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                SizedBox(height: 0),
 
-              // ✅ Sirf API wala chart
-              ref.watch(dashboardProvider).loadingfor == "dashboard"
-                  ? LoadingChart()
-                  : HomeChart(
-                          bookingsData: _parseDoubleList(
-                            dashboardService
-                                .dashboardData['orderCountsListForChart'],
-                          ),
-                          rentalsData: _parseDoubleList(
-                            dashboardService
-                                .dashboardData["rentalCountsListForChart"],
-                          ),
-                          labels: _parseStringList(
-                            dashboardService
-                                .dashboardData["productTitelsListForChart"],
-                          ),
-                        )
-                        .animate(
-                          // onPlay: (controller) => controller.repeat(),
-                        )
-                        .moveX(),
+                // ✅ Sirf API wala chart
+                ref.watch(dashboardProvider).loadingfor == "dashboard"
+                    ? LoadingChart()
+                    : HomeChart(
+                            bookingsData: _parseDoubleList(
+                              dashboardService
+                                  .dashboardData['orderCountsListForChart'],
+                            ),
+                            rentalsData: _parseDoubleList(
+                              dashboardService
+                                  .dashboardData["rentalCountsListForChart"],
+                            ),
+                            labels: _parseStringList(
+                              dashboardService
+                                  .dashboardData["productTitelsListForChart"],
+                            ),
+                          )
+                          .animate(
+                            // onPlay: (controller) => controller.repeat(),
+                          )
+                          .moveX(),
 
-              // Text(
-              //   "${dashboardService.dashboardData['orderCountsListForChart']}",
-              // ),
-              const SizedBox(height: 28),
-              // ✅ Earnings & Rating Row
-              Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      homeTextWidget(
-                        title: "Total Earning",
-                        value:
-                            "\$${dashboardService.dashboardData['totalEarning']?.toString() ?? '0.00'}",
-                      ),
-                      // const SizedBox(width: 12),
-                      homeTextWidget(
-                        title: " Total Rating",
-                        value:
-                            dashboardService.dashboardData['totalRating']
-                                ?.toString() ??
-                            "0.0",
-                      ),
-                    ],
-                  )
-                  .animate(
-                    // onPlay: (controller) => controller.repeat(),
-                  )
-                  .moveX(duration: Duration(milliseconds: 1500))
-                  .fadeIn(duration: Duration(milliseconds: 1500)),
-
-              const SizedBox(height: 5),
-
-              // ✅ Favorities & Rentals Row
-              SizedBox(
-                    height: ScreenSize.height * 0.19,
-                    child: ListView(
-                      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      physics: BouncingScrollPhysics(),
+                // Text(
+                //   "${dashboardService.dashboardData['orderCountsListForChart']}",
+                // ),
+                const SizedBox(height: 28),
+                // ✅ Earnings & Rating Row
+                Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        homeMenuBoxWidget(
-                          label: "My Favorities",
-                          pageName: Favourite(),
-                          icon: Icons.bookmark_border,
+                        homeTextWidget(
+                          title: "Total Earning",
+                          value:
+                              "\$${dashboardService.dashboardData['totalEarning']?.toString() ?? '0.00'}",
                         ),
-                        homeMenuBoxWidget(
-                          label: "Rent Outs",
-                          pageName: RentOutPage(),
-                          icon: Icons.calendar_month_outlined,
+                        // const SizedBox(width: 12),
+                        SizedBox(
+                          width: 20,
+                          height: 50,
+                          child: VerticalDivider(
+                            color: Colors.black12,
+                            thickness: 2,
+                            width: 2,
+                          ),
                         ),
-                        homeMenuBoxWidget(
-                          label: "Blogs",
-                          pageName: Blogs(),
-                          icon: Icons.article_outlined,
-                        ),
-                        homeMenuBoxWidget(
-                          label: "Help & support",
-                          pageName: Help(),
-                          icon: Icons.support_agent,
+                        homeTextWidget(
+                          title: " Total Rating",
+                          value:
+                              dashboardService.dashboardData['totalRating']
+                                  ?.toString() ??
+                              "0.0",
                         ),
                       ],
-                    ),
-                  )
-                  .animate(
-                    // onPlay: (controller) => controller.repeat(),
-                  )
-                  .moveX(
-                    duration: Duration(milliseconds: 800),
-                    begin: 100,
-                    end: 0,
-                  )
-                  .fadeIn(duration: Duration(milliseconds: 800)),
+                    )
+                    .animate(
+                      // onPlay: (controller) => controller.repeat(),
+                    )
+                    .moveX(duration: Duration(milliseconds: 1500))
+                    .fadeIn(duration: Duration(milliseconds: 1500)),
 
-              const SizedBox(height: 5),
+                const SizedBox(height: 5),
 
-              // ✅ All Items Button
-              InkWell(
-                    onTap: () {
-                      goto(ListingPage());
-                    },
-                    child:
-                        Container(
-                              width: ScreenSize.width * 0.9,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(14),
-                                child: Center(
-                                  child: Text(
-                                    "My Items",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                // ✅ Favorities & Rentals Row
+                SizedBox(
+                      height: ScreenSize.height * 0.19,
+                      child: ListView(
+                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        children: [
+                          homeMenuBoxWidget(
+                            label: "My Favorities",
+                            pageName: Favourite(),
+                            icon: Icons.bookmark_border,
+                          ),
+                          homeMenuBoxWidget(
+                            label: "Rent Outs",
+                            pageName: RentOutPage(),
+                            icon: Icons.calendar_month_outlined,
+                          ),
+                          homeMenuBoxWidget(
+                            label: "Blogs",
+                            pageName: Blogs(),
+                            icon: Icons.article_outlined,
+                          ),
+                          homeMenuBoxWidget(
+                            label: "Help & support",
+                            pageName: Help(),
+                            icon: Icons.support_agent,
+                          ),
+                        ],
+                      ),
+                    )
+                    .animate(
+                      // onPlay: (controller) => controller.repeat(),
+                    )
+                    .moveX(
+                      duration: Duration(milliseconds: 800),
+                      begin: 100,
+                      end: 0,
+                    )
+                    .fadeIn(duration: Duration(milliseconds: 800)),
+
+                const SizedBox(height: 5),
+
+                // ✅ All Items Button
+                InkWell(
+                      onTap: () {
+                        goto(ListingPage());
+                      },
+                      child:
+                          Container(
+                                width: ScreenSize.width * 0.9,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(14),
+                                  child: Center(
+                                    child: Text(
+                                      "My Items",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                            .animate(
-                              onPlay: (controller) => controller.repeat(),
-                            )
-                            .shimmer(duration: Duration(seconds: 3)),
-                  )
-                  .animate(
-                    // onPlay: (controller) => controller.repeat(),
-                  )
-                  .moveY(
-                    duration: Duration(milliseconds: 800),
-                    begin: 100,
-                    end: 0,
-                  )
-                  .fadeIn(duration: Duration(milliseconds: 800)),
-            ],
+                              )
+                              .animate(
+                                onPlay: (controller) => controller.repeat(),
+                              )
+                              .shimmer(duration: Duration(seconds: 3)),
+                    )
+                    .animate(
+                      // onPlay: (controller) => controller.repeat(),
+                    )
+                    .moveY(
+                      duration: Duration(milliseconds: 800),
+                      begin: 100,
+                      end: 0,
+                    )
+                    .fadeIn(duration: Duration(milliseconds: 800)),
+              ],
+            ),
           ),
-        ),
 
-        bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
+          bottomNavigationBar: BottomNavBarWidget(currentIndex: 0),
+        ),
       ),
     );
   }

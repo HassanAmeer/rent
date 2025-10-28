@@ -7,6 +7,7 @@ import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 
 import '../../constants/api_endpoints.dart';
+import '../../constants/appColors.dart';
 import '../../services/toast.dart';
 
 class Chats extends ConsumerStatefulWidget {
@@ -84,163 +85,176 @@ class _ChatsState extends ConsumerState<Chats> {
 
     // ✅ Last message preview
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            ref
-                .read(chatClass)
-                .chatedUsers(
-                  uid: ref.read(userDataClass).userData['id'].toString(),
-                );
-
-            Navigator.pop(context);
-          },
-        ),
-
-        title: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.cyan.shade700,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              width: 35,
-              height: 35,
-              clipBehavior: Clip.antiAlias,
-              child: CacheImageWidget(
-                url: Api.imgPath + widget.msgdata['fromuid']["image"],
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Text("${widget.msgdata['sid']}"),
-                Text(
-                  widget.msgdata['fromuid']["name"] ?? "User Name",
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.white, AppColors.mainColor.shade100],
         ),
       ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          // iconTheme: const IconThemeData(color: Colors.black),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              ref
+                  .read(chatClass)
+                  .chatedUsers(
+                    uid: ref.read(userDataClass).userData['id'].toString(),
+                  );
 
-      body:
-          // Text("Chat with ${widget.msgdata}"),
-          // SizedBox(
-          //   height: 777,
-          //   child: SingleChildScrollView(
-          //     child: Text("${chatProvider.messagesList}"),
-          //   ),
-          // ),
-          // ✅ Chats List
-          chatProvider.loadingFor == "getallchats"
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: DotLoader(),
-              ),
-            )
-          : ListView.builder(
-              itemCount: chatProvider.messagesList.length,
-              padding: const EdgeInsets.only(
-                left: 8,
-                right: 8,
-                bottom: 88,
-                top: 10,
-              ),
-              controller: scrollController,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                var chat = chatProvider.messagesList[index];
-                bool isMe = userProvider.userData['id'] == chat['sid'];
+              Navigator.pop(context);
+            },
+          ),
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: isMe
-                        ? MainAxisAlignment.end
-                        : MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 250),
-                        decoration: BoxDecoration(
-                          color: isMe ? Colors.black : Colors.cyan,
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(16),
-                            topRight: const Radius.circular(16),
-                            bottomLeft: Radius.circular(isMe ? 16 : 0),
-                            bottomRight: Radius.circular(isMe ? 0 : 16),
+          title: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.cyan.shade700,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                width: 35,
+                height: 35,
+                clipBehavior: Clip.antiAlias,
+                child: CacheImageWidget(
+                  url: Api.imgPath + widget.msgdata['fromuid']["image"],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text("${widget.msgdata['sid']}"),
+                  Text(
+                    widget.msgdata['fromuid']["name"] ?? "User Name",
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        body:
+            // Text("Chat with ${widget.msgdata}"),
+            // SizedBox(
+            //   height: 777,
+            //   child: SingleChildScrollView(
+            //     child: Text("${chatProvider.messagesList}"),
+            //   ),
+            // ),
+            // ✅ Chats List
+            chatProvider.loadingFor == "getallchats"
+            ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: DotLoader(),
+                ),
+              )
+            : ListView.builder(
+                itemCount: chatProvider.messagesList.length,
+                padding: const EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                  bottom: 88,
+                  top: 10,
+                ),
+                controller: scrollController,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  var chat = chatProvider.messagesList[index];
+                  bool isMe = userProvider.userData['id'] == chat['sid'];
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 4, bottom: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: isMe
+                          ? MainAxisAlignment.end
+                          : MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 250),
+                          decoration: BoxDecoration(
+                            color: isMe ? Colors.black : Colors.cyan,
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(16),
+                              topRight: const Radius.circular(16),
+                              bottomLeft: Radius.circular(isMe ? 16 : 0),
+                              bottomRight: Radius.circular(isMe ? 0 : 16),
+                            ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8.0,
-                          ),
-                          child: Text(
-                            chat['msg'],
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8.0,
+                            ),
+                            child: Text(
+                              chat['msg'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: // ✅ Chat Input Box
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        color: Colors.white,
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    hintText: "Type a message",
-                    border: InputBorder.none,
-                  ),
-                  textInputAction: TextInputAction.send,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            CircleAvatar(
-              backgroundColor: Colors.cyan.shade700,
-              child: IconButton(
-                icon: ref.watch(chatClass).loadingFor == "sendmsg"
-                    ? CircularProgressIndicator.adaptive(
-                        backgroundColor: Colors.white,
-                        valueColor: AlwaysStoppedAnimation(Colors.grey),
-                        strokeWidth: 2,
-                      )
-                    : const Icon(Icons.send, color: Colors.white),
-                onPressed: () async {
-                  await _sendMessage();
+                      ],
+                    ),
+                  );
                 },
               ),
-            ),
-          ],
+
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: // ✅ Chat Input Box
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          color: Colors.white,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: "Type a message",
+                      border: InputBorder.none,
+                    ),
+                    textInputAction: TextInputAction.send,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              CircleAvatar(
+                backgroundColor: Colors.cyan.shade700,
+                child: IconButton(
+                  icon: ref.watch(chatClass).loadingFor == "sendmsg"
+                      ? CircularProgressIndicator.adaptive(
+                          backgroundColor: Colors.white,
+                          valueColor: AlwaysStoppedAnimation(Colors.grey),
+                          strokeWidth: 2,
+                        )
+                      : const Icon(Icons.send, color: Colors.white),
+                  onPressed: () async {
+                    await _sendMessage();
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

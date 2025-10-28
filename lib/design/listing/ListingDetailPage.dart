@@ -42,7 +42,16 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text("Listing Details"),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+          ),
+          title: const Text(
+            "Listing Details",
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         body: ItemContentDetailsWidget(
           images: listingData.images,

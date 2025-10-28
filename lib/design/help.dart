@@ -4,6 +4,8 @@ import 'package:rent/apidata/help&supportapi.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../constants/appColors.dart';
+
 class Help extends ConsumerStatefulWidget {
   const Help({super.key});
 
@@ -23,113 +25,152 @@ class _HelpState extends ConsumerState<Help> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.cyan,
-
-        title: Text(
-          "Help and support",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.white, AppColors.mainColor.shade100],
         ),
       ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        // appBar: AppBar(
+        // backgroundColor: Colors.transparent,
 
-      body: Column(
-        children: [
-          SizedBox(height: 27),
+        //   title: Text(
+        //     "Help and support",
+        //     style: TextStyle(
+        //       color: Colors.black,
+        //       fontSize: 20,
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //   ),
+        // ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(height: 27),
 
-          // Center(
-          //   child: Text(
-          //     "Contact information :",
-          //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          //   ),
-          // ),
-          // SizedBox(height: 5),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              '''If you have any questions or need assistance, feel free to reach out to us. We’re here to help! ''',
-              style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
-            ),
-          ),
-
-          SizedBox(height: 20),
-
-          ListTile(
-            minVerticalPadding: 0,
-            contentPadding: EdgeInsets.only(left: 20),
-            title: Text(
-              "Contect us",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          ref.watch(SupportProvider).loadingFor == "help"
-              ? const Center(child: DotLoader())
-              : ref.watch(SupportProvider).settings == null
-              ? Center(child: Text("Settings not available"))
-              : ListTile(
-                  minVerticalPadding: 0,
-                  contentPadding: EdgeInsets.only(left: 20),
-                  title: Text(
-                    "Email:",
+              Row(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+                  ),
+                  const Text(
+                    "Help and support",
                     style: TextStyle(
-                      color: Colors.black,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontSize: 20,
                     ),
                   ),
-                  onTap: () {
-                    String? encodeQueryParameters(Map<String, String> params) {
-                      return params.entries
-                          .map(
-                            (MapEntry<String, String> e) =>
-                                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
-                          )
-                          .join('&');
-                    }
+                ],
+              ),
+              const SizedBox(height: 8),
 
-                    // ···
-                    final Uri emailLaunchUri = Uri(
-                      scheme: 'mailto',
-                      path: ref.watch(SupportProvider).settings!.displayEmail,
-                      query: encodeQueryParameters(<String, String>{
-                        'subject': 'Hey: welcome to the Local rent',
-                      }),
-                    );
+              // Center(
+              //   child: Text(
+              //     "Contact information :",
+              //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              //   ),
+              // ),
+              // SizedBox(height: 5),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  '''If you have any questions or need assistance, feel free to reach out to us. We’re here to help! ''',
+                  style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
+                ),
+              ),
 
-                    launchUrl(emailLaunchUri);
-                  },
+              SizedBox(height: 20),
 
-                  subtitle: Text(
-                    ref.watch(SupportProvider).settings!.displayEmail,
-                    style: TextStyle(color: Colors.blue),
+              ListTile(
+                minVerticalPadding: 0,
+                contentPadding: EdgeInsets.only(left: 20),
+                title: Text(
+                  "Contect us",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.grey,
                   ),
                 ),
-          SizedBox(height: 10),
-          ListTile(
-            minVerticalPadding: 0,
-            contentPadding: EdgeInsets.only(left: 20),
-            title: Text(
-              "Hours:",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
               ),
-            ),
+              ref.watch(SupportProvider).loadingFor == "help"
+                  ? const Center(child: DotLoader())
+                  : ref.watch(SupportProvider).settings == null
+                  ? Center(child: Text("Settings not available"))
+                  : ListTile(
+                      minVerticalPadding: 0,
+                      contentPadding: EdgeInsets.only(left: 20),
+                      title: Text(
+                        "Email:",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        String? encodeQueryParameters(
+                          Map<String, String> params,
+                        ) {
+                          return params.entries
+                              .map(
+                                (MapEntry<String, String> e) =>
+                                    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+                              )
+                              .join('&');
+                        }
 
-            subtitle: Text(
-              ref.watch(SupportProvider).settings?.supportHours ??
-                  '09:00 AM - 06:00 PM PKT (Monday to Friday)',
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
+                        // ···
+                        final Uri emailLaunchUri = Uri(
+                          scheme: 'mailto',
+                          path: ref
+                              .watch(SupportProvider)
+                              .settings!
+                              .displayEmail,
+                          query: encodeQueryParameters(<String, String>{
+                            'subject': 'Hey: welcome to the Local rent',
+                          }),
+                        );
+
+                        launchUrl(emailLaunchUri);
+                      },
+
+                      subtitle: Text(
+                        ref.watch(SupportProvider).settings!.displayEmail,
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+              SizedBox(height: 10),
+              ListTile(
+                minVerticalPadding: 0,
+                contentPadding: EdgeInsets.only(left: 20),
+                title: Text(
+                  "Hours:",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                subtitle: Text(
+                  ref.watch(SupportProvider).settings?.supportHours ??
+                      '09:00 AM - 06:00 PM PKT (Monday to Friday)',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

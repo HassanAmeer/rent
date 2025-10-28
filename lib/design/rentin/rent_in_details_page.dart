@@ -36,256 +36,359 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final itemIndex = ref.watch(rentInProvider).rentInListData[widget.index];
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          "Rent In Details",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.white, AppColors.mainColor.shade100],
         ),
-        elevation: 0,
-        backgroundColor: AppColors.mainColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: Colors.black,
-                  title: const Text(
-                    'Delete Order',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    'Are you sure you want to delete this?',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'Cancel',
-
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // ✅ delete using ref
-                        ref
-                            .watch(rentInProvider)
-                            .deleteOrder(
-                              orderId: itemIndex.id.toString(),
-                              loadingFor: "delete${itemIndex.id}",
-                            );
-                        Navigator.pop(context);
-                      },
-                      child:
-                          const Text(
-                                'Delete',
-                                style: TextStyle(color: Colors.grey),
-                              )
-                              .animate(
-                                onPlay: (controller) =>
-                                    controller.repeat(reverse: true),
-                              )
-                              .shimmer(color: Colors.red.shade200),
-                    ),
-                  ],
-                ),
-              );
-            },
-            icon:
-                ref.watch(rentInProvider).loadingFor == "delete${itemIndex.id}"
-                ? CircleAvatar(
-                    radius: 10,
-                    backgroundColor: Colors.black,
-                    child: DotLoader(showDots: 1),
-                  )
-                : Icon(Icons.delete),
-          ),
-        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: AppColors.mainColor,
-        foregroundColor: Colors.white,
-        child: Icon(Icons.chat_outlined),
-      ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.only(top: 0, bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: Offset(0, -2),
-              blurRadius: 10,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Column(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        // appBar: AppBar(
+        //   title: const Text(
+        //     "Rent In Details",
+        //     style: TextStyle(
+        //       color: Colors.white,
+        //       fontWeight: FontWeight.bold,
+        //       fontSize: 20,
+        //     ),
+        //   ),
+        //   elevation: 0,
+        //   backgroundColor: AppColors.mainColor,
+        //   iconTheme: const IconThemeData(color: Colors.white),
+        //   actions: [
+        //     const Text(
+        //       "Rent In Details",
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontWeight: FontWeight.bold,
+        //         fontSize: 20,
+        //       ),
+        //     ),
+        //     IconButton(
+        //       onPressed: () async {
+        //         showDialog(
+        //           context: context,
+        //           builder: (context) => AlertDialog(
+        //             backgroundColor: Colors.black,
+        //             title: const Text(
+        //               'Delete Order',
+        //               style: TextStyle(color: Colors.white),
+        //             ),
+        //             content: const Text(
+        //               'Are you sure you want to delete this?',
+        //               style: TextStyle(color: Colors.grey),
+        //             ),
+        //             actions: [
+        //               TextButton(
+        //                 onPressed: () => Navigator.pop(context),
+        //                 child: const Text(
+        //                   'Cancel',
+
+        //                   style: TextStyle(color: Colors.grey),
+        //                 ),
+        //               ),
+        //               TextButton(
+        //                 onPressed: () {
+        //                   // ✅ delete using ref
+        //                   ref
+        //                       .watch(rentInProvider)
+        //                       .deleteOrder(
+        //                         orderId: itemIndex.id.toString(),
+        //                         loadingFor: "delete${itemIndex.id}",
+        //                       );
+        //                   Navigator.pop(context);
+        //                 },
+        //                 child:
+        //                     const Text(
+        //                           'Delete',
+        //                           style: TextStyle(color: Colors.grey),
+        //                         )
+        //                         .animate(
+        //                           onPlay: (controller) =>
+        //                               controller.repeat(reverse: true),
+        //                         )
+        //                         .shimmer(color: Colors.red.shade200),
+        //               ),
+        //             ],
+        //           ),
+        //         );
+        //       },
+        //       icon:
+        //           ref.watch(rentInProvider).loadingFor ==
+        //               "delete${itemIndex.id}"
+        //           ? CircleAvatar(
+        //               radius: 10,
+        //               backgroundColor: Colors.black,
+        //               child: DotLoader(showDots: 1),
+        //             )
+        //           : Icon(Icons.delete),
+        //     ),
+        //   ],
+        // ),
+        floatingActionButton: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 5),
+            FloatingActionButton(
+              onPressed: () {},
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              child: Icon(Icons.chat_outlined),
+            ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
+            FloatingActionButton.small(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.black,
+                    title: const Text(
+                      'Delete Order',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    content: const Text(
+                      'Are you sure you want to delete this?',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          'Cancel',
 
-            ProRentStatusStepper(
-              initialStatus: itemIndex.isRejected.toString() == '1'
-                  ? "0"
-                  : itemIndex.deliverd.toString() == '0'
-                  ? "1"
-                  : itemIndex.deliverd.toString() == '1'
-                  ? "2"
-                  : itemIndex.deliverd.toString() == '2'
-                  ? "3"
-                  : '2',
-              onStatusChanged: (status) {},
-              selectAble: false,
-              height: 30,
-              cornerRadius: 20,
-            ).animate().fadeIn(delay: 0.3.seconds, duration: 0.8.seconds),
-            Divider(height: 2),
-            CupertinoListTile(
-              // minVerticalPadding: 0,
-              leading: IconButton(
-                onPressed: () async {
-                  try {
-                    List<DateTime?> dates = [];
-                    var results = await showCalendarDatePicker2Dialog(
-                      context: context,
-                      config: CalendarDatePicker2WithActionButtonsConfig(
-                        calendarType: CalendarDatePicker2Type.range,
-                      ),
-                      dialogSize: const Size(325, 400),
-                      value: dates,
-                      borderRadius: BorderRadius.circular(15),
-                    );
-
-                    if (results!.isEmpty) {
-                      toast("Please Pickup date range");
-                    }
-
-                    // print(results.toString());
-                    var startDate = results.first; // DateTime
-                    var endDate = results.last; // DateTime
-
-                    // Formatter
-                    var formatter = DateFormat("d MMMM yyyy");
-
-                    // Convert to string
-                    var finalDateRange =
-                        "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
-                    // print(finalDateRange.toString());
-                    var daysCount = endDate.difference(startDate).inDays + 1;
-                    ////
-                    debugPrint((itemIndex.dailyrate * daysCount).toString());
-                    // return;
-
-                    ref
-                        .watch(rentInProvider)
-                        .updateRentnPickupTime(
-                          uid: ref
-                              .watch(userDataClass)
-                              .userData["id"]
-                              .toString(),
-                          orderId: itemIndex.id.toString(),
-                          loadingFor: "updateRentnPickupTime",
-                          pickup_date_range: finalDateRange,
-                          total_price:
-                              (int.tryParse(itemIndex.dailyrate ?? '0')! *
-                                      daysCount)
-                                  .toString(),
-                        );
-                  } catch (e) {
-                    debugPrint("error $e");
-                    toast("Try Later! $e");
-                  }
-                },
-                icon:
-                    ref.watch(rentInProvider).loadingFor ==
-                        "updateRentnPickupTime"
-                    ? DotLoader(showDots: 1, size: 20, spacing: 0)
-                    : Icon(Icons.edit_outlined),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              title: Text(
-                "My Pickup Date:",
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              subtitle:
-                  Text(
-                        itemIndex.userCanPickupInDateRange,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                          style: TextStyle(color: Colors.grey),
                         ),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(
-                        color: AppColors.mainColor,
-                        duration: Duration(seconds: 2),
                       ),
-
-              trailing:
-                  Text(
-                        "\$ ${itemIndex.totalPriceByUser}",
-                        style: TextStyle(
-                          color: AppColors.mainColor,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(
-                        color: Colors.black,
-                        duration: Duration(seconds: 2),
+                      TextButton(
+                        onPressed: () {
+                          // ✅ delete using ref
+                          ref
+                              .watch(rentInProvider)
+                              .deleteOrder(
+                                orderId: itemIndex.id.toString(),
+                                loadingFor: "delete${itemIndex.id}",
+                              );
+                          Navigator.pop(context);
+                        },
+                        child:
+                            const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.grey),
+                                )
+                                .animate(
+                                  onPlay: (controller) =>
+                                      controller.repeat(reverse: true),
+                                )
+                                .shimmer(color: Colors.red.shade200),
                       ),
-            ),
-            SizedBox(height: 5),
+                    ],
+                  ),
+                );
+              },
+              child:
+                  ref.watch(rentInProvider).loadingFor ==
+                      "delete${itemIndex.id}"
+                  ? CircleAvatar(
+                      radius: 10,
+                      backgroundColor: Colors.red,
+                      child: DotLoader(showDots: 1),
+                    )
+                  : Icon(Icons.delete),
+            ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
           ],
         ),
-      ).animate().fade(duration: 1.seconds).slideY(begin: 1),
-      body: ItemContentDetailsWidget(
-        images: itemIndex.productImage,
-        title: itemIndex.productTitle,
-        description: itemIndex.productDesc,
-        catgName:
-            "${itemIndex.productby != null
-                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
-                      : null
-                : null}",
-        catgImg:
-            "${itemIndex.categoryId != null
-                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
-                      : null
-                : null}",
-        dailyRate: itemIndex.dailyrate.toString(),
-        weeklyRate: itemIndex.weeklyrate.toString(),
-        monthlyRate: itemIndex.monthlyrate.toString(),
-        availability: itemIndex.availability ?? '',
-        listingDate: itemIndex.createdAt.toString(),
-        // orderDate: orderDate,
-        userImage: itemIndex.productby?.image,
-        userName: itemIndex.productby?.name,
-        userEmail: itemIndex.productby?.email,
-        userPhone: itemIndex.productby?.phone,
-        userAddress: itemIndex.productby?.address,
-        userAbout: itemIndex.productby?.aboutUs,
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.only(top: 0, bottom: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                offset: Offset(0, -2),
+                blurRadius: 10,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 5),
+
+              ProRentStatusStepper(
+                initialStatus: itemIndex.isRejected.toString() == '1'
+                    ? "0"
+                    : itemIndex.deliverd.toString() == '0'
+                    ? "1"
+                    : itemIndex.deliverd.toString() == '1'
+                    ? "2"
+                    : itemIndex.deliverd.toString() == '2'
+                    ? "3"
+                    : '2',
+                onStatusChanged: (status) {},
+                selectAble: false,
+                height: 30,
+                cornerRadius: 20,
+              ).animate().fadeIn(delay: 0.3.seconds, duration: 0.8.seconds),
+              Divider(height: 2),
+              CupertinoListTile(
+                // minVerticalPadding: 0,
+                leading: IconButton(
+                  onPressed: () async {
+                    try {
+                      List<DateTime?> dates = [];
+                      var results = await showCalendarDatePicker2Dialog(
+                        context: context,
+                        config: CalendarDatePicker2WithActionButtonsConfig(
+                          calendarType: CalendarDatePicker2Type.range,
+                        ),
+                        dialogSize: const Size(325, 400),
+                        value: dates,
+                        borderRadius: BorderRadius.circular(15),
+                      );
+
+                      if (results!.isEmpty) {
+                        toast("Please Pickup date range");
+                      }
+
+                      // print(results.toString());
+                      var startDate = results.first; // DateTime
+                      var endDate = results.last; // DateTime
+
+                      // Formatter
+                      var formatter = DateFormat("d MMMM yyyy");
+
+                      // Convert to string
+                      var finalDateRange =
+                          "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                      // print(finalDateRange.toString());
+                      var daysCount = endDate.difference(startDate).inDays + 1;
+                      ////
+                      debugPrint((itemIndex.dailyrate * daysCount).toString());
+                      // return;
+
+                      ref
+                          .watch(rentInProvider)
+                          .updateRentnPickupTime(
+                            uid: ref
+                                .watch(userDataClass)
+                                .userData["id"]
+                                .toString(),
+                            orderId: itemIndex.id.toString(),
+                            loadingFor: "updateRentnPickupTime",
+                            pickup_date_range: finalDateRange,
+                            total_price:
+                                (int.tryParse(itemIndex.dailyrate ?? '0')! *
+                                        daysCount)
+                                    .toString(),
+                          );
+                    } catch (e) {
+                      debugPrint("error $e");
+                      toast("Try Later! $e");
+                    }
+                  },
+                  icon:
+                      ref.watch(rentInProvider).loadingFor ==
+                          "updateRentnPickupTime"
+                      ? DotLoader(showDots: 1, size: 20, spacing: 0)
+                      : Icon(Icons.edit_outlined),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                title: Text(
+                  "My Pickup Date:",
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                subtitle:
+                    Text(
+                          itemIndex.userCanPickupInDateRange,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .shimmer(
+                          color: AppColors.mainColor,
+                          duration: Duration(seconds: 2),
+                        ),
+
+                trailing:
+                    Text(
+                          "\$ ${itemIndex.totalPriceByUser}",
+                          style: TextStyle(
+                            color: AppColors.mainColor,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                        .animate(onPlay: (controller) => controller.repeat())
+                        .shimmer(
+                          color: Colors.black,
+                          duration: Duration(seconds: 2),
+                        ),
+              ),
+              SizedBox(height: 5),
+            ],
+          ),
+        ).animate().fade(duration: 1.seconds).slideY(begin: 1),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            controller: ScrollController(),
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                // Align(
+                //   alignment: Alignment.centerLeft,
+                //   child: const Text(
+                //     "  Rent In Details",
+                //     style: TextStyle(
+                //       color: Colors.black,
+                //       fontWeight: FontWeight.bold,
+                //       fontSize: 20,
+                //     ),
+                //   ),
+                // ),
+                ItemContentDetailsWidget(
+                  images: itemIndex.productImage,
+                  title: itemIndex.productTitle,
+                  description: itemIndex.productDesc,
+                  catgName:
+                      "${itemIndex.productby != null
+                          ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                                : null
+                          : null}",
+                  catgImg:
+                      "${itemIndex.categoryId != null
+                          ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                                : null
+                          : null}",
+                  dailyRate: itemIndex.dailyrate.toString(),
+                  weeklyRate: itemIndex.weeklyrate.toString(),
+                  monthlyRate: itemIndex.monthlyrate.toString(),
+                  availability: itemIndex.availability ?? '',
+                  listingDate: itemIndex.createdAt.toString(),
+                  // orderDate: orderDate,
+                  userImage: itemIndex.productby?.image,
+                  userName: itemIndex.productby?.name,
+                  userEmail: itemIndex.productby?.email,
+                  userPhone: itemIndex.productby?.phone,
+                  userAddress: itemIndex.productby?.address,
+                  userAbout: itemIndex.productby?.aboutUs,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

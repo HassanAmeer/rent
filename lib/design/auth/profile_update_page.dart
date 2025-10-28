@@ -112,329 +112,327 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Update Profile",
-          style: TextStyle(color: Colors.black),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [Colors.white, AppColors.mainColor.shade100],
         ),
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
       ),
-      body: isLoading
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 0),
-                child: DotLoader(),
-              ),
-            )
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // Top Row with Profile Image and Edit button
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          isPickingImage
-                              ? Container(
-                                  width: 100,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppColors.mainColor,
-                                      width: 2,
-                                    ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            "Update Profile",
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: Colors.black),
+          elevation: 0,
+        ),
+        body: isLoading
+            ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 0),
+                  child: DotLoader(),
+                ),
+              )
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Top Row with Profile Image and Edit button
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        isPickingImage
+                            ? Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.mainColor,
+                                    width: 2,
                                   ),
-                                  child: const Center(child: DotLoader()),
-                                )
-                              : pikedImage.isNotEmpty
-                              ? Container(
-                                  width: 100,
-                                  height: 100,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppColors.mainColor,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.file(
-                                      File(pikedImage),
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                )
-                              : CacheImageWidget(
-                                  width: 100,
-                                  height: 100,
-                                  isCircle: true,
-                                  radius: 200,
-                                  url:
-                                      (ref
-                                                  .watch(userDataClass)
-                                                  .userData['image'] !=
-                                              null &&
-                                          ref
-                                              .watch(userDataClass)
-                                              .userData['image']
-                                              .toString()
-                                              .isNotEmpty)
-                                      ? Api.imgPath +
-                                            ref
-                                                .watch(userDataClass)
-                                                .userData['image']
-                                      : ImgLinks.profileImage,
                                 ),
+                                child: const Center(child: DotLoader()),
+                              )
+                            : pikedImage.isNotEmpty
+                            ? Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.mainColor,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: Image.file(
+                                    File(pikedImage),
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                            : CacheImageWidget(
+                                width: 100,
+                                height: 100,
+                                isCircle: true,
+                                radius: 200,
+                                url: ref.watch(userDataClass).userData['image'],
+                              ),
 
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: InkWell(
-                              onTap: () {
-                                _showImagePickerOptions(context);
-                              },
-                              borderRadius: BorderRadius.circular(100),
-                              child: CircleAvatar(
-                                radius: 15,
-                                backgroundColor: Colors.black,
-                                child: Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: AppColors.mainColor,
-                                ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: InkWell(
+                            onTap: () {
+                              _showImagePickerOptions(context);
+                            },
+                            borderRadius: BorderRadius.circular(100),
+                            child: CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.black,
+                              child: Icon(
+                                Icons.edit,
+                                size: 16,
+                                color: AppColors.mainColor,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      labelText: "Name",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 15,
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: "Name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  TextField(
-                    controller: phoneController,
-                    decoration: InputDecoration(
-                      labelText: "Phone",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    TextField(
+                      controller: phoneController,
+                      decoration: InputDecoration(
+                        labelText: "Phone",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 15,
+                      keyboardType: TextInputType.phone,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    TextField(
+                      controller: aboutController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        labelText: "About Us",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
                       ),
                     ),
-                    keyboardType: TextInputType.phone,
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 15,
-                      ),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  TextField(
-                    controller: aboutController,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: "About Us",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 15,
+                    TextField(
+                      controller: addressController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: "Address",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 15,
+                        ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 5),
 
-                  TextField(
-                    controller: addressController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: "Address",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 15,
-                      ),
-                    ),
-                  ),
+                    // Row(
+                    //   children: const [
+                    //     Text(
+                    //       "Verified By",
+                    //       style: TextStyle(fontWeight: FontWeight.bold),
+                    //     ),
+                    //     SizedBox(width: 10),
+                    //     Text(
+                    //       "google",
+                    //       style: TextStyle(
+                    //         fontFamily: 'monospace',
+                    //         fontWeight: FontWeight.normal,
+                    //         color: Colors.grey,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
 
-                  const SizedBox(height: 5),
+                    // const SizedBox(height: 20),
 
-                  // Row(
-                  //   children: const [
-                  //     Text(
-                  //       "Verified By",
-                  //       style: TextStyle(fontWeight: FontWeight.bold),
-                  //     ),
-                  //     SizedBox(width: 10),
-                  //     Text(
-                  //       "google",
-                  //       style: TextStyle(
-                  //         fontFamily: 'monospace',
-                  //         fontWeight: FontWeight.normal,
-                  //         color: Colors.grey,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text(
+                    //       "Send Emails",
+                    //       style: TextStyle(fontWeight: FontWeight.bold),
+                    //     ),
+                    //     Switch(
+                    //       value: sendEmails,
+                    //       onChanged: (value) {
+                    //         setState(() {
+                    //           sendEmails = value;
+                    //         });
+                    //       },
+                    //     ),
+                    //   ],
+                    // ),
 
-                  // const SizedBox(height: 20),
-
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     const Text(
-                  //       "Send Emails",
-                  //       style: TextStyle(fontWeight: FontWeight.bold),
-                  //     ),
-                  //     Switch(
-                  //       value: sendEmails,
-                  //       onChanged: (value) {
-                  //         setState(() {
-                  //           sendEmails = value;
-                  //         });
-                  //       },
-                  //     ),
-                  //   ],
-                  // ),
-
-                  // const SizedBox(height: 20),
-                  CupertinoListTile(
-                    onTap: () {
-                      goto(PrivacyPolicyPage());
-                    },
-                    padding: EdgeInsets.symmetric(vertical: 0),
-                    leading: Checkbox(
-                      value: acceptPrivacy,
-                      onChanged: (val) {
-                        setState(() {
-                          acceptPrivacy = val ?? false;
-                        });
+                    // const SizedBox(height: 20),
+                    CupertinoListTile(
+                      onTap: () {
+                        goto(PrivacyPolicyPage());
                       },
-                    ),
-                    title: RichText(
-                      text: TextSpan(
-                        text: "I accept the ",
-                        style: const TextStyle(color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text: "Privacy Policy",
-                            style: TextStyle(color: AppColors.mainColor),
-                          ),
-                        ],
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      leading: Checkbox(
+                        value: acceptPrivacy,
+                        onChanged: (val) {
+                          setState(() {
+                            acceptPrivacy = val ?? false;
+                          });
+                        },
+                        fillColor: acceptPrivacy
+                            ? WidgetStatePropertyAll(Colors.cyan)
+                            : null,
+                      ),
+                      title: RichText(
+                        text: TextSpan(
+                          text: "I accept the ",
+                          style: const TextStyle(color: Colors.black),
+                          children: [
+                            TextSpan(
+                              text: "Privacy Policy",
+                              style: TextStyle(color: AppColors.mainColor),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  CupertinoListTile(
-                    padding: EdgeInsets.symmetric(vertical: 0),
-                    onTap: () {
-                      goto(TermsConditionPage());
-                    },
-                    leading: Checkbox(
-                      value: acceptTerms,
-                      onChanged: (val) {
-                        setState(() {
-                          acceptTerms = val ?? false;
-                        });
+                    CupertinoListTile(
+                      padding: EdgeInsets.symmetric(vertical: 0),
+                      onTap: () {
+                        goto(TermsConditionPage());
                       },
-                    ),
-                    title: RichText(
-                      text: TextSpan(
-                        text: "I accept the ",
-                        style: const TextStyle(color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text: "Terms and Conditions",
-                            style: TextStyle(color: AppColors.mainColor),
-                          ),
-                        ],
+                      leading: Checkbox(
+                        fillColor: acceptTerms
+                            ? WidgetStatePropertyAll(Colors.cyan)
+                            : null,
+                        value: acceptTerms,
+                        onChanged: (val) {
+                          setState(() {
+                            acceptTerms = val ?? false;
+                          });
+                        },
+                      ),
+                      title: RichText(
+                        text: TextSpan(
+                          text: "I accept the ",
+                          style: const TextStyle(color: Colors.black),
+                          children: [
+                            TextSpan(
+                              text: "Terms and Conditions",
+                              style: TextStyle(color: AppColors.mainColor),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 100),
-                ],
+                    const SizedBox(height: 100),
+                  ],
+                ),
               ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: SizedBox(
+          width: double.infinity,
+          height: 65,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: (acceptPrivacy && acceptTerms)
+                    ? Colors.black
+                    : Colors.grey,
+              ),
+              onPressed: () {
+                if (acceptPrivacy && acceptTerms) {
+                  ref
+                      .watch(userDataClass)
+                      .updateProfile(
+                        name: nameController.text,
+                        phone: phoneController.text,
+                        email: emailController.text,
+                        aboutUs: aboutController.text,
+                        address: addressController.text,
+                        imagePath: pikedImage,
+                      );
+                } else {
+                  toast("please accept our policies !");
+                }
+              },
+              child: ref.watch(userDataClass).isLoading
+                  ? const DotLoader()
+                  : const Text(
+                      "Update Profile",
+                      style: TextStyle(color: Colors.white),
+                    ),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        width: double.infinity,
-        height: 65,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (acceptPrivacy && acceptTerms)
-                  ? Colors.black
-                  : Colors.grey,
-            ),
-            onPressed: () {
-              if (acceptPrivacy && acceptTerms) {
-                ref
-                    .watch(userDataClass)
-                    .updateProfile(
-                      name: nameController.text,
-                      phone: phoneController.text,
-                      email: emailController.text,
-                      aboutUs: aboutController.text,
-                      address: addressController.text,
-                      imagePath: pikedImage,
-                    );
-              } else {
-                toast("please accept our policies !");
-              }
-            },
-            child: ref.watch(userDataClass).isLoading
-                ? const DotLoader()
-                : const Text(
-                    "Update Profile",
-                    style: TextStyle(color: Colors.white),
-                  ),
           ),
         ),
       ),
