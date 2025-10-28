@@ -14,6 +14,7 @@ class BookingModel {
   int delivered;
   int isRejected;
   final int productId;
+  final int categoryId;
   final int productBy;
   final String productTitle;
   final String productDesc;
@@ -37,6 +38,7 @@ class BookingModel {
     this.delivered = 0,
     this.isRejected = 0,
     this.productId = 0,
+    this.categoryId = 0,
     this.productBy = 0,
     this.productTitle = '',
     this.productDesc = '',
@@ -81,6 +83,7 @@ class BookingModel {
       delivered: json['deliverd'] ?? 0,
       isRejected: json['isRejected'] ?? 0,
       productId: json['productId'] ?? 0,
+      categoryId: json['category_id'] ?? 0,
       productBy: json['product_by'] ?? 0,
       productTitle: json['productTitle']?.toString() ?? '',
       productDesc: json['productDesc']?.toString() ?? '',
@@ -116,6 +119,7 @@ class BookingModel {
       'deliverd': delivered,
       'isRejected': isRejected,
       'productId': productId,
+      'category_id': categoryId,
       'product_by': productBy,
       'productTitle': productTitle,
       'productDesc': productDesc,

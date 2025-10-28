@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
+import 'package:rent/constants/appColors.dart';
+import 'package:rent/constants/screensizes.dart';
 import 'package:rent/services/goto.dart';
 import 'package:rent/design/all%20items/allitems.dart';
 import 'package:rent/design/fav/favdetails.dart';
@@ -13,6 +16,7 @@ import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/images.dart';
 import '../../models/favorite_model.dart';
+import '../../widgets/listings_widgets/items_box_widget.dart';
 
 class Favourite extends ConsumerStatefulWidget {
   const Favourite({super.key});
@@ -47,8 +51,15 @@ class _FavouriteState extends ConsumerState<Favourite> {
       appBar: AppBar(
         title: const Text(
           "My Favorites",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
         ),
+        backgroundColor: AppColors.mainColor,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -67,198 +78,233 @@ class _FavouriteState extends ConsumerState<Favourite> {
           child: Column(
             children: [
               favrtProvider.loadingFor == "refresh"
-                  ? QuickTikTokLoader(
-                      progressColor: Colors.black,
-                      backgroundColor: Colors.grey,
-                    )
+                  ? Container(
+                      height: 60,
+                      child: QuickTikTokLoader(
+                        progressColor: AppColors.mainColor,
+                        backgroundColor: Colors.grey.shade200,
+                      ),
+                    ).animate().fadeIn(duration: Duration(milliseconds: 300))
                   : SizedBox.shrink(),
 
-              const SizedBox(height: 3),
+              const SizedBox(height: 8),
+
               // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 10,
-                ),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    border: Border.all(color: Colors.black, width: 2),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+              Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade200),
                       ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: searchcontrollers,
-                          decoration: InputDecoration(
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                ref
-                                    .read(favProvider)
-                                    .getAllFavItems(
-                                      refresh: true,
-                                      loadingFor: "refresh",
-                                      uid: ref.watch(userDataClass).userId,
-                                      search: searchcontrollers.text,
-                                    );
-                              },
-                              child: Icon(Icons.search),
-                            ),
-                            hintText: 'Search How to & more',
-                            hintStyle: TextStyle(color: Colors.black54),
-                            border: InputBorder.none,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                          style: const TextStyle(color: Colors.black),
-                          cursorColor: Colors.black,
+                        ],
+                      ),
+                      child: TextField(
+                        controller: searchcontrollers,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              ref
+                                  .read(favProvider)
+                                  .getAllFavItems(
+                                    refresh: true,
+                                    loadingFor: "refresh",
+                                    uid: ref.watch(userDataClass).userId,
+                                    search: searchcontrollers.text,
+                                  );
+                            },
+                            icon: Icon(
+                              Icons.search,
+                              color: AppColors.mainColor,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          hintText: 'Search favorites & more...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 16,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 16,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(
+                    delay: Duration(milliseconds: 300),
+                    duration: Duration(milliseconds: 800),
+                  )
+                  .slideY(begin: -0.1),
               // Favorites Grid
               if (favrtProvider.loadingFor == "favorItems")
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 260),
-                    child: DotLoader(),
-                  ),
-                )
+                Center(
+                      child: Container(
+                        padding: EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mainColor.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            DotLoader(),
+                            SizedBox(height: 16),
+                            Text(
+                              "Loading favorites...",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: Duration(milliseconds: 500))
+                    .scale()
               else if (favrtProvider.favouriteItems.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text("No favorites found"),
-                )
+                Center(
+                      child: Container(
+                        padding: EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mainColor.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.favorite_border,
+                              size: 80,
+                              color: AppColors.mainColor,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "No Favorites Found",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Your favorite items will appear here",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(
+                      delay: Duration(milliseconds: 500),
+                      duration: Duration(milliseconds: 800),
+                    )
+                    .scale()
               else
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
-                    vertical: 8.0,
+                    vertical: 16.0,
                   ),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1,
+                  child:
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:
+                              ScreenSize.isTablet || ScreenSize.isDesktop
+                              ? 3
+                              : 2,
+                          crossAxisSpacing:
+                              ScreenSize.isTablet || ScreenSize.isDesktop
+                              ? 20
+                              : 16,
+                          mainAxisSpacing:
+                              ScreenSize.isTablet || ScreenSize.isDesktop
+                              ? 20
+                              : 16,
+                          childAspectRatio: 0.9,
                         ),
-                    itemCount: favrtProvider.favouriteItems.length,
-                    itemBuilder: (context, index) {
-                      final item = favrtProvider.favouriteItems[index];
-                      // return Text(item.displayTitle.toString());
-                      return GestureDetector(
-                        onTap: () {
-                          goto(FavDetailsPage(index: index));
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.cyan.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.cyan.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  CacheImageWidget(
-                                    isCircle: false,
-                                    height: 130,
-                                    width: 165,
-                                    url: item.itemImages.first,
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child:
-                                        ref.watch(getAllItems).loadingFor ==
-                                            item.id.toString()
-                                        ? DotLoader(showDots: 1)
-                                        // ? Icon(Icons.h_mobiledata_outlined)
-                                        : InkWell(
-                                            onTap: () {
-                                              ref
-                                                  .watch(favProvider)
-                                                  .togglefavrt(
-                                                    uid: ref
-                                                        .watch(userDataClass)
-                                                        .userId,
-                                                    itemId: item.itemId
-                                                        .toString(),
-                                                    loadingFor: item.id
-                                                        .toString(),
-                                                  );
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Colors.black26,
-                                                border: Border.all(
-                                                  width: 1,
-                                                  color: Colors.black,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                              ),
-                                              child: Icon(
-                                                Icons.bookmark,
-                                                color: Colors.white,
-                                                size: 28,
-                                                shadows: [
-                                                  Shadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.3),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(1, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                        itemCount: favrtProvider.favouriteItems.length,
+                        itemBuilder: (context, index) {
+                          final item = favrtProvider.favouriteItems[index];
 
-                            const SizedBox(height: 8),
-                            Text(
-                              item.displayTitle,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          return ListingBox(
+                                id: item.id.toString(),
+                                title: item.displayTitle,
+                                showFav: true,
+                                onFavTap: () {
+                                  ref
+                                      .read(favProvider)
+                                      .togglefavrt(
+                                        uid: ref.watch(userDataClass).userId,
+                                        itemId: item.itemId.toString(),
+                                        loadingFor: item.id.toString(),
+                                      );
+                                },
+                                isFavLoading:
+                                    favrtProvider.loadingFor ==
+                                    item.id.toString(),
+                                isFavFilled: true,
+                                imageUrl: item.itemImages.first,
+                                onTap: () => goto(FavDetailsPage(index: index)),
+                              )
+                              .animate()
+                              .fadeIn(
+                                delay: Duration(milliseconds: index * 100),
+                                duration: 0.2.seconds,
+                              )
+                              .slideY(begin: 0.2);
+                        },
+                      ).animate().fadeIn(
+                        delay: Duration(milliseconds: 500),
+                        duration: Duration(milliseconds: 800),
+                      ),
                 ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 80),
             ],
           ),
         ),
@@ -266,12 +312,18 @@ class _FavouriteState extends ConsumerState<Favourite> {
 
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: FloatingActionButton(
-          onPressed: () {
-            goto(AllItemsPage());
-          },
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+        child:
+            FloatingActionButton(
+              backgroundColor: AppColors.mainColor,
+              foregroundColor: Colors.white,
+              onPressed: () {
+                goto(AllItemsPage());
+              },
+              child: const Icon(Icons.add),
+            ).animate().scale(
+              delay: Duration(milliseconds: 500),
+              duration: Duration(milliseconds: 500),
+            ),
       ),
     );
   }

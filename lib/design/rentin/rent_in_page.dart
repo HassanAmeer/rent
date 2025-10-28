@@ -17,8 +17,11 @@ import 'package:rent/widgets/dotloader.dart';
 import '../../apidata/rent_in_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../constants/screensizes.dart';
 import '../../models/rent_in_model.dart';
 import '../../widgets/btmnavbar.dart';
+import '../../widgets/delete_alert_box.dart';
+import '../../widgets/listings_widgets/items_box_widget.dart';
 
 class RentInPage extends ConsumerStatefulWidget {
   final bool refresh;
@@ -51,101 +54,177 @@ class _RentInPageState extends ConsumerState<RentInPage> {
     final rentalData = ref.watch(rentInProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         titleSpacing: 0,
         title: const Text(
           "  Rent In",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
-        backgroundColor: Colors.cyan,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 1,
+        backgroundColor: AppColors.mainColor,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
       bottomNavigationBar: BottomNavBarWidget(currentIndex: 2),
 
       body: Column(
         children: [
           rentalData.loadingFor == "refresh"
-              ? QuickTikTokLoader(
-                  progressColor: Colors.black,
-                  backgroundColor: Colors.grey,
-                )
+              ? Container(
+                  height: 60,
+                  child: QuickTikTokLoader(
+                    progressColor: AppColors.mainColor,
+                    backgroundColor: Colors.grey.shade200,
+                  ),
+                ).animate().fadeIn(duration: 0.3.seconds)
               : SizedBox.shrink(),
 
-          // Search bar just below AppBar (with grey background)
+          // Search bar just below AppBar (with enhanced styling)
           Container(
-            color: Colors.grey[300],
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: TextField(
-              controller: searchfeildcontroller,
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    final userId = ref.read(userDataClass).userId;
-                    ref
-                        .watch(rentInProvider)
-                        .fetchRentIn(
-                          userId: userId,
-                          search: searchfeildcontroller.text,
-                        );
-                  },
-                  icon: const Icon(Icons.search),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade200),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchfeildcontroller,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          final userId = ref.read(userDataClass).userId;
+                          ref
+                              .watch(rentInProvider)
+                              .fetchRentIn(
+                                userId: userId,
+                                search: searchfeildcontroller.text,
+                              );
+                        },
+                        icon: Icon(Icons.search, color: AppColors.mainColor),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: "Search rentals & more...",
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 16,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.black87, fontSize: 16),
+                  ),
                 ),
-                filled: true,
-                fillColor: Colors.white,
-                hintText: "Search How to & More",
-                hintStyle: const TextStyle(color: Colors.black54, fontSize: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: const TextStyle(color: Colors.black87, fontSize: 16),
-            ),
-          ),
+              )
+              .animate()
+              .fadeIn(delay: 0.3.seconds, duration: 0.8.seconds)
+              .slideY(begin: -0.1),
 
           // Rentals content with loading and empty states
           Expanded(
             child: rentalData.loadingFor == "fetchRentIn"
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 100),
-                      child: DotLoader(),
+                ? Center(
+                    child: Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mainColor.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DotLoader(),
+                          SizedBox(height: 16),
+                          Text(
+                            "Loading rentals...",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )
+                  ).animate().fadeIn(duration: 0.5.seconds).scale()
                 : rentalData.rentInListData.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inbox_outlined,
-                          size: 80,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          "No Rentals Found",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
+                ? Center(
+                        child: Container(
+                          padding: EdgeInsets.all(32),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.mainColor.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.inbox_outlined,
+                                size: 80,
+                                color: AppColors.mainColor,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                "No Rentals Found",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                "Your rental items will appear here",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          "Your rental items will appear here",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
+                      )
+                      .animate()
+                      .fadeIn(delay: 0.5.seconds, duration: 0.8.seconds)
+                      .scale()
                 : RefreshIndicator(
                     onRefresh: () async {
                       final userId = ref.read(userDataClass).userId;
@@ -164,18 +243,58 @@ class _RentInPageState extends ConsumerState<RentInPage> {
                         vertical: 16,
                       ),
                       itemCount: rentalData.rentInListData.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // Mobile 2 columns
-                            mainAxisSpacing: 18,
-                            crossAxisSpacing: 18,
-                            childAspectRatio: 0.85,
-                          ),
-                      itemBuilder: (context, index) => _buildRentalItem(
-                        context,
-                        rentalData.rentInListData[index],
-                        index,
+
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            ScreenSize.isLandscape || ScreenSize.isTablet
+                            ? 3
+                            : 2,
+                        mainAxisSpacing:
+                            ScreenSize.isLandscape || ScreenSize.isTablet
+                            ? 20
+                            : 15,
+                        crossAxisSpacing:
+                            ScreenSize.isLandscape || ScreenSize.isTablet
+                            ? 20
+                            : 15,
+                        childAspectRatio: 0.95,
                       ),
+
+                      itemBuilder: (context, index) {
+                        var item = rentalData.rentInListData[index];
+                        return ListingBox(
+                              id: item.id.toString(),
+                              title: item.productTitle,
+                              showStatusLabel: true,
+                              statusLabelType: item.deliverd.toString(),
+                              showDelete: true,
+                              isDeleteLoading:
+                                  ref.watch(rentInProvider).loadingFor ==
+                                  "delete${item.id}",
+                              onDeleteTap: () {
+                                alertBoxDelete(
+                                  context,
+                                  onDeleteTap: () {
+                                    ref
+                                        .watch(rentInProvider)
+                                        .deleteOrder(
+                                          orderId: item.id.toString(),
+                                          loadingFor: "delete${item.id}",
+                                        );
+                                  },
+                                );
+                              },
+                              imageUrl: item.productImage.first,
+                              onTap: () =>
+                                  goto(RentInDetailsPage(index: index)),
+                            )
+                            .animate()
+                            .fadeIn(
+                              delay: Duration(milliseconds: index * 100),
+                              duration: 0.2.seconds,
+                            )
+                            .slideY(begin: 0.2);
+                      },
                     ),
                   ),
           ),
@@ -185,9 +304,10 @@ class _RentInPageState extends ConsumerState<RentInPage> {
         onPressed: () {
           goto(AllItemsPage()); // Add new rental logic here
         },
-        backgroundColor: AppColors.btnBgColor,
-        child: Icon(Icons.add, color: AppColors.btnIconColor),
-      ),
+        backgroundColor: AppColors.mainColor,
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add),
+      ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
     );
   }
 
@@ -195,140 +315,170 @@ class _RentInPageState extends ConsumerState<RentInPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.14),
-            blurRadius: 7,
+            color: AppColors.mainColor.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: AppColors.mainColor.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Stack(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(width: 6),
-              // Main content (image and texts, centered)
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    goto(RentInDetailsPage(index: index));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: SizedBox(
-                            height: 90,
-                            width: 130,
-                            child: FittedBox(
-                              fit: BoxFit.cover, // ✅ hamesha container me fit
-                              child: CacheImageWidget(
-                                isCircle: false,
-                                url: rental.productImage.first,
-                                height: 90,
-                                width: 130,
-                              ),
-                            ),
-                          ),
+          InkWell(
+            onTap: () {
+              goto(RentInDetailsPage(index: index));
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      width: double.infinity,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        border: Border.all(
+                          color: AppColors.mainColor.withOpacity(0.2),
+                          width: 1,
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          rental.productTitle,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          rental.productby?.name ?? '',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 2),
-                      ],
+                      ),
+                      child: CacheImageWidget(
+                        isCircle: false,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        url: rental.productImage.first,
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    rental.productTitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    rental.productby?.name ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-            ],
+            ),
           ),
           Positioned(
             left: 8,
-            top: 0,
-            child: IconButton(
-              onPressed: () async {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: Colors.black,
-                    title: const Text(
-                      'Delete Order',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    content: const Text(
-                      'Are you sure you want to delete this?',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          'Cancel',
-
-                          style: TextStyle(color: Colors.grey),
+            top: 8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(
+                  color: AppColors.mainColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: IconButton(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      title: const Text(
+                        'Delete Order',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          // ✅ delete using ref
-                          ref
-                              .watch(rentInProvider)
-                              .deleteOrder(
-                                orderId: rental.id.toString(),
-                                loadingFor: "delete+${rental.id}",
-                              );
-                          Navigator.pop(context);
-                        },
-                        child:
-                            const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.grey),
-                                )
-                                .animate(
-                                  onPlay: (controller) =>
-                                      controller.repeat(reverse: true),
-                                )
-                                .shimmer(color: Colors.red.shade200),
+                      content: const Text(
+                        'Are you sure you want to delete this?',
+                        style: TextStyle(color: Colors.grey),
                       ),
-                    ],
-                  ),
-                );
-              },
-              icon:
-                  ref.watch(rentInProvider).loadingFor == "delete+${rental.id}"
-                  ? CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.black,
-                      child: DotLoader(showDots: 1),
-                    )
-                  : Icon(Icons.delete),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // ✅ delete using ref
+                            ref
+                                .watch(rentInProvider)
+                                .deleteOrder(
+                                  orderId: rental.id.toString(),
+                                  loadingFor: "delete+${rental.id}",
+                                );
+                            Navigator.pop(context);
+                          },
+                          child:
+                              const Text(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                                  .animate(
+                                    onPlay: (controller) =>
+                                        controller.repeat(reverse: true),
+                                  )
+                                  .shimmer(color: Colors.red.shade200),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon:
+                    ref.watch(rentInProvider).loadingFor ==
+                        "delete+${rental.id}"
+                    ? CircleAvatar(
+                        radius: 12,
+                        backgroundColor: AppColors.mainColor,
+                        child: DotLoader(showDots: 1, size: 8),
+                      )
+                    : Icon(Icons.delete, color: Colors.red.shade400, size: 20),
+                iconSize: 20,
+                padding: EdgeInsets.all(8),
+              ),
             ),
           ),
           // Right-top Status Label
@@ -343,29 +493,38 @@ class _RentInPageState extends ConsumerState<RentInPage> {
   }
 
   Widget _statusLabel(String? status) {
-    Color bgColor = Colors.orange;
-    String label = "Delivered";
+    Color bgColor = AppColors.mainColor;
+    String label = "Active";
+
     if (status.toString() == "0") {
-      bgColor = Colors.orange.withOpacity(0.5);
+      bgColor = Colors.orange;
       label = "Pending";
     } else if (status.toString() == "1") {
-      bgColor = AppColors.mainColor.withOpacity(0.7);
+      bgColor = AppColors.mainColor;
       label = "Rented";
     } else {
-      bgColor = Colors.green.withOpacity(0.7);
-      label = "Closed";
+      bgColor = Colors.green;
+      label = "Completed";
     }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: bgColor.withOpacity(0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         label,
         style: const TextStyle(
           color: Colors.white,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.bold,
           fontSize: 10,
         ),
       ),

@@ -14,12 +14,14 @@ import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:rent/widgets/imageview.dart';
 
+import '../../apidata/categoryapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
 import '../../constants/screensizes.dart';
 import '../../models/rent_in_model.dart';
 import '../../services/toast.dart';
+import '../../widgets/item_content_details_widget.dart';
 import '../../widgets/rentStepperWidget.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
@@ -33,13 +35,21 @@ class RentInDetailsPage extends ConsumerStatefulWidget {
 class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final renting = ref.watch(rentInProvider).rentInListData[widget.index];
+    final itemIndex = ref.watch(rentInProvider).rentInListData[widget.index];
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Rent In Details"),
+        title: const Text(
+          "Rent In Details",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
-
+        backgroundColor: AppColors.mainColor,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             onPressed: () async {
@@ -70,8 +80,8 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         ref
                             .watch(rentInProvider)
                             .deleteOrder(
-                              orderId: renting.id.toString(),
-                              loadingFor: "delete${renting.id}",
+                              orderId: itemIndex.id.toString(),
+                              loadingFor: "delete${itemIndex.id}",
                             );
                         Navigator.pop(context);
                       },
@@ -90,7 +100,8 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                 ),
               );
             },
-            icon: ref.watch(rentInProvider).loadingFor == "delete${renting.id}"
+            icon:
+                ref.watch(rentInProvider).loadingFor == "delete${itemIndex.id}"
                 ? CircleAvatar(
                     radius: 10,
                     backgroundColor: Colors.black,
@@ -102,18 +113,24 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
+        backgroundColor: AppColors.mainColor,
+        foregroundColor: Colors.white,
         child: Icon(Icons.chat_outlined),
-      ),
+      ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(top: 0, bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black38,
-              offset: Offset(1, 1),
-              blurRadius: 5,
-              spreadRadius: 1,
+              color: Colors.black.withOpacity(0.1),
+              offset: Offset(0, -2),
+              blurRadius: 10,
+              spreadRadius: 0,
             ),
           ],
         ),
@@ -123,20 +140,20 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
             const SizedBox(height: 5),
 
             ProRentStatusStepper(
-              initialStatus: renting.isRejected.toString() == '1'
+              initialStatus: itemIndex.isRejected.toString() == '1'
                   ? "0"
-                  : renting.deliverd.toString() == '0'
+                  : itemIndex.deliverd.toString() == '0'
                   ? "1"
-                  : renting.deliverd.toString() == '1'
+                  : itemIndex.deliverd.toString() == '1'
                   ? "2"
-                  : renting.deliverd.toString() == '2'
+                  : itemIndex.deliverd.toString() == '2'
                   ? "3"
                   : '2',
               onStatusChanged: (status) {},
               selectAble: false,
               height: 30,
               cornerRadius: 20,
-            ),
+            ).animate().fadeIn(delay: 0.3.seconds, duration: 0.8.seconds),
             Divider(height: 2),
             CupertinoListTile(
               // minVerticalPadding: 0,
@@ -171,7 +188,7 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                     // print(finalDateRange.toString());
                     var daysCount = endDate.difference(startDate).inDays + 1;
                     ////
-                    debugPrint((renting.dailyrate * daysCount).toString());
+                    debugPrint((itemIndex.dailyrate * daysCount).toString());
                     // return;
 
                     ref
@@ -181,11 +198,11 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                               .watch(userDataClass)
                               .userData["id"]
                               .toString(),
-                          orderId: renting.id.toString(),
+                          orderId: itemIndex.id.toString(),
                           loadingFor: "updateRentnPickupTime",
                           pickup_date_range: finalDateRange,
                           total_price:
-                              (int.tryParse(renting.dailyrate ?? '0')! *
+                              (int.tryParse(itemIndex.dailyrate ?? '0')! *
                                       daysCount)
                                   .toString(),
                         );
@@ -203,26 +220,17 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               title: Text(
                 "My Pickup Date:",
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               subtitle:
                   Text(
-                        renting.userCanPickupInDateRange,
-                        style: TextStyle(color: Colors.black),
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(
-                        color: Colors.cyan,
-                        duration: Duration(seconds: 2),
-                      ),
-
-              trailing:
-                  Text(
-                        "\$ ${renting.totalPriceByUser}",
+                        itemIndex.userCanPickupInDateRange,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
@@ -230,304 +238,54 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                         color: AppColors.mainColor,
                         duration: Duration(seconds: 2),
                       ),
+
+              trailing:
+                  Text(
+                        "\$ ${itemIndex.totalPriceByUser}",
+                        style: TextStyle(
+                          color: AppColors.mainColor,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      .animate(onPlay: (controller) => controller.repeat())
+                      .shimmer(
+                        color: Colors.black,
+                        duration: Duration(seconds: 2),
+                      ),
             ),
             SizedBox(height: 5),
           ],
         ),
       ).animate().fade(duration: 1.seconds).slideY(begin: 1),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CarouselSlider.builder(
-              itemCount: renting.productImage.length,
-              itemBuilder: (context, index, realIndex) {
-                final imageUrl = renting.productImage[index];
-                return CacheImageWidget(
-                  onTap: () {
-                    showImageView(context, imageUrl);
-                  },
-                  width: double.infinity,
-                  height: ScreenSize.height * 0.3,
-                  isCircle: false,
-                  fit: BoxFit.contain,
-                  radius: 0,
-                  url: imageUrl,
-                );
-              },
-              options: CarouselOptions(
-                height: ScreenSize.height * 0.35,
-                viewportFraction: 0.68,
-                enlargeCenterPage: true,
-                autoPlay: renting.productImage.length > 1,
-                autoPlayInterval: const Duration(seconds: 2),
-                autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                autoPlayCurve: Curves.fastOutSlowIn,
-                enableInfiniteScroll: renting.productImage.length > 1,
-                scrollDirection: Axis.horizontal,
-              ),
-            ),
-            const SizedBox(height: 5),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Status Row
-                  // const SizedBox(height: 5),
-                  Text(
-                    renting.productTitle,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-
-                  // Description Section
-                  if (renting.productDesc.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(renting.productDesc),
-                    const SizedBox(height: 24),
-                  ],
-
-                  SizedBox(height: 20),
-                  const Text(
-                    "  Rates",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black38,
-                    ),
-                  ),
-                  // Rental Information Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 5),
-                        _buildInfoRow(
-                          "Daily Rate",
-                          "\$${renting.dailyrate ?? '0'}",
-                        ),
-                        _buildInfoRow(
-                          "Weekly Rate",
-                          "\$${renting.weeklyrate ?? '0'}",
-                        ),
-                        _buildInfoRow(
-                          "Monthly Rate",
-                          "\$${renting.monthlyrate ?? '0'}",
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 20),
-                  const Text(
-                    "  Calender",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black38,
-                    ),
-                  ),
-                  // Rental Information Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          minTileHeight: 0,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          minLeadingWidth: 50,
-                          leading: Text(
-                            "Order Date",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          title:
-                              Text(
-                                    "${renting.userCanPickupInDateRange}",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 13,
-                                    ),
-                                  )
-                                  .animate(
-                                    onPlay: (controller) => controller.repeat(),
-                                  )
-                                  .shimmer(
-                                    color: AppColors.mainColor,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                        ),
-                        Divider(color: Colors.grey.shade300),
-
-                        ListTile(
-                          minTileHeight: 0,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          minLeadingWidth: 50,
-                          leading: Text(
-                            "Availability",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          title:
-                              Text(
-                                    renting.availability,
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 13,
-                                    ),
-                                  )
-                                  .animate(
-                                    onPlay: (controller) => controller.repeat(),
-                                  )
-                                  .shimmer(
-                                    color: Colors.black,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                        ),
-
-                        Divider(color: Colors.grey.shade300),
-                        ListTile(
-                          minTileHeight: 0,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          minLeadingWidth: 50,
-                          leading: Text(
-                            "Listing Date",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          title: Text(
-                            "${renting.productby?.createdAt}",
-                            style: TextStyle(color: Colors.black, fontSize: 13),
-                          ),
-                        ),
-
-                        // Divider(color: Colors.green.shade50),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  SizedBox(height: 20),
-                  const Text(
-                    "  Listing By",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black38,
-                    ),
-                  ),
-                  // User Information Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Container(
-                            width: 60,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey[300]!,
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: CacheImageWidget(
-                                width: 50,
-                                height: 40,
-                                isCircle: true,
-                                radius: 0,
-                                url: renting.productby!.image,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            renting.productby?.name ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          subtitle: Text(
-                            renting.productby?.email ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ),
-                        Divider(color: Colors.grey.shade200),
-                        const SizedBox(height: 10),
-                        _buildInfoRow(
-                          "Phone Number",
-                          renting.productby?.phone ?? '',
-                        ),
-                        Divider(color: Colors.grey.shade200),
-                        const SizedBox(height: 10),
-                        _buildInfoRow(
-                          "Address",
-                          renting.productby?.address ?? '',
-                        ),
-                        Divider(color: Colors.grey.shade200),
-                        const SizedBox(height: 10),
-                        _buildInfoRow(
-                          "About",
-                          renting.productby?.aboutUs ?? '',
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 70),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: ItemContentDetailsWidget(
+        images: itemIndex.productImage,
+        title: itemIndex.productTitle,
+        description: itemIndex.productDesc,
+        catgName:
+            "${itemIndex.productby != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                      : null
+                : null}",
+        catgImg:
+            "${itemIndex.categoryId != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                      : null
+                : null}",
+        dailyRate: itemIndex.dailyrate.toString(),
+        weeklyRate: itemIndex.weeklyrate.toString(),
+        monthlyRate: itemIndex.monthlyrate.toString(),
+        availability: itemIndex.availability ?? '',
+        listingDate: itemIndex.createdAt.toString(),
+        // orderDate: orderDate,
+        userImage: itemIndex.productby?.image,
+        userName: itemIndex.productby?.name,
+        userEmail: itemIndex.productby?.email,
+        userPhone: itemIndex.productby?.phone,
+        userAddress: itemIndex.productby?.address,
+        userAbout: itemIndex.productby?.aboutUs,
       ),
     );
   }
@@ -566,24 +324,29 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
   // Helper method to build info row
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 120,
             child: Text(
               "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+                fontSize: 14,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+                fontSize: 14,
+              ),
             ),
           ),
         ],

@@ -119,14 +119,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                 );
               },
-              icon:
-                  const Icon(
-                        Icons.notifications,
-                        color: Colors.white60,
-                        size: 30,
-                      )
-                      .animate(onPlay: (controller) => controller.repeat())
-                      .shimmer(color: Colors.black26, duration: 2.seconds),
+              icon: const Icon(Icons.notifications, size: 30),
             ),
             InkWell(
               onTap: () {
@@ -140,8 +133,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   color: Colors.cyan.shade700,
                   borderRadius: BorderRadius.circular(25),
                 ),
-                width: 35,
-                height: 35,
+                width: 47,
+                height: 47,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
                   url: Api.imgPath + ref.watch(userDataClass).userImage,
@@ -323,8 +316,8 @@ class HomeChart extends ConsumerStatefulWidget {
 class _HomeChartState extends ConsumerState<HomeChart> {
   @override
   Widget build(BuildContext context) {
-    // debugPrint("👉🏻 Bookings Data: ${widget.bookingsData}");
-    // debugPrint("Rentals Data: ${widget.rentalsData}");
+    debugPrint("👉🏻 Bookings Data: ${widget.bookingsData}");
+    debugPrint("Rentals Data: ${widget.rentalsData}");
 
     double maxYValue = 0;
     if (widget.bookingsData.isNotEmpty) {

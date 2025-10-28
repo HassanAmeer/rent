@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -42,155 +44,218 @@ class _BlogsdetailsState extends ConsumerState<Blogsdetails> {
     final blog = ref.watch(blogDataProvider).blogs[widget.index];
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Blog Details"),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.black,
+        title: const Text(
+          "Blog Details",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: AppColors.mainColor,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.only(top: 200),
-                child: DotLoader(),
+          ? Center(
+              child: Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.mainColor.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DotLoader(),
+                    SizedBox(height: 16),
+                    Text(
+                      "Loading blog...",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )
+            ).animate().fadeIn(duration: Duration(milliseconds: 500)).scale()
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ✅ Blog Image with Text Overlay
                   Container(
-                    width: double.infinity,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                        width: double.infinity,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mainColor.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Stack(
-                        children: [
-                          // Background Image - Full size
-                          Positioned.fill(
-                            child: CachedNetworkImage(
-                              imageUrl: blog.image,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                              placeholder: (context, url) => Container(
-                                color: Colors.grey[300],
-                                child: const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey[300],
-                                child: const Icon(
-                                  Icons.image_not_supported,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Gradient Overlay for better text readability
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.8),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Text Overlay - Better positioning
-                          Positioned(
-                            bottom: 16,
-                            left: 16,
-                            right: 16,
-                            child: SafeArea(
-                              child: Text(
-                                blog.title,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  height: 1.3,
-                                  shadows: [
-                                    Shadow(
-                                      offset: Offset(2, 2),
-                                      blurRadius: 4,
-                                      color: Colors.black,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Stack(
+                            children: [
+                              // Background Image - Full size
+                              Positioned.fill(
+                                child: CachedNetworkImage(
+                                  imageUrl: blog.image,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey.shade100,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.mainColor,
+                                      ),
                                     ),
-                                  ],
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                        color: Colors.grey.shade100,
+                                        child: Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: AppColors.mainColor,
+                                        ),
+                                      ),
                                 ),
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
+
+                              // Gradient Overlay for better text readability
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        AppColors.mainColor.withOpacity(0.8),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Text Overlay - Better positioning
+                              Positioned(
+                                bottom: 20,
+                                left: 20,
+                                right: 20,
+                                child: SafeArea(
+                                  child: Text(
+                                    blog.title,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      height: 1.3,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(2, 2),
+                                          blurRadius: 4,
+                                          color: Colors.black,
+                                        ),
+                                      ],
+                                    ),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(
+                        delay: Duration(milliseconds: 300),
+                        duration: Duration(milliseconds: 800),
+                      )
+                      .slideY(begin: -0.1),
 
-                  const SizedBox(height: 20),
-
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
                   // ✅ Blog Description
                   Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Description",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mainColor.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: AppColors.mainColor.withOpacity(0.1),
+                            width: 1,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        // ✅ HTML Widget for rich text content
-                        HtmlWidget(
-                          blog.content,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.black54,
-                            height: 1.5,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Description",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // ✅ HTML Widget for rich text content
+                            HtmlWidget(
+                              blog.content,
+                              textStyle: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                height: 1.6,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      )
+                      .animate()
+                      .fadeIn(
+                        delay: Duration(milliseconds: 500),
+                        duration: Duration(milliseconds: 800),
+                      )
+                      .slideY(begin: 0.1),
 
-                  const SizedBox(height: 20),
-
-                  // ✅ Additional Info (if available)
+                  const SizedBox(height: 80),
                 ],
               ),
             ),

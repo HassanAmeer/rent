@@ -1,21 +1,23 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/constants/appColors.dart';
-import 'package:rent/constants/images.dart';
-import 'package:rent/services/goto.dart';
 import 'package:rent/constants/screensizes.dart';
+import 'package:rent/services/goto.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/listing/ListingDetailPage.dart';
 import 'package:rent/design/listing/add_new_listing_page.dart';
-import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/listings_widgets/items_box_widget.dart';
 import 'package:rent/widgets/searchfield.dart';
 import '../../apidata/listingapi.dart';
 import '../../apidata/user.dart';
-import '../home_page.dart';
+import '../../widgets/delete_alert_box.dart';
 
 class ListingPage extends ConsumerStatefulWidget {
   const ListingPage({super.key});
@@ -25,345 +27,238 @@ class ListingPage extends ConsumerStatefulWidget {
 }
 
 class _ListingPageState extends ConsumerState<ListingPage> {
-  var searchfieldcontroller = TextEditingController();
+  final _searchCtrl = TextEditingController();
+  final _scrollCtrl = ScrollController();
+  Timer? _debounce;
+
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((v) {
-      ref
-          .watch(listingDataProvider)
-          .fetchMyItems(
-            uid: ref.watch(userDataClass).userData["id"].toString(),
-            search: "",
-            loadingfor: "getlistings",
-          );
-    });
-
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetch(''));
+    _searchCtrl.addListener(() {
+      _debounce?.cancel();
+      _debounce = Timer(const Duration(milliseconds: 500), () {
+        _fetch(_searchCtrl.text.trim());
+      });
+    });
+  }
+
+  void _fetch(String query, {bool refresh = false}) {
+    final uid = ref.read(userDataClass).userData["id"].toString();
+    ref
+        .read(listingDataProvider)
+        .fetchMyItems(
+          uid: uid,
+          search: query,
+          refresh: refresh,
+          loadingfor: refresh ? "refresh" : "getlistings",
+        );
+  }
+
+  Future<void> _refresh() async =>
+      _fetch(_searchCtrl.text.trim(), refresh: true);
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    _scrollCtrl.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final listingProvider = ref.watch(listingDataProvider);
+    final prov = ref.watch(listingDataProvider);
+    final isInit = prov.loadingfor == "getlistings";
+    final isRefresh = prov.loadingfor == "refresh";
+
+    // responsive cross-axis count
+    final width = MediaQuery.of(context).size.width;
+    final crossCount = width > 1200
+        ? 4
+        : width > 800
+        ? 3
+        : 2;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.cyan,
-        automaticallyImplyLeading: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black,
         title: const Text(
-          "My Listings",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          'My Listings',
+          style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
           PopupMenuButton<String>(
-            color: Colors.black38,
-            shadowColor: Colors.transparent,
-            icon: Icon(Icons.more_vert),
-            onSelected: (String value) async {
-              if (value == 'refresh') {
-                WidgetsBinding.instance.addPostFrameCallback((v) {
-                  ref
-                      .watch(listingDataProvider)
-                      .fetchMyItems(
-                        uid: ref.watch(userDataClass).userData["id"].toString(),
-                        refresh: true,
-                        loadingfor: "refresh",
-                      );
-                });
-              }
-            },
-            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.more_vert),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
-            menuPadding: EdgeInsets.zero,
-            elevation: 0,
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
-                padding: const EdgeInsets.all(0),
+            color: Colors.black54,
+            itemBuilder: (_) => [
+              PopupMenuItem(
                 value: 'refresh',
                 child: Row(
                   children: [
-                    SizedBox(width: 5),
                     Icon(
                       Icons.refresh,
-                      color:
-                          ref.watch(listingDataProvider).loadingfor == "refresh"
-                          ? AppColors.mainColor
-                          : Colors.white,
+                      color: isRefresh ? AppColors.mainColor : Colors.white,
+                    ).animate().rotate(duration: isRefresh ? 800.ms : 0.ms),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Refresh',
+                      style: TextStyle(color: Colors.white),
                     ),
-                    SizedBox(width: 3),
-                    Text('Refresh', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
             ],
+            onSelected: (_) => _refresh(),
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref
-              .watch(listingDataProvider)
-              .fetchMyItems(
-                uid: ref.watch(userDataClass).userData["id"].toString(),
-                refresh: true,
-                loadingfor: "refresh",
-              );
-        },
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          child: Column(
-            children: [
-              ref.watch(listingDataProvider).loadingfor == "refresh"
-                  ? const QuickTikTokLoader(
-                      progressColor: Colors.black,
-                      backgroundColor: Colors.grey,
-                    )
-                  : SizedBox.shrink(),
-              SizedBox(height: 10),
-
-              /// Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SearchFeildWidget(
-                  searchFieldController: searchfieldcontroller,
-                  hint: "Search Listings...",
-                  onSearchIconTap: () {
-                    // if (searchfieldcontroller.text.isEmpty) {
-                    //   toast("Write Someting");
-                    //   return;
-                    // }
-                    ref
-                        .watch(listingDataProvider)
-                        .fetchMyItems(
-                          uid: ref
-                              .watch(userDataClass)
-                              .userData["id"]
-                              .toString(),
-                          search: searchfieldcontroller.text,
-                          loadingfor: "refresh",
-                        );
-                  },
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Color(0xFFB2EBF2)], // cyan[200]
+          ),
+        ),
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            color: AppColors.mainColor,
+            child: CustomScrollView(
+              controller: _scrollCtrl,
+              slivers: [
+                // ---------- SEARCH ----------
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 15,
+                    ),
+                    child: SearchFeildWidget(
+                      searchFieldController: _searchCtrl,
+                      hint: "Search listings…",
+                      onSearchIconTap: () => _fetch(_searchCtrl.text.trim()),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              ref.watch(listingDataProvider).loadingfor == "getlistings"
-                  ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 250),
-                        child: DotLoader(),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.1,
-                              mainAxisSpacing: 15,
-                              crossAxisSpacing: 10,
+
+                // ---------- LOADING / EMPTY ----------
+                if (isInit)
+                  const SliverFillRemaining(child: Center(child: DotLoader()))
+                else if (prov.listings.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.list_alt,
+                            size: 72,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "No listings yet",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
                             ),
-                        shrinkWrap: true,
-                        controller: ScrollController(),
-                        itemCount: listingProvider.listings.length,
-                        itemBuilder: (context, index) {
-                          final item = listingProvider.listings[index];
-                          return GestureDetector(
-                            onTap: () {
-                              goto(ListingDetailPage(index: index));
-                            },
-                            child: ListingBox(
-                              ref: ref, // ✅ ref pass kar diya constructor se
-                              id: item.id.toString(),
-                              productBy: item.userId.toString(),
-                              title: item.displayTitle,
-                              imageUrl: item.images.first,
-                            ),
-                          );
-                        },
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            onPressed: _refresh,
+                            icon: const Icon(Icons.refresh),
+                            label: const Text("Refresh"),
+                          ),
+                        ],
                       ),
                     ),
-            ],
+                  )
+                else
+                  // ---------- GRID ----------
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossCount,
+                        mainAxisSpacing: ScreenSize.width * 0.03,
+                        crossAxisSpacing: ScreenSize.width * 0.03,
+                        childAspectRatio: 1,
+                      ),
+                      delegate: SliverChildBuilderDelegate((ctx, i) {
+                        final item = prov.listings[i];
+                        final deleting = prov.loadingfor == item.id.toString();
+
+                        return ListingBox(
+                              id: item.id.toString(),
+                              title: item.displayTitle,
+                              imageUrl: item.images.first,
+                              showDelete: true,
+                              isDeleteLoading: deleting,
+                              onTap: () => goto(ListingDetailPage(index: i)),
+                              onDeleteTap: () {
+                                alertBoxDelete(
+                                  context,
+                                  onDeleteTap: () {
+                                    final uid = ref
+                                        .read(userDataClass)
+                                        .userData["id"]
+                                        .toString();
+                                    ref
+                                        .read(listingDataProvider)
+                                        .deleteItemById(
+                                          itemId: item.id.toString(),
+                                          uid: uid,
+                                          loadingfor: item.id.toString(),
+                                        );
+                                  },
+                                );
+                              },
+                            )
+                            .animate()
+                            .fadeIn(
+                              delay: Duration(milliseconds: i * 100),
+                              duration: 0.2.seconds,
+                            )
+                            .slideY(begin: 0.2);
+                      }, childCount: prov.listings.length),
+                    ),
+                  ),
+
+                // ---------- REFRESH BAR ----------
+                if (isRefresh)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: QuickTikTokLoader(
+                        progressColor: AppColors.mainColor,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
 
-      /// Floating Add Button
+      // ---------- FAB ----------
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddNewListingPage()),
-          );
-        },
-        backgroundColor: const Color.fromARGB(255, 11, 11, 11),
+        backgroundColor: Colors.black87,
+        elevation: 8,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddNewListingPage()),
+        ),
         child: const Icon(Icons.add, color: Colors.white),
-      ),
+      ).animate().scale(delay: 150.ms),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-}
-
-class ListingBox extends StatelessWidget {
-  final String title;
-  final String imageUrl;
-  final String id;
-  final WidgetRef ref;
-  var productBy; // ✅ ref constructor me receive karenge
-
-  ListingBox({
-    super.key,
-    required this.title,
-    required this.imageUrl,
-    required this.id,
-    required this.ref,
-    var productBy, // ✅ required banaya
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      // height: ScreenSize.height*0.1,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.25),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Image container with expanded height
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(10),
-                ),
-                child: CacheImageWidget(
-                  url: imageUrl,
-                  isCircle: false,
-                  width: ScreenSize.width * 0.46,
-                  height: ScreenSize.height * 0.16,
-                ),
-              ),
-              Positioned(
-                top: 5,
-                right: 5,
-
-                child:
-                    ref.read(listingDataProvider).loadingfor.toString() ==
-                        id.toString()
-                    ? CircleAvatar(
-                        radius: 10,
-                        backgroundColor: Colors.black,
-                        child: DotLoader(showDots: 1),
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          // Show confirm
-                          //Dation dialog
-
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor: Colors.black,
-                              title: const Text(
-                                'Delete Listing',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              content: const Text(
-                                'Are you sure you want to delete this listing?',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text(
-                                    'Cancel',
-
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    // ✅ delete using ref
-
-                                    ref
-                                        .read(listingDataProvider)
-                                        .deleteItemById(
-                                          itemId: id,
-                                          uid: ref
-                                              .watch(userDataClass)
-                                              .userData["id"]
-                                              .toString(),
-                                          loadingfor: id,
-                                        );
-                                    Navigator.pop(context);
-                                  },
-                                  child:
-                                      const Text(
-                                            'Delete',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          )
-                                          .animate(
-                                            onPlay: (controller) => controller
-                                                .repeat(reverse: true),
-                                          )
-                                          .shimmer(color: Colors.red.shade200),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(
-                              255,
-                              238,
-                              236,
-                              236,
-                            ).withOpacity(0.7),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.delete,
-                            size: 18,
-                            color: Color.fromARGB(255, 193, 16, 4),
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-
-          // Text container with reduced height
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

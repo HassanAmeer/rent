@@ -54,17 +54,17 @@ class RentInProvider with ChangeNotifier {
             .reversed
             .toList();
 
-        debugPrint("👉 fetchRentIn loaded: ${rentInListData.length} items");
+        debugPrint("👉 fetched RentIn loaded: ${rentInListData.length} items");
         setLoading();
         notifyListeners();
       } else {
-        toast(data['msg'] ?? 'Failed to fetch rentals');
+        toast(data['msg'] ?? 'Failed to fetch rent in');
         setLoading();
       }
     } catch (e) {
       setLoading();
-      debugPrint(" 💥 Error fetchRentIn: $e");
-      toast("Error fetchRentIn: ${e.toString()}");
+      debugPrint(" 💥 Error fetch RentIn: $e");
+      toast("Error fetch RentIn: ${e.toString()}");
     } finally {
       setLoading();
     }

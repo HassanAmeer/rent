@@ -15,6 +15,7 @@ import '../../services/toast.dart';
 import '../../widgets/casheimage.dart';
 import '../../models/item_model.dart';
 import '../../widgets/imageview.dart';
+import '../../widgets/item_content_details_widget.dart';
 // ✅ Edit page import
 
 class Allitemdetailspage extends ConsumerStatefulWidget {
@@ -29,7 +30,7 @@ class Allitemdetailspage extends ConsumerStatefulWidget {
 class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
   @override
   Widget build(BuildContext context) {
-    final item = ref.watch(getAllItems).allItems[widget.index];
+    final itemIndex = ref.watch(getAllItems).allItems[widget.index];
     return Scaffold(
       appBar: AppBar(title: const Text("Item Details")),
       floatingActionButton: Column(
@@ -77,19 +78,20 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                     "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
                 // print(finalDateRange.toString());
                 var daysCount = endDate.difference(startDate).inDays + 1;
-                debugPrint((item.dailyRate * daysCount).toString());
+                debugPrint((itemIndex.dailyRate * daysCount).toString());
                 ref
                     .read(getAllItems)
                     .orderitems(
                       userCanPickupInDateRange: finalDateRange,
-                      productId: item.id.toString(),
-                      totalprice_by: (item.dailyRate * daysCount).toString(),
-                      product_by: item.user!.id.toString(),
+                      productId: itemIndex.id.toString(),
+                      totalprice_by: (itemIndex.dailyRate * daysCount)
+                          .toString(),
+                      product_by: itemIndex.user!.id.toString(),
                       userId: ref
                           .watch(userDataClass)
                           .userData["id"]
                           .toString(),
-                      loadingFor: "${item.id}order",
+                      loadingFor: "${itemIndex.id}order",
                       context: context,
                     );
               } catch (e) {
@@ -97,7 +99,7 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
               }
             },
 
-            child: ref.watch(getAllItems).loadingFor == "${item.id}order"
+            child: ref.watch(getAllItems).loadingFor == "${itemIndex.id}order"
                 ? Padding(
                     padding: const EdgeInsets.all(15),
                     child: CircularProgressIndicator(
@@ -106,7 +108,7 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                     ),
                   )
                 : Icon(
-                    ref.watch(getAllItems).orderedItems.contains(item.id)
+                    ref.watch(getAllItems).orderedItems.contains(itemIndex.id)
                         ? Icons
                               .shopping_cart // Filled cart
                         : Icons.shopping_cart_outlined, // Outlined cart
@@ -122,11 +124,11 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                   .watch(favProvider)
                   .togglefavrt(
                     uid: ref.watch(userDataClass).userId,
-                    itemId: item.id.toString(),
-                    loadingFor: "${item.id}fav",
+                    itemId: itemIndex.id.toString(),
+                    loadingFor: "${itemIndex.id}fav",
                   );
             },
-            child: ref.watch(favProvider).loadingFor == "${item.id}fav"
+            child: ref.watch(favProvider).loadingFor == "${itemIndex.id}fav"
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CircularProgressIndicator(
@@ -137,7 +139,9 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                 : ref
                       .watch(favProvider)
                       .favouriteItems
-                      .any((i) => i.itemId.toString() == item.id.toString())
+                      .any(
+                        (i) => i.itemId.toString() == itemIndex.id.toString(),
+                      )
                 ? const Icon(Icons.bookmark, size: 22, color: Colors.white)
                 : const Icon(
                     Icons.bookmark_border,
@@ -147,127 +151,34 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CarouselSlider.builder(
-                itemCount: item.images.length,
-                itemBuilder: (context, index, realIndex) {
-                  final imageUrl = item.images[index];
-                  return CacheImageWidget(
-                    onTap: () {
-                      showImageView(context, imageUrl);
-                    },
-                    width: double.infinity,
-                    height: ScreenSize.height * 0.3,
-                    isCircle: false,
-                    fit: BoxFit.contain,
-                    radius: 0,
-                    url: imageUrl,
-                  );
-                },
-                options: CarouselOptions(
-                  height: ScreenSize.height * 0.35,
-                  viewportFraction: 0.68,
-                  enlargeCenterPage: true,
-                  autoPlay: item.images.length > 1,
-                  autoPlayInterval: const Duration(seconds: 2),
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: item.images.length > 1,
-                  scrollDirection: Axis.horizontal,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              Text(
-                item.displayTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-              HtmlWidget(item.description ?? 'No description available'),
-
-              SizedBox(height: 15),
-              ListTile(
-                tileColor: Colors.grey.shade200,
-                contentPadding: EdgeInsets.only(left: 5),
-
-                leading: CacheImageWidget(
-                  width: 25,
-                  height: 25,
-                  isCircle: true,
-                  radius: 5,
-                  url:
-                      "${item.categoryId != null
-                          ? ref.watch(categoryProvider).categories.where((e) => e.id == item.categoryId).isNotEmpty
-                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == item.categoryId).image
-                                : null
-                          : null}",
-                ),
-                title: Text(
-                  "${item.categoryId != null
-                      ? ref.watch(categoryProvider).categories.where((e) => e.id == item.categoryId).isNotEmpty
-                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == item.categoryId).name
-                            : null
-                      : null}",
-                ),
-                trailing: Text("Category  "),
-              ),
-              Divider(),
-
-              ListTile(title: Text("Daily Rate: ${item.formattedDailyRate}")),
-              Divider(),
-              ListTile(title: Text("Weekly Rate: ${item.formattedWeeklyRate}")),
-              Divider(),
-              ListTile(
-                title: Text("Monthly Rate: ${item.formattedMonthlyRate}"),
-              ),
-
-              Divider(),
-              ListTile(
-                title: Text(
-                  "Availability: ${item.availabilityDays ?? 'Not specified'}",
-                ),
-              ),
-              Divider(),
-
-              // Item owner information
-              if (item.user != null) ...[
-                const ListTile(title: Text("From User")),
-                ListTile(
-                  leading: CacheImageWidget(
-                    width: 50,
-                    height: 50,
-                    isCircle: true,
-                    radius: 200,
-                    url: item.user!.fullImageUrl.isNotEmpty
-                        ? item.user!.fullImageUrl
-                        : ImgLinks.profileImage,
-                  ),
-                  title: Text(item.user!.displayName),
-                  subtitle: Text(item.user!.email),
-                ),
-              ],
-              Divider(),
-              ListTile(
-                title: Text(
-                  "Listing Date:",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                subtitle: Text(item.createdAt?.toString() ?? 'N/A'),
-              ),
-              SizedBox(height: 50),
-            ],
-          ),
-        ),
+      body: ItemContentDetailsWidget(
+        images: itemIndex.images,
+        title: itemIndex.displayTitle,
+        description: itemIndex.description,
+        catgName:
+            "${itemIndex.categoryId != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                      : null
+                : null}",
+        catgImg:
+            "${itemIndex.categoryId != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                      : null
+                : null}",
+        dailyRate: itemIndex.dailyRate.toString(),
+        weeklyRate: itemIndex.weeklyRate.toString(),
+        monthlyRate: itemIndex.monthlyRate.toString(),
+        availability: itemIndex.availabilityRange ?? '',
+        listingDate: itemIndex.createdAt.toString(),
+        // orderDate: orderDate,
+        userImage: itemIndex.user?.image,
+        userName: itemIndex.user?.name,
+        userEmail: itemIndex.user?.email,
+        userPhone: itemIndex.user?.phone,
+        userAddress: itemIndex.user?.address,
+        userAbout: itemIndex.user?.aboutUs,
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:rent/services/goto.dart';
 import 'package:rent/constants/screensizes.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/services/toast.dart';
+import '../../apidata/categoryapi.dart';
 import '../../apidata/rent_out_api.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
@@ -19,6 +20,7 @@ import '../../models/rent_out_model.dart';
 import '../../widgets/casheimage.dart';
 import '../../widgets/dotloader.dart';
 import '../../widgets/imageview.dart';
+import '../../widgets/item_content_details_widget.dart';
 import '../../widgets/rentStepperWidget.dart';
 
 class RentOutDetailsPage extends ConsumerStatefulWidget {
@@ -32,10 +34,21 @@ class RentOutDetailsPage extends ConsumerStatefulWidget {
 class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(rentOutProvider).comingOrders[widget.index];
+    final itemIndex = ref.watch(rentOutProvider).comingOrders[widget.index];
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("  Rent Out Details"),
+        title: const Text(
+          "  Rent Out Details",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: AppColors.mainColor,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             onPressed: () async {
@@ -66,8 +79,8 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                         ref
                             .watch(rentOutProvider)
                             .deleteOrder(
-                              orderId: data.id.toString(),
-                              loadingFor: "delete${data.id}",
+                              orderId: itemIndex.id.toString(),
+                              loadingFor: "delete${itemIndex.id}",
                             );
                         Navigator.pop(context);
                       },
@@ -86,7 +99,8 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                 ),
               );
             },
-            icon: ref.watch(rentOutProvider).loadingfor == "delete${data.id}"
+            icon:
+                ref.watch(rentOutProvider).loadingfor == "delete${itemIndex.id}"
                 ? CircleAvatar(
                     radius: 10,
                     backgroundColor: Colors.black,
@@ -97,20 +111,25 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.mainColor,
+        foregroundColor: Colors.white,
         onPressed: () {},
-        child: const Icon(Icons.chat_outlined, size: 22, color: Colors.white),
-      ).animate().flipH().shimmer(duration: 2.seconds),
+        child: const Icon(Icons.chat_outlined, size: 22),
+      ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(top: 0, bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black38,
-              offset: Offset(1, 1),
-              blurRadius: 5,
-              spreadRadius: 1,
+              color: Colors.black.withOpacity(0.1),
+              offset: Offset(0, -2),
+              blurRadius: 10,
+              spreadRadius: 0,
             ),
           ],
         ),
@@ -126,13 +145,13 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
             const SizedBox(height: 5),
 
             ProRentStatusStepper(
-              initialStatus: data.isRejected.toString() == '1'
+              initialStatus: itemIndex.isRejected.toString() == '1'
                   ? "0"
-                  : data.delivered.toString() == '0'
+                  : itemIndex.delivered.toString() == '0'
                   ? "1"
-                  : data.delivered.toString() == '1'
+                  : itemIndex.delivered.toString() == '1'
                   ? "2"
-                  : data.delivered.toString() == '2'
+                  : itemIndex.delivered.toString() == '2'
                   ? "3"
                   : '2',
               onStatusChanged: (status) {
@@ -144,7 +163,7 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
                           .watch(userDataClass)
                           .userData["id"]
                           .toString(),
-                      orderId: data.id.toString(),
+                      orderId: itemIndex.id.toString(),
                       statusId: status == "0"
                           ? '3'
                           : status == "1"
@@ -160,19 +179,25 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
 
               height: 30,
               cornerRadius: 20,
-            ),
+            ).animate().fadeIn(delay: 0.3.seconds, duration: 0.8.seconds),
             Divider(height: 2),
             CupertinoListTile(
               // minVerticalPadding: 0,
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               title: Text(
                 "Pickup Date Range From User:",
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               subtitle:
                   Text(
-                        data.userCanPickupInDateRange,
-                        style: TextStyle(color: Colors.black),
+                        itemIndex.userCanPickupInDateRange,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
                       .shimmer(
@@ -182,16 +207,16 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
 
               trailing:
                   Text(
-                        "\$ ${data.totalPriceByUser}",
+                        "\$ ${itemIndex.totalPriceByUser}",
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
+                          color: AppColors.mainColor,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
                       .shimmer(
-                        color: AppColors.mainColor,
+                        color: Colors.black,
                         duration: Duration(seconds: 2),
                       ),
             ),
@@ -199,310 +224,34 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
           ],
         ),
       ).animate().fade(duration: 1.seconds).slideY(begin: 1),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CarouselSlider.builder(
-                    itemCount: data.productImages.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final imageUrl = data.productImages[index];
-                      return CacheImageWidget(
-                        onTap: () {
-                          showImageView(context, imageUrl);
-                        },
-                        width: double.infinity,
-                        height: ScreenSize.height * 0.3,
-                        isCircle: false,
-                        fit: BoxFit.contain,
-                        radius: 0,
-                        url: imageUrl,
-                      );
-                    },
-                    options: CarouselOptions(
-                      height: ScreenSize.height * 0.35,
-                      viewportFraction: 0.68,
-                      enlargeCenterPage: true,
-                      autoPlay: data.productImages.length > 1,
-                      autoPlayInterval: const Duration(seconds: 2),
-                      autoPlayAnimationDuration: const Duration(
-                        milliseconds: 800,
-                      ),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enableInfiniteScroll: data.productImages.length > 1,
-                      scrollDirection: Axis.horizontal,
-                    ),
-                  )
-                  .animate()
-                  .fade(duration: 200.milliseconds)
-                  .scale(begin: Offset(0.5, 0.5)),
-
-              const SizedBox(height: 10),
-
-              Text(
-                data.productTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              Text(
-                data.productDesc ?? "",
-                style: const TextStyle(fontSize: 18),
-              ),
-
-              const SizedBox(height: 8),
-              SizedBox(height: 5),
-              ListTile(
-                title: Text("Rates", style: TextStyle(color: Colors.grey)),
-                minVerticalPadding: 0,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    CupertinoListTile(
-                      title: Text(
-                        "daily rate:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("\$ ${data.dailyRate}"),
-                    ),
-                    CupertinoListTile(
-                      title: Text(
-                        "weekly rate:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("\$ ${data.weeklyRate}"),
-                    ),
-                    CupertinoListTile(
-                      title: Text(
-                        "monthly rate:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("\$ ${data.monthlyRate}"),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 5),
-              ListTile(
-                title: Text("Calender", style: TextStyle(color: Colors.grey)),
-                minVerticalPadding: 0,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        "Availability Days:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      subtitle: Text(
-                        data.availability,
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    // Divider(),
-                    // ListTile(
-                    //   title: Text(
-                    //     "Pickup Date Range From User:",
-                    //     style: TextStyle(color: Colors.grey),
-                    //   ),
-                    //   subtitle:
-                    //       Text(
-                    //             data.userCanPickupInDateRange,
-                    //             style: TextStyle(color: Colors.black),
-                    //           )
-                    //           .animate(
-                    //             onPlay: (controller) => controller.repeat(),
-                    //           )
-                    //           .shimmer(
-                    //             color: Colors.red,
-                    //             duration: Duration(seconds: 2),
-                    //           ),
-                    // ),
-                    Divider(),
-                    ListTile(
-                      title: Text(
-                        "Order Date:",
-                        style: TextStyle(color: Colors.cyan),
-                      ),
-                      subtitle: Text(
-                        "${data.createdAt}",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 40),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Divider(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text("Order From User")
-                        .animate(onPlay: (controller) => controller.repeat())
-                        .shimmer(
-                          color: Colors.cyan,
-                          duration: Duration(seconds: 2),
-                        ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 5),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: CacheImageWidget(
-                        width: 50,
-                        height: 50,
-                        isCircle: true,
-                        radius: 200,
-                        url: data.orderByUser!.fullImageUrl,
-                      ),
-                      title: Text(data.orderByUser!.name),
-                      subtitle: Text(data.orderByUser!.email),
-                    ),
-                    Divider(),
-                    CupertinoListTile(
-                      title: Text(
-                        "Phone Number: ",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("${data.orderByUser?.phone}"),
-                    ),
-                    Divider(),
-                    CupertinoListTile(
-                      title: Text(
-                        "Address: ",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("${data.orderByUser?.address}"),
-                    ),
-                    Divider(),
-                    CupertinoListTile(
-                      title: Text(
-                        "About: ",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      trailing: Text("${data.orderByUser?.aboutUs}"),
-                    ),
-                    SizedBox(height: 15),
-                  ],
-                ),
-              ),
-              SizedBox(height: 70),
-              //
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Container statuswidget() {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-  //     decoration: BoxDecoration(
-  //       color: _getStatusColor(data.delivered.toString()),
-  //       borderRadius: BorderRadius.circular(20),
-  //     ),
-  //     child: Row(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         Icon(
-  //           _getStatusIcon(data.delivered.toString()),
-  //           color: Colors.white,
-  //           size: 16,
-  //         ),
-  //         const SizedBox(width: 6),
-  //         Text(
-  //           _getStatusText(data.delivered.toString()),
-  //           style: const TextStyle(
-  //             color: Colors.white,
-  //             fontWeight: FontWeight.w600,
-  //             fontSize: 12,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // Helper method to get status color
-  // Color _getStatusColor(String? status) {
-  //   return status == "1" ? Colors.green : Colors.orange;
-  // }
-
-  // // Helper method to get status icon
-  // IconData _getStatusIcon(String? status) {
-  //   return status == "1" ? Icons.check_circle : Icons.history;
-  // }
-
-  // // Helper method to get status text
-  // String _getStatusText(String? status) {
-  //   return status == "1" ? "Delivered" : "Not Delivered";
-  // }
-
-  // Helper method to format date
-  String _formatDate(dynamic date) {
-    if (date == null) return 'Not specified';
-    try {
-      DateTime parsedDate = DateTime.parse(date.toString());
-      return "${parsedDate.day}/${parsedDate.month}/${parsedDate.year}";
-    } catch (e) {
-      return date.toString();
-    }
-  }
-
-  // Helper method to build info row
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              "$label:",
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
+      body: ItemContentDetailsWidget(
+        images: itemIndex.productImages,
+        title: itemIndex.productTitle,
+        description: itemIndex.productDesc,
+        catgName:
+            "${itemIndex.categoryId != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                      : null
+                : null}",
+        catgImg:
+            "${itemIndex.categoryId != null
+                ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                      ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                      : null
+                : null}",
+        dailyRate: itemIndex.dailyRate.toString(),
+        weeklyRate: itemIndex.weeklyRate.toString(),
+        monthlyRate: itemIndex.monthlyRate.toString(),
+        availability: itemIndex.availability ?? '',
+        listingDate: itemIndex.createdAt.toString(),
+        // orderDate: orderDate,
+        userImage: itemIndex.orderByUser?.image,
+        userName: itemIndex.orderByUser?.name,
+        userEmail: itemIndex.orderByUser?.email,
+        userPhone: itemIndex.orderByUser?.phone,
+        userAddress: itemIndex.orderByUser?.address,
+        userAbout: itemIndex.orderByUser?.aboutUs,
       ),
     );
   }

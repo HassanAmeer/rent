@@ -10,6 +10,7 @@ import 'package:rent/constants/screensizes.dart';
 import 'package:rent/widgets/btmnavbar.dart';
 // import 'package:rent/design/myrentals/itemsrent.dart';
 import 'package:rent/widgets/casheimage.dart';
+import 'package:rent/widgets/delete_alert_box.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:quick_widgets/widgets/tiktok.dart';
 import '../../apidata/rent_out_api.dart';
@@ -18,6 +19,7 @@ import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
 import '../../services/goto.dart';
 import '../../services/toast.dart';
+import '../../widgets/listings_widgets/items_box_widget.dart';
 import '../../widgets/searchfield.dart';
 import '../../models/rent_out_model.dart';
 
@@ -61,6 +63,9 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
         elevation: 1,
       ),
       body: RefreshIndicator(
+        color: AppColors.mainColor,
+        backgroundColor: Colors.black87,
+        elevation: 0,
         onRefresh: () async {
           ref
               .watch(rentOutProvider)
@@ -124,18 +129,63 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
                         vertical: 10,
                       ),
                       itemCount: ref.watch(rentOutProvider).comingOrders.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // Mobile 2 columns
-                            mainAxisSpacing: 15,
-                            crossAxisSpacing: 15,
-                            childAspectRatio: 0.85,
-                          ),
-                      itemBuilder: (context, index) => _bookingCard(
-                        context,
-                        ref.watch(rentOutProvider).comingOrders[index],
-                        index,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            ScreenSize.isTablet || ScreenSize.isLandscape
+                            ? 3
+                            : 2,
+                        mainAxisSpacing:
+                            ScreenSize.isTablet || ScreenSize.isLandscape
+                            ? 20
+                            : 15,
+                        crossAxisSpacing:
+                            ScreenSize.isTablet || ScreenSize.isLandscape
+                            ? 20
+                            : 15,
+                        childAspectRatio: 0.9,
                       ),
+                      itemBuilder: (context, index) {
+                        var item = ref
+                            .watch(rentOutProvider)
+                            .comingOrders[index];
+                        return ListingBox(
+                              id: item.id.toString(),
+                              title: item.displayTitle,
+                              showStatusLabel: true,
+                              statusLabelType: item.delivered.toString(),
+                              showDelete: true,
+                              isDeleteLoading:
+                                  ref.watch(rentOutProvider).loadingfor ==
+                                  "delete${item.id}",
+                              onDeleteTap: () {
+                                alertBoxDelete(
+                                  context,
+                                  onDeleteTap: () {
+                                    ref
+                                        .watch(rentOutProvider)
+                                        .deleteOrder(
+                                          orderId: item.id.toString(),
+                                          loadingFor: "delete${item.id}",
+                                        );
+                                  },
+                                );
+                              },
+                              imageUrl: item.productImages.first,
+                              onTap: () =>
+                                  goto(RentOutDetailsPage(index: index)),
+                            )
+                            .animate()
+                            .fadeIn(
+                              delay: Duration(milliseconds: index * 100),
+                              duration: 0.2.seconds,
+                            )
+                            .slideY(begin: 0.2);
+                      },
+                      // _bookingCard(
+                      //   context,
+                      //   ref.watch(rentOutProvider).comingOrders[index],
+                      //   index,
+                      // ),
                     ),
             ],
           ),
@@ -284,12 +334,8 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
                   : Icon(Icons.delete),
             ),
           ),
+
           // Right-top Status Label
-          Positioned(
-            right: 8,
-            top: 8,
-            child: _statusLabel(booking.delivered.toString()),
-          ),
         ],
       ),
     );
@@ -306,38 +352,6 @@ class _RentOutPageState extends ConsumerState<RentOutPage> {
         radius: 15,
         backgroundColor: Colors.black,
         child: Icon(icon, color: iconColor, size: 16.5),
-      ),
-    );
-  }
-
-  Widget _statusLabel(String? status) {
-    Color bgColor = Colors.orange;
-    String label = "Delivered";
-
-    if (status.toString() == "0") {
-      bgColor = Colors.orange.withOpacity(0.5);
-      label = "Pending";
-    } else if (status.toString() == "1") {
-      bgColor = AppColors.mainColor.withOpacity(0.7);
-      label = "Rented";
-    } else {
-      bgColor = Colors.green.withOpacity(0.7);
-      label = "Closed";
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-          fontSize: 10,
-        ),
       ),
     );
   }

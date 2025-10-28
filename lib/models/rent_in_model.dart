@@ -11,6 +11,7 @@ class RentInModel {
   int deliverd;
   int isRejected;
   int productId;
+  int categoryId;
   int productBy;
   String productTitle;
   String productDesc;
@@ -34,6 +35,7 @@ class RentInModel {
     this.deliverd = 0,
     this.isRejected = 0,
     this.productId = 0,
+    this.categoryId = 0,
     this.productBy = 0,
     this.productTitle = "",
     this.productDesc = "",
@@ -58,6 +60,7 @@ class RentInModel {
     deliverd: json["deliverd"] ?? 0,
     isRejected: json["isRejected"] ?? 0,
     productId: json["productId"] ?? 0,
+    categoryId: json["category_id"] ?? 0,
     productBy: json["product_by"] ?? 0,
     productTitle: json["productTitle"] ?? "",
     productDesc: json["productDesc"] ?? "",
@@ -92,6 +95,7 @@ class RentInModel {
     "deliverd": deliverd,
     "isRejected": isRejected,
     "productId": productId,
+    "category_id": categoryId,
     "product_by": productBy,
     "productTitle": productTitle,
     "productDesc": productDesc,
