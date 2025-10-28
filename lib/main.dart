@@ -37,6 +37,24 @@ class MyApp extends StatelessWidget {
           backgroundColor: AppColors.btnBgColor,
           foregroundColor: AppColors.btnIconColor,
         ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(width: 1, color: Colors.grey.shade400),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(width: 1, color: AppColors.mainColor),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(width: 1, color: Colors.grey.shade400),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(width: 1, color: Colors.grey.shade400),
+          ),
+        ),
         primarySwatch: AppColors.mainColor,
         scaffoldBackgroundColor: AppColors.scaffoldBgColor,
         appBarTheme: AppBarTheme(backgroundColor: AppColors.mainColor),

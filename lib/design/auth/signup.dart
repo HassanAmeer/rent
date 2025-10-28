@@ -78,6 +78,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     decoration: InputDecoration(
                       hintText: 'Password',
                       border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: AppColors.mainColor,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       prefixIcon: const Icon(Icons.lock),

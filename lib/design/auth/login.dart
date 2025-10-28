@@ -70,9 +70,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       prefixIcon: const Icon(Icons.email),
                     ),
                   ).animate().slideX(duration: 400.milliseconds),
@@ -82,9 +79,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       prefixIcon: const Icon(Icons.lock),
                     ),
                   ).animate().slideX(duration: 400.milliseconds),
