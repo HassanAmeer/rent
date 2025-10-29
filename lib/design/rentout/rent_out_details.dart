@@ -27,7 +27,7 @@ import '../message/chat.dart';
 
 class RentOutDetailsPage extends ConsumerStatefulWidget {
   final int index;
-  RentOutDetailsPage({super.key, required this.index});
+  const RentOutDetailsPage({super.key, required this.index});
 
   @override
   ConsumerState<RentOutDetailsPage> createState() => _RentOutDetailsPageState();

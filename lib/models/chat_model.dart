@@ -28,25 +28,25 @@ class ChatModel {
     //     : ChatUser.fromJson(json['recieverUser'] as Map<String, dynamic>);
     if (json['chats'] != null) {
       chats = <ChatMessage>[];
-      (json['chats'] as List).forEach((v) {
-        chats!.add(new ChatMessage.fromJson(v as Map<String, dynamic>));
-      });
+      for (var v in (json['chats'] as List)) {
+        chats!.add(ChatMessage.fromJson(v as Map<String, dynamic>));
+      }
     }
     chats = chats?.reversed.toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['msg'] = this.msg;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['msg'] = msg;
     // if (this.senderUser != null) {
     //   data['senderUser'] = this.senderUser!.toJson();
     // }
     // if (this.recieverUser != null) {
     //   data['recieverUser'] = this.recieverUser!.toJson();
     // }
-    if (this.chats != null) {
-      data['chats'] = this.chats!.map((v) => v.toJson()).toList();
+    if (chats != null) {
+      data['chats'] = chats!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -92,14 +92,14 @@ class ChatMessage {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['sid'] = this.sid;
-    data['msg'] = this.msg;
-    data['rid'] = this.rid;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['deleted_at'] = this.deletedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['sid'] = sid;
+    data['msg'] = msg;
+    data['rid'] = rid;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['deleted_at'] = deletedAt;
     return data;
   }
 
@@ -167,22 +167,22 @@ class ChatUser {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['image'] = this.image;
-    data['activeUser'] = this.activeUser;
-    data['name'] = this.name;
-    data['phone'] = this.phone;
-    data['email'] = this.email;
-    data['last_online_time'] = this.lastOnlineTime;
-    data['address'] = this.address;
-    data['aboutUs'] = this.aboutUs;
-    data['verifiedBy'] = this.verifiedBy;
-    data['sendEmail'] = this.sendEmail;
-    data['password'] = this.password;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['deleted_at'] = this.deletedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['image'] = image;
+    data['activeUser'] = activeUser;
+    data['name'] = name;
+    data['phone'] = phone;
+    data['email'] = email;
+    data['last_online_time'] = lastOnlineTime;
+    data['address'] = address;
+    data['aboutUs'] = aboutUs;
+    data['verifiedBy'] = verifiedBy;
+    data['sendEmail'] = sendEmail;
+    data['password'] = password;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['deleted_at'] = deletedAt;
     return data;
   }
 
