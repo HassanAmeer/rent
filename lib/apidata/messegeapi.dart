@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,11 +8,14 @@ import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart';
 
+import '../models/chat_model.dart';
+import '../models/chatedUsersModel.dart';
+
 var chatClass = ChangeNotifierProvider<ChatApi>((ref) => ChatApi());
 
 class ChatApi with ChangeNotifier {
-  List chatedUsersList = []; // ✅ API se aaya list store hoga
-  List messagesList = [];
+  List<ChatedUsersModel> chatedUsersList = []; // ✅ API se aaya list store hoga
+  ChatModel? messagesData;
   String loadingFor = "";
 
   setLoading([String loadingName = ""]) {
@@ -20,9 +24,14 @@ class ChatApi with ChangeNotifier {
   }
 
   /// ✅ Fetch All Chats
-  Future<void> chatedUsers({var loadingFor = "", required String uid}) async {
+  Future<void> chatedUsers({
+    var loadingFor = "",
+    required String uid,
+    bool refresh = false,
+  }) async {
     try {
       if (await checkInternet() == false) return;
+      if (chatedUsersList.isNotEmpty && refresh == false) return;
 
       setLoading(loadingFor);
 
@@ -33,7 +42,13 @@ class ChatApi with ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        chatedUsersList = data['chatedUsers'] ?? []; // ✅ safe parsing
+        List chatedList = data['chatedUsers'] ?? [];
+        // ✅ safe parsing
+        chatedUsersList = chatedList
+            .map((e) => ChatedUsersModel.fromJson(e))
+            .toList();
+        // debugPrint("👉 Response chatedUsersList: $chatedUsersList");
+
         setLoading();
       } else {
         toast(data['message'] ?? data['msg'] ?? 'Failed to fetch chats');
@@ -65,13 +80,16 @@ class ChatApi with ChangeNotifier {
       debugPrint("Response status: ${response.statusCode}");
 
       var result = json.decode(response.body);
-      print("👉 Response: $result");
-
-      List reverseList = result['chats'];
-      messagesList = reverseList.toList().reversed.toList();
-      print("messagesList.length: ${messagesList.length}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        // log("👉 getUserMsgs Response: $result");
+        // List chatList = result['chats'];
+        // messagesData = chatList
+        //     .map((e) => ChatModel.fromJson(e))
+        //     .toList()
+        //     .reversed
+        //     .toList();
+        messagesData = ChatModel.fromJson(result);
         // toast(result['msg'], backgroundColor: Colors.green);
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       } else {
@@ -87,7 +105,7 @@ class ChatApi with ChangeNotifier {
     }
   }
 
-  sndingmsgs({
+  sendingOrCreatingmsg({
     required String senderId,
     required String recieverId,
     String loadingfor = "",

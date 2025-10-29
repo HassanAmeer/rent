@@ -129,28 +129,43 @@ class ItemContentDetailsWidget extends StatelessWidget {
           catgImg!.toString().toNullString().isEmpty ||
                   catgName!.toString().toNullString().isEmpty
               ? SizedBox.shrink()
-              : ListTile(
-                  tileColor: Colors.grey.shade200,
-                  contentPadding: EdgeInsets.only(left: 10, right: 10),
-                  leading: catgImg == null || catgName == null
-                      ? SizedBox.shrink()
-                      : CacheImageWidget(
-                          onTap: () {
-                            showImageView(context, catgImg!);
-                          },
-                          width: 25,
-                          height: 25,
-                          isCircle: true,
-                          radius: 5,
-                          url: catgImg!,
-                          // "${listingData.categoryId != null
-                          //     ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
-                          //           ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).image
-                          //           : null
-                          //     : null}",
-                        ),
-                  title: catgName == null ? SizedBox.shrink() : Text(catgName!),
-                  trailing: Text("Category  "),
+              : Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white24,
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    tileColor: Colors.grey.shade200,
+                    contentPadding: EdgeInsets.only(left: 10, right: 10),
+                    leading: catgImg == null || catgName == null
+                        ? SizedBox.shrink()
+                        : CacheImageWidget(
+                            onTap: () {
+                              showImageView(context, catgImg!);
+                            },
+                            width: 25,
+                            height: 25,
+                            isCircle: true,
+                            radius: 5,
+                            url: catgImg!,
+                            // "${listingData.categoryId != null
+                            //     ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
+                            //           ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).image
+                            //           : null
+                            //     : null}",
+                          ),
+                    title: catgName == null
+                        ? SizedBox.shrink()
+                        : Text(catgName!),
+                    trailing: Text("Category  "),
+                  ),
                 ),
           SizedBox(height: 15),
           ListTile(

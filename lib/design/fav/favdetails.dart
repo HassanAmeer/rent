@@ -13,6 +13,9 @@ import '../../apidata/categoryapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
+import '../../models/chat_model.dart' hide ChatUser;
+import '../../models/chatedUsersModel.dart';
+import '../../services/goto.dart';
 import '../../services/toast.dart';
 import '../../widgets/casheimage.dart';
 
@@ -20,6 +23,7 @@ import '../../models/item_model.dart';
 import '../../models/favorite_model.dart';
 import '../../widgets/imageview.dart';
 import '../../widgets/item_content_details_widget.dart';
+import '../message/chat.dart';
 
 class FavDetailsPage extends ConsumerStatefulWidget {
   final int index;
@@ -84,9 +88,47 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
           children: [
             FloatingActionButton(
               backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              onPressed: () {},
-              child: const Icon(Icons.chat_outlined, size: 22),
+              onPressed: () {
+                if (favitem.rentalusers == null) {
+                  toast("User not Available From Long Time!");
+                  return;
+                }
+                goto(
+                  Chats(
+                    msgdata: ChatedUsersModel(
+                      id: 1,
+                      sid: int.tryParse(
+                        ref.watch(userDataClass).userData["id"].toString(),
+                      ),
+                      rid: int.tryParse(favitem.rentalusers!.id.toString()),
+                      msg: "",
+                      fromuid: ChatUser(
+                        id: int.tryParse(
+                          ref.watch(userDataClass).userData["id"].toString(),
+                        ),
+                        image: ref
+                            .watch(userDataClass)
+                            .userData["image"]
+                            .toString(),
+                        name: ref
+                            .watch(userDataClass)
+                            .userData["name"]
+                            .toString(),
+                      ),
+                      touid: ChatUser(
+                        id: int.tryParse(favitem.rentalusers!.id.toString()),
+                        image: favitem.rentalusers!.image.toString(),
+                        name: favitem.rentalusers!.name.toString(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.chat_outlined,
+                size: 22,
+                color: Colors.white,
+              ),
             ).animate().scale(
               delay: Duration(milliseconds: 300),
               duration: Duration(milliseconds: 500),

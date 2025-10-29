@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:rent/constants/tostring.dart';
 import 'package:rent/widgets/casheimage.dart';
 import '../../constants/appColors.dart';
 import '../dotloader.dart';
@@ -215,18 +216,26 @@ class _ListingBoxState extends State<ListingBox>
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        widget.subTitle.isEmpty
+                                        widget.subTitle
+                                                .toString()
+                                                .toNullString()
+                                                .isEmpty
                                             ? SizedBox.shrink()
-                                            : SizedBox(height: 10),
-                                        widget.subTitle.isEmpty
+                                            : SizedBox(height: 2),
+                                        widget.subTitle
+                                                .toString()
+                                                .toNullString()
+                                                .isEmpty
                                             ? SizedBox.shrink()
                                             : Text(
-                                                widget.title,
+                                                widget.subTitle
+                                                    .toString()
+                                                    .toNullString(),
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w800,
                                                   fontSize: 11,
-                                                  color: Colors.grey,
+                                                  color: AppColors.mainColor,
                                                   height: 1.3,
                                                   shadows: [
                                                     Shadow(

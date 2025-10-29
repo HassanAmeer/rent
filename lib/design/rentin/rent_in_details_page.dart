@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:rent/apidata/rent_in_api.dart';
 // import 'package:rent/apidata/myrentalapi.dart' show rentalDataProvider;
 import 'package:rent/constants/images.dart';
+import 'package:rent/design/message/chat.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:rent/widgets/imageview.dart';
@@ -19,7 +20,9 @@ import '../../apidata/user.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
 import '../../constants/screensizes.dart';
+import '../../models/chatedUsersModel.dart';
 import '../../models/rent_in_model.dart';
+import '../../services/goto.dart';
 import '../../services/toast.dart';
 import '../../widgets/item_content_details_widget.dart';
 import '../../widgets/rentStepperWidget.dart';
@@ -132,11 +135,53 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             FloatingActionButton(
-              onPressed: () {},
               backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              child: Icon(Icons.chat_outlined),
-            ).animate().scale(delay: 0.5.seconds, duration: 0.5.seconds),
+              onPressed: () {
+                if (itemIndex.productby == null) {
+                  toast("User not Available From Long Time!");
+                  return;
+                }
+                goto(
+                  Chats(
+                    msgdata: ChatedUsersModel(
+                      id: 1,
+                      sid: int.tryParse(
+                        ref.watch(userDataClass).userData["id"].toString(),
+                      ),
+                      rid: int.tryParse(itemIndex.productby!.id.toString()),
+                      msg: "",
+                      fromuid: ChatUser(
+                        id: int.tryParse(
+                          ref.watch(userDataClass).userData["id"].toString(),
+                        ),
+                        image: ref
+                            .watch(userDataClass)
+                            .userData["image"]
+                            .toString(),
+                        name: ref
+                            .watch(userDataClass)
+                            .userData["name"]
+                            .toString(),
+                      ),
+                      touid: ChatUser(
+                        id: int.tryParse(itemIndex.productby!.id.toString()),
+                        image: itemIndex.productby!.image.toString(),
+                        name: itemIndex.productby!.name.toString(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Icon(
+                Icons.chat_outlined,
+                size: 22,
+                color: Colors.white,
+              ),
+            ).animate().scale(
+              delay: Duration(milliseconds: 300),
+              duration: Duration(milliseconds: 500),
+            ),
+            SizedBox(height: 15),
             FloatingActionButton.small(
               onPressed: () {
                 showDialog(

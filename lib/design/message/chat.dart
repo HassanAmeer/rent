@@ -5,14 +5,16 @@ import 'package:rent/apidata/user.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
+import 'package:rent/widgets/imageview.dart';
 
 import '../../constants/api_endpoints.dart';
 import '../../constants/appColors.dart';
+import '../../models/chatedUsersModel.dart';
 import '../../services/toast.dart';
 
 class Chats extends ConsumerStatefulWidget {
-  var msgdata;
-  Chats({super.key, required this.msgdata});
+  final ChatedUsersModel msgdata;
+  const Chats({super.key, required this.msgdata});
 
   @override
   ConsumerState<Chats> createState() => _ChatsState();
@@ -31,9 +33,9 @@ class _ChatsState extends ConsumerState<Chats> {
 
       var recieverId =
           ref.watch(userDataClass).userData['id'].toString() ==
-              widget.msgdata['sid'].toString()
-          ? widget.msgdata['rid']
-          : widget.msgdata['sid'];
+              widget.msgdata.sid.toString()
+          ? widget.msgdata.rid
+          : widget.msgdata.sid;
       await ref
           .watch(chatClass)
           .getUserMsgs(
@@ -54,16 +56,16 @@ class _ChatsState extends ConsumerState<Chats> {
 
       var recieverId =
           ref.watch(userDataClass).userData['id'].toString() ==
-              widget.msgdata['sid'].toString()
-          ? widget.msgdata['rid']
-          : widget.msgdata['sid'];
+              widget.msgdata.sid.toString()
+          ? widget.msgdata.rid
+          : widget.msgdata.sid;
 
-      print("senderId: $senderId");
-      print("recieverId: $recieverId");
+      debugPrint("senderId: $senderId");
+      debugPrint("recieverId: $recieverId");
       // return;
       await ref
           .watch(chatClass)
-          .sndingmsgs(
+          .sendingOrCreatingmsg(
             senderId: senderId.toString(),
             recieverId: recieverId.toString(),
             msg: message,
@@ -105,9 +107,10 @@ class _ChatsState extends ConsumerState<Chats> {
               ref
                   .read(chatClass)
                   .chatedUsers(
+                    loadingFor: 'refresh',
+                    refresh: true,
                     uid: ref.read(userDataClass).userData['id'].toString(),
                   );
-
               Navigator.pop(context);
             },
           ),
@@ -123,16 +126,19 @@ class _ChatsState extends ConsumerState<Chats> {
                 height: 35,
                 clipBehavior: Clip.antiAlias,
                 child: CacheImageWidget(
-                  url: Api.imgPath + widget.msgdata['fromuid']["image"],
+                  onTap: () {
+                    showImageView(context, widget.msgdata.touid!.image!);
+                  },
+                  url: widget.msgdata.touid!.image!,
                 ),
               ),
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text("${widget.msgdata['sid']}"),
+                  // Text("${widget.msgdata.sid}"),
                   Text(
-                    widget.msgdata['fromuid']["name"] ?? "User Name",
+                    widget.msgdata.touid!.name ?? "User Name",
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -161,7 +167,7 @@ class _ChatsState extends ConsumerState<Chats> {
                 ),
               )
             : ListView.builder(
-                itemCount: chatProvider.messagesList.length,
+                itemCount: chatProvider.messagesData!.chats!.length,
                 padding: const EdgeInsets.only(
                   left: 8,
                   right: 8,
@@ -171,8 +177,10 @@ class _ChatsState extends ConsumerState<Chats> {
                 controller: scrollController,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  var chat = chatProvider.messagesList[index];
-                  bool isMe = userProvider.userData['id'] == chat['sid'];
+                  var chat = chatProvider.messagesData!.chats![index];
+                  bool isMe =
+                      userProvider.userData['id'].toString() ==
+                      chat.sid!.toString();
 
                   return Padding(
                     padding: const EdgeInsets.only(top: 4, bottom: 4),
@@ -199,7 +207,7 @@ class _ChatsState extends ConsumerState<Chats> {
                               vertical: 8.0,
                             ),
                             child: Text(
-                              chat['msg'],
+                              chat.msg!,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
@@ -215,10 +223,11 @@ class _ChatsState extends ConsumerState<Chats> {
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: // ✅ Chat Input Box
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          color: Colors.white,
+        Padding(
+          padding: const EdgeInsets.only(left: 14, right: 14, top: 8.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Container(
@@ -226,12 +235,19 @@ class _ChatsState extends ConsumerState<Chats> {
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(30),
+                    // border: Border.all(color: Colors.transparent, width: 0),
                   ),
                   child: TextField(
                     controller: _controller,
+                    minLines: 1,
+                    maxLines: 5,
                     decoration: const InputDecoration(
                       hintText: "Type a message",
                       border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
                     ),
                     textInputAction: TextInputAction.send,
                   ),

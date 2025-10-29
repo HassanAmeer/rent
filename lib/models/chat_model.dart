@@ -1,184 +1,197 @@
-/// Chat Model for messaging functionality
+import 'package:rent/constants/tostring.dart';
+
+import '../constants/api_endpoints.dart';
+
 class ChatModel {
-  final int id;
-  final int senderId;
-  final int receiverId;
-  final String message;
-  final String? time;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  bool? success;
+  String? msg;
+  // ChatUser? senderUser;
+  // ChatUser? recieverUser;
+  List<ChatMessage>? chats;
 
   ChatModel({
-    required this.id,
-    required this.senderId,
-    required this.receiverId,
-    required this.message,
-    this.time,
-    this.createdAt,
-    this.updatedAt,
+    this.success,
+    this.msg,
+    // this.senderUser,
+    // this.recieverUser,
+    this.chats,
   });
 
-  factory ChatModel.fromJson(Map<String, dynamic> json) {
-    return ChatModel(
-      id: json['id'] ?? 0,
-      senderId: json['senderId'] ?? json['sid'] ?? 0,
-      receiverId: json['receiverId'] ?? json['rid'] ?? 0,
-      message: json['message']?.toString() ?? json['msg']?.toString() ?? '',
-      time: json['time']?.toString(),
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.tryParse(json['updated_at'].toString())
-          : null,
-    );
+  ChatModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    msg = json['msg']?.toString().toNullString();
+    // senderUser = json['senderUser'] == null
+    //     ? null
+    //     : ChatUser.fromJson(json['senderUser'] as Map<String, dynamic>);
+    // recieverUser = json['recieverUser'] == null
+    //     ? null
+    //     : ChatUser.fromJson(json['recieverUser'] as Map<String, dynamic>);
+    if (json['chats'] != null) {
+      chats = <ChatMessage>[];
+      (json['chats'] as List).forEach((v) {
+        chats!.add(new ChatMessage.fromJson(v as Map<String, dynamic>));
+      });
+    }
+    chats = chats?.reversed.toList();
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'senderId': senderId,
-      'receiverId': receiverId,
-      'message': message,
-      'time': time,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-    };
-  }
-
-  /// Check if message is from current user
-  bool isFromUser(int currentUserId) => senderId == currentUserId;
-
-  /// Get formatted time for display
-  String get formattedTime {
-    if (time != null && time!.isNotEmpty) {
-      try {
-        // Assuming time is in HH:mm format
-        final parts = time!.split(':');
-        if (parts.length == 2) {
-          final hour = int.tryParse(parts[0]) ?? 0;
-          final minute = int.tryParse(parts[1]) ?? 0;
-          final period = hour >= 12 ? 'PM' : 'AM';
-          final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-          return '$displayHour:${minute.toString().padLeft(2, '0')} $period';
-        }
-      } catch (_) {}
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['msg'] = this.msg;
+    // if (this.senderUser != null) {
+    //   data['senderUser'] = this.senderUser!.toJson();
+    // }
+    // if (this.recieverUser != null) {
+    //   data['recieverUser'] = this.recieverUser!.toJson();
+    // }
+    if (this.chats != null) {
+      data['chats'] = this.chats!.map((v) => v.toJson()).toList();
     }
-
-    if (createdAt != null) {
-      final hour = createdAt!.hour;
-      final minute = createdAt!.minute;
-      final period = hour >= 12 ? 'PM' : 'AM';
-      final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-      return '$displayHour:${minute.toString().padLeft(2, '0')} $period';
-    }
-
-    return '';
+    return data;
   }
 
-  /// Get message preview for chat list
-  String get messagePreview {
-    return message.length > 50 ? '${message.substring(0, 50)}...' : message;
+  String toNullString() {
+    return toString();
   }
-
-  /// Check if message is empty
-  bool get isEmpty => message.trim().isEmpty;
-
-  /// Get message length
-  int get messageLength => message.length;
 
   @override
   String toString() {
-    return 'ChatModel(id: $id, senderId: $senderId, message: ${message.substring(0, message.length > 20 ? 20 : message.length)}...)';
+    return '''ChatModel{success: $success, msg: $msg, chats: $chats}''';
+    // senderUser: $senderUser, recieverUser: $recieverUser,
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ChatModel && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
 }
 
-/// Chat User Model for chat users list
-class ChatUserModel {
-  final int id;
-  final String name;
-  final String? image;
-  final String? lastMessage;
-  final String? lastMessageTime;
-  final int unreadCount;
-  final DateTime? lastMessageDate;
+class ChatMessage {
+  int? id;
+  int? sid;
+  String? msg;
+  int? rid;
+  String? createdAt;
+  String? updatedAt;
+  dynamic deletedAt;
 
-  ChatUserModel({
-    required this.id,
-    required this.name,
-    this.image,
-    this.lastMessage,
-    this.lastMessageTime,
-    this.unreadCount = 0,
-    this.lastMessageDate,
+  ChatMessage({
+    this.id,
+    this.sid,
+    this.msg,
+    this.rid,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
   });
 
-  factory ChatUserModel.fromJson(Map<String, dynamic> json) {
-    return ChatUserModel(
-      id: json['id'] ?? 0,
-      name: json['name']?.toString() ?? '',
-      image: json['image']?.toString(),
-      lastMessage: json['lastMessage']?.toString(),
-      lastMessageTime: json['lastMessageTime']?.toString(),
-      unreadCount: json['unreadCount'] ?? 0,
-      lastMessageDate: json['lastMessageDate'] != null
-          ? DateTime.tryParse(json['lastMessageDate'].toString())
-          : null,
-    );
+  ChatMessage.fromJson(Map<String, dynamic> json) {
+    id = json['id'] as int?;
+    sid = json['sid'] as int?;
+    msg = json['msg']?.toString().toNullString();
+    rid = json['rid'] as int?;
+    createdAt = json['created_at']?.toString().toNullString();
+    updatedAt = json['updated_at']?.toString().toNullString();
+    deletedAt = json['deleted_at'];
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'image': image,
-      'lastMessage': lastMessage,
-      'lastMessageTime': lastMessageTime,
-      'unreadCount': unreadCount,
-      'lastMessageDate': lastMessageDate?.toIso8601String(),
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['sid'] = this.sid;
+    data['msg'] = this.msg;
+    data['rid'] = this.rid;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['deleted_at'] = this.deletedAt;
+    return data;
   }
 
-  /// Get full image URL
-  String get fullImageUrl {
-    if (image == null || image!.isEmpty) return '';
-    return 'https://thelocalrent.com/uploads/$image';
-  }
-
-  /// Check if user has unread messages
-  bool get hasUnreadMessages => unreadCount > 0;
-
-  /// Get display name with fallback
-  String get displayName => name.isNotEmpty ? name : 'Unknown User';
-
-  /// Get last message preview
-  String get lastMessagePreview {
-    if (lastMessage == null || lastMessage!.isEmpty) return 'No messages yet';
-    return lastMessage!.length > 30
-        ? '${lastMessage!.substring(0, 30)}...'
-        : lastMessage!;
+  String toNullString() {
+    return toString();
   }
 
   @override
   String toString() {
-    return 'ChatUserModel(id: $id, name: $name, unreadCount: $unreadCount)';
+    return 'ChatMessage{id: $id, sid: $sid, msg: $msg, rid: $rid, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt}';
+  }
+}
+
+class ChatUser {
+  String? id;
+  String? image;
+  int? activeUser;
+  String? name;
+  String? phone;
+  String? email;
+  String? lastOnlineTime;
+  String? address;
+  String? aboutUs;
+  String? verifiedBy;
+  int? sendEmail;
+  String? password;
+  String? createdAt;
+  String? updatedAt;
+  dynamic deletedAt;
+
+  ChatUser({
+    this.id,
+    this.image,
+    this.activeUser,
+    this.name,
+    this.phone,
+    this.email,
+    this.lastOnlineTime,
+    this.address,
+    this.aboutUs,
+    this.verifiedBy,
+    this.sendEmail,
+    this.password,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+  });
+
+  ChatUser.fromJson(Map<String, dynamic> json) {
+    id = json['id'].toString().toNullString();
+    image = (Api.imgPath + json['image']!.toString().toNullString());
+    activeUser = json['activeUser'] as int?;
+    name = json['name']?.toString().toNullString();
+    phone = json['phone']?.toString().toNullString();
+    email = json['email']?.toString().toNullString();
+    lastOnlineTime = json['last_online_time']?.toString().toNullString();
+    address = json['address']?.toString().toNullString();
+    aboutUs = json['aboutUs']?.toString().toNullString();
+    verifiedBy = json['verifiedBy']?.toString().toNullString();
+    sendEmail = json['sendEmail'] as int?;
+    password = json['password']?.toString().toNullString();
+    createdAt = json['created_at']?.toString().toNullString();
+    updatedAt = json['updated_at']?.toString().toNullString();
+    deletedAt = json['deleted_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['image'] = this.image;
+    data['activeUser'] = this.activeUser;
+    data['name'] = this.name;
+    data['phone'] = this.phone;
+    data['email'] = this.email;
+    data['last_online_time'] = this.lastOnlineTime;
+    data['address'] = this.address;
+    data['aboutUs'] = this.aboutUs;
+    data['verifiedBy'] = this.verifiedBy;
+    data['sendEmail'] = this.sendEmail;
+    data['password'] = this.password;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    data['deleted_at'] = this.deletedAt;
+    return data;
+  }
+
+  String toNullString() {
+    return toString();
   }
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ChatUserModel && other.id == id;
+  String toString() {
+    return 'ChatUser{id: $id, name: $name}';
   }
-
-  @override
-  int get hashCode => id.hashCode;
 }

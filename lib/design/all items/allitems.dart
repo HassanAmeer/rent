@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:quick_widgets/widgets/tiktok.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
 import 'package:rent/services/goto.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/all%20items/allitemdetails.dart';
@@ -240,6 +241,11 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                     return ListingBox(
                                           id: item.id.toString(),
                                           title: item.displayTitle,
+                                          subTitle: item.user == null
+                                              ? ""
+                                              : item.user!.name
+                                                    .toString()
+                                                    .toNullString(),
                                           showFav: true,
                                           onFavTap: () {
                                             ref
@@ -373,9 +379,9 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                         .animate()
                                         .fadeIn(
                                           delay: Duration(
-                                            milliseconds: index * 100,
+                                            milliseconds: index * 70,
                                           ),
-                                          duration: 0.2.seconds,
+                                          duration: 0.1.seconds,
                                         )
                                         .slideY(begin: 0.2);
                                   },

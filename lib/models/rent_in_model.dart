@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
 
 class RentInModel {
   int id;
@@ -150,7 +151,7 @@ class Productby {
 
   factory Productby.fromJson(Map<String, dynamic> json) => Productby(
     id: json["id"],
-    image: json["image"],
+    image: Api.imgPath + json["image"].toString().toNullString(),
     activeUser: json["activeUser"],
     name: json["name"],
     phone: json["phone"],
