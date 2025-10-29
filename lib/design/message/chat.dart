@@ -26,9 +26,14 @@ class _ChatsState extends ConsumerState<Chats> {
   ScrollController scrollController = ScrollController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.msgdata.rid == widget.msgdata.sid) {
+        toast("Can Not Chat With Your Self");
+        Navigator.pop(context);
+        return;
+      }
       var senderId = ref.watch(userDataClass).userData['id'].toString();
 
       var recieverId =

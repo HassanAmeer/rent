@@ -85,6 +85,11 @@ class GetAllItems with ChangeNotifier {
   }) async {
     if (await checkInternet() == false) return;
 
+    if (userId == product_by) {
+      toast("Can Not Order With Your Item");
+      return;
+    }
+
     // print("userId:$userId");
     // return;
     setLoading(loadingFor);
