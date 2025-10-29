@@ -1,4 +1,4 @@
-import 'dart:convert';
+<!-- import 'dart:convert';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -24,7 +24,6 @@ import '../../apidata/user.dart';
 import '../../constants/appColors.dart';
 import '../../models/item_model.dart';
 // import '../../design/orders/mybooking.dart';
-// import '../../widgets/lsitings_widgets/items_box_widget.dart';
 import '../../widgets/lsitings_widgets/items_box_widget.dart';
 import '../../widgets/searchfield.dart';
 import '../rentout/rent_out_page.dart'; // ✅ Import MyBooking page
@@ -282,7 +281,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                               .rentInListData
                                               .any(
                                                 (i) =>
-                                                    i.productId.toString() ==
+                                                    i.productby?.id
+                                                        .toString() ==
                                                     item.id.toString(),
                                               ),
                                           isCartLoading:
@@ -294,12 +294,6 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                               : false,
                                           onCartTap: () async {
                                             try {
-                                              if (item.user == null) {
-                                                toast(
-                                                  "User not Available From Long Time!",
-                                                );
-                                                return;
-                                              }
                                               List<DateTime?> dates = [];
                                               var results =
                                                   await showCalendarDatePicker2Dialog(
@@ -406,4 +400,4 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
       ),
     );
   }
-}
+} -->

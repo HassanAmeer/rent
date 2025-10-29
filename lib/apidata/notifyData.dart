@@ -24,9 +24,14 @@ class NotifyData with ChangeNotifier {
   }
 
   List<NotificationModel> notify = [];
-  Future getNotifyData({required String uid, String loadingFor = ""}) async {
+  Future getNotifyData({
+    required String uid,
+    String loadingFor = "",
+    bool refresh = false,
+  }) async {
     try {
       if (await checkInternet() == false) return;
+      if (notify.isNotEmpty && refresh == false) return;
 
       setLoading(loadingFor);
       final response = await http.get(
@@ -35,11 +40,11 @@ class NotifyData with ChangeNotifier {
       debugPrint("👉 getNotifyData Response status: ${response.statusCode}");
       // log(" 👉 getNotifyData Response body: ${response.body}");
       var result = json.decode(response.body);
-      print("👉 Response: $result");
+      // debugPrint("👉 Response: $result");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        toast(result['msg']);
-        final notificationsData = result['notifications'] ?? [];
+        // toast(result['msg']);
+        List notificationsData = result['notifications'] ?? [];
         notify = notificationsData
             .map<NotificationModel>(
               (notification) => NotificationModel.fromJson(notification),
@@ -50,6 +55,9 @@ class NotifyData with ChangeNotifier {
       }
       setLoading();
     } catch (e) {
+      debugPrint("💥try catch fetching notify Error:$e");
+      setLoading();
+    } finally {
       setLoading();
     }
   }
@@ -63,24 +71,31 @@ class NotifyData with ChangeNotifier {
     required String uid,
     String loadingfor = "",
   }) async {
-    if (await checkInternet() == false) return;
+    try {
+      if (await checkInternet() == false) return;
 
-    // print("$loadingfor");
-    setLoading(loadingfor);
-    debugPrint("notificationId : $notificationId");
-    // debugPrint("uid : $uid");
+      // print("$loadingfor");
+      setLoading(loadingfor);
+      debugPrint("notificationId : $notificationId");
+      // debugPrint("uid : $uid");
 
-    final respnse = await http.delete(
-      Uri.parse("${Api.deleteNotificationEndpoint}$notificationId"),
-    );
+      final respnse = await http.delete(
+        Uri.parse("${Api.deleteNotificationEndpoint}$notificationId"),
+      );
 
-    final data = jsonDecode(respnse.body);
-    if (statusCode(respnse)) {
-      toast(data['msg'], backgroundColor: Colors.green);
-      getNotifyData(uid: uid);
-    } else {
-      toast(data['msg'], backgroundColor: Colors.red);
+      final data = jsonDecode(respnse.body);
+      if (statusCode(respnse)) {
+        toast(data['msg'], backgroundColor: Colors.green);
+        notify.removeWhere((e) => e.id.toString() == notificationId);
+      } else {
+        toast(data['msg'], backgroundColor: Colors.red);
+      }
+      setLoading();
+    } catch (e) {
+      debugPrint("💥try catch deleteNotification Error:$e");
+      setLoading();
+    } finally {
+      setLoading();
     }
-    setLoading();
   }
 }

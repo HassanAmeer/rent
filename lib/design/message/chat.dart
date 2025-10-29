@@ -224,7 +224,12 @@ class _ChatsState extends ConsumerState<Chats> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: // ✅ Chat Input Box
         Padding(
-          padding: const EdgeInsets.only(left: 14, right: 14, top: 8.0),
+          padding: const EdgeInsets.only(
+            left: 14,
+            right: 14,
+            top: 8.0,
+            bottom: 10,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,

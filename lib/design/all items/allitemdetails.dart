@@ -113,6 +113,10 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
             FloatingActionButton(
               onPressed: () async {
                 try {
+                  if (itemIndex.user == null) {
+                    toast("User not Available From Long Time!");
+                    return;
+                  }
                   List<DateTime?> dates = [];
 
                   var results = await showCalendarDatePicker2Dialog(
