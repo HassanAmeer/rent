@@ -58,6 +58,9 @@ dependencies:
   quick_widgets: ^0.0.1
   carousel_slider: ^5.1.1
 
+  # just_audio: ^0.9.40   # or latest
+  audio_session: ^0.2.2
+
 
 
 

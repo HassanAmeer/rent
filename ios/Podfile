@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-# platform :ios, '12.0'
+# platform :ios, '13.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -36,8 +36,61 @@ target 'Runner' do
   end
 end
 
+
+
+
+
+
+
+# original code
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
 end
+
+# post_install do |installer|
+#   installer.pods_project.targets.each do |target|
+#     flutter_additional_ios_build_settings(target)
+#     target.build_configurations.each do |config|
+#       config.build_settings['CONFIGURATION_BUILD_DIR'] = '$PODS_CONFIGURATION_BUILD_DIR'
+#     end
+#   end
+# end
+
+# post_install do |installer|
+#   installer.pods_project.targets.each do |target|
+#     flutter_additional_ios_build_settings(target)
+#   end
+
+#   # This single line silences the warning in 99% of Flutter projects
+#   installer.generated_projects.each do |project|
+#     project.targets.each do |target|
+#       target.build_configurations.each do |config|
+#         config.base_configuration_reference = nil
+#       end
+#     end
+#   end
+# end
+
+# post_install do |installer|
+#   installer.pods_project.targets.each do |target|
+#     flutter_additional_ios_build_settings(target)
+
+#     # This line fixes the xcconfig warning in almost all cases
+#     target.build_configurations.each do |config|
+#       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+#       # Fix for the base configuration warning in Flutter
+#       xcconfig_path = config.base_configuration_reference&.real_path
+#       if xcconfig_path
+#         xcconfig_content = File.read(xcconfig_path)
+#         if !xcconfig_content.include?("Pods/Target Support Files")
+#           File.open(xcconfig_path, "a") do |f|
+#             f << "\n#include \"Pods/Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig\"\n"
+#           end
+#         end
+#       end
+#     end
+#   end
+# end
