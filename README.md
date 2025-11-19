@@ -1,18 +1,23 @@
 # rent
 
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.36 PM-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM (1)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (1)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (2)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM (1)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM (1)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (2)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (1)-min.jpeg">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM-min.jpeg">
+### 1. web
+<a href="https://thelocalrent.com/" target="_blank">thelocalrent</a>
+<a href="[thelocalrent.com](https://thelocalrent.com/)" target="_blank">thelocalrent.com</a>
+
+### 2. App
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.36 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM (1)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (1)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (2)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM (1)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM (1)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (2)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (1)-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM-min.jpeg" style="width:300px;">
 
 
 
@@ -30,3 +35,5 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
