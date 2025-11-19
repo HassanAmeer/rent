@@ -7,19 +7,19 @@
 
 ### 2. App
 <div style="diisplay-flex; flex-wrap: wrap;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.36 PM-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM (1)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (1)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (2)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM (1)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM (1)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (2)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (1)-min.jpeg" style="width:300px;">
-<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM-min.jpeg" style="width:300px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.36 PM-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM (1)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.35 PM-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (1)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM (2)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM (1)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.33 PM-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM (1)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.32 PM-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (2)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.31 PM (1)-min.jpeg" style="width:250px;">
+<img src="demo/WhatsApp Image 2025-11-12 at 8.56.34 PM-min.jpeg" style="width:250px;">
 </div>
 
 
