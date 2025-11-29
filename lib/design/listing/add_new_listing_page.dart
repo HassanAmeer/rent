@@ -327,7 +327,7 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
                         .map(
                           (e) => DropdownItem(
                             title: e.name,
-                            subtitle: e.id.toString(),
+                            // subtitle: e.id.toString(),
                             image: CachedNetworkImage(imageUrl: e.image),
                             value: e.name,
                           ),
@@ -1011,6 +1011,9 @@ class _AddNewListingPageState extends ConsumerState<AddNewListingPage> {
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
+        onTapOutside: (event) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
         decoration: InputDecoration(
           hintText: hintText,
           prefixIcon: prefixIcon,

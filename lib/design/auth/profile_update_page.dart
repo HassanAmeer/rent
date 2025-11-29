@@ -335,9 +335,6 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
 
                     // const SizedBox(height: 20),
                     CupertinoListTile(
-                      onTap: () {
-                        goto(PrivacyPolicyPage());
-                      },
                       padding: EdgeInsets.symmetric(vertical: 0),
                       leading: Checkbox(
                         value: acceptPrivacy,
@@ -350,25 +347,27 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                             ? WidgetStatePropertyAll(Colors.cyan)
                             : null,
                       ),
-                      title: RichText(
-                        text: TextSpan(
-                          text: "I accept the ",
-                          style: const TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: "Privacy Policy",
-                              style: TextStyle(color: AppColors.mainColor),
-                            ),
-                          ],
+                      title: GestureDetector(
+                        onTap: () {
+                          goto(PrivacyPolicyPage());
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: "I accept the ",
+                            style: const TextStyle(color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: "Privacy Policy",
+                                style: TextStyle(color: AppColors.mainColor),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
 
                     CupertinoListTile(
                       padding: EdgeInsets.symmetric(vertical: 0),
-                      onTap: () {
-                        goto(TermsConditionPage());
-                      },
                       leading: Checkbox(
                         fillColor: acceptTerms
                             ? WidgetStatePropertyAll(Colors.cyan)
@@ -380,16 +379,21 @@ class _ProfileUpdatePageState extends ConsumerState<ProfileUpdatePage> {
                           });
                         },
                       ),
-                      title: RichText(
-                        text: TextSpan(
-                          text: "I accept the ",
-                          style: const TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: "Terms and Conditions",
-                              style: TextStyle(color: AppColors.mainColor),
-                            ),
-                          ],
+                      title: GestureDetector(
+                        onTap: () {
+                          goto(TermsConditionPage());
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: "I accept the ",
+                            style: const TextStyle(color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: "Terms and Conditions",
+                                style: TextStyle(color: AppColors.mainColor),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

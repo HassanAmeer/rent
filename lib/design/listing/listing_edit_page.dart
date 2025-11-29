@@ -431,7 +431,7 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                         .map(
                           (e) => DropdownItem(
                             title: e.name,
-                            subtitle: e.id.toString(),
+                            // subtitle: e.id.toString(),
                             image: CachedNetworkImage(imageUrl: e.image),
                             value: e.name,
                           ),
@@ -495,6 +495,9 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
               // Title
               TextFormField(
                     controller: _titleController,
+                    onTapOutside: (event) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     decoration: InputDecoration(
                       labelText: 'Title',
                       border: OutlineInputBorder(
@@ -548,6 +551,10 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                             TextFormField(
                                   controller: _dailyRateController,
                                   keyboardType: TextInputType.number,
+                                  onTapOutside: (event) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   decoration: InputDecoration(
                                     labelText: 'Daily Rate',
                                     border: OutlineInputBorder(
@@ -565,6 +572,10 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                             TextFormField(
                                   controller: _weeklyRateController,
                                   keyboardType: TextInputType.number,
+                                  onTapOutside: (event) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   decoration: InputDecoration(
                                     labelText: 'Weekly Rate',
                                     border: OutlineInputBorder(
@@ -582,6 +593,10 @@ class _EditListingPageState extends ConsumerState<EditListingPage> {
                             TextFormField(
                                   controller: _monthlyRateController,
                                   keyboardType: TextInputType.number,
+                                  onTapOutside: (event) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   decoration: InputDecoration(
                                     labelText: 'Monthly Rate',
                                     border: OutlineInputBorder(
