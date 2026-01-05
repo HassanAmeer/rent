@@ -6,7 +6,7 @@ import 'package:rent/models/home_menu_item.dart';
 import 'package:rent/providers/home_menu_provider.dart';
 
 class CustomizeHomeMenuPage extends ConsumerStatefulWidget {
-  const CustomizeHomeMenuPage({Key? key}) : super(key: key);
+  const CustomizeHomeMenuPage({super.key});
 
   @override
   ConsumerState<CustomizeHomeMenuPage> createState() =>

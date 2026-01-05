@@ -26,6 +26,7 @@ import '../../services/goto.dart';
 import '../../services/toast.dart';
 import '../../widgets/item_content_details_widget.dart';
 import '../../widgets/rentStepperWidget.dart';
+import '../../helpers/calendar_theme.dart';
 
 class RentInDetailsPage extends ConsumerStatefulWidget {
   final int index;
@@ -289,8 +290,8 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                       List<DateTime?> dates = [];
                       var results = await showCalendarDatePicker2Dialog(
                         context: context,
-                        config: CalendarDatePicker2WithActionButtonsConfig(
-                          calendarType: CalendarDatePicker2Type.range,
+                        config: CalendarTheme.getConfig(
+                          type: CalendarDatePicker2Type.range,
                         ),
                         dialogSize: const Size(325, 400),
                         value: dates,

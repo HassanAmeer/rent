@@ -22,7 +22,7 @@ class CategoryModel {
       id: json['id'] ?? 1,
       image: json['image'] != null && json['image'].toString().trim().isNotEmpty
           ? Api.imgPath + json['image'].toString()
-          : Api.imgPath + 'demo-category.png',
+          : '${Api.imgPath}demo-category.png',
       name: (json['name']?.toString() ?? '').toNullStringOrDemo(
         'Demo Category',
       ),

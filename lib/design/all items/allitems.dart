@@ -18,6 +18,7 @@ import 'package:rent/widgets/btmnavbar.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:rent/widgets/dotloader.dart';
 import 'package:intl/intl.dart';
+import 'package:rent/helpers/calendar_theme.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/favrtapi.dart';
 import '../../apidata/user.dart';
@@ -304,8 +305,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                               var results =
                                                   await showCalendarDatePicker2Dialog(
                                                     context: context,
-                                                    config: CalendarDatePicker2WithActionButtonsConfig(
-                                                      calendarType:
+                                                    config: CalendarTheme.getConfig(
+                                                      type:
                                                           CalendarDatePicker2Type
                                                               .range,
                                                     ),

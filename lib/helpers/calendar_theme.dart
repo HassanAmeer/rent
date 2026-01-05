@@ -31,11 +31,18 @@ class CalendarTheme {
       ),
 
       // ✅ Action buttons styling
-      okButton: const Text(
+      okButton: Text(
         'Book Now',
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: AppColors.mainColor,
+        ),
       ),
-      cancelButton: const Text('Cancel', style: TextStyle(fontSize: 16)),
+      cancelButton: Text(
+        'Cancel',
+        style: TextStyle(fontSize: 16, color: AppColors.mainColor),
+      ),
 
       // ✅ Weekday labels
       weekdayLabelTextStyle: TextStyle(
