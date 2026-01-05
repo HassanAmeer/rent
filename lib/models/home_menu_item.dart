@@ -36,15 +36,9 @@ class HomeMenuItem {
     final id = json['id'] ?? '';
     final predefined = AvailableMenuOptions.getById(id);
 
-    // If predefined found, use its icon (which is const and tree-shake safe)
-    // Otherwise fallback to dynamic constructions (might still cause issues if not cautious,
-    // but for this app all items seem to be from the list)
-    final iconData =
-        predefined?.icon ??
-        IconData(
-          json['iconCodePoint'] ?? Icons.error.codePoint,
-          fontFamily: json['iconFontFamily'] ?? 'MaterialIcons',
-        );
+    // If predefined found, use its icon.
+    // Fallback to a default constant icon to satisfy tree-shaking.
+    final iconData = predefined?.icon ?? Icons.grid_view;
 
     return HomeMenuItem(
       id: id,
