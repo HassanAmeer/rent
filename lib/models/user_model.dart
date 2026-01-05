@@ -38,19 +38,25 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] ?? 0,
-      image: json['image']!.toString().toNullString().isEmpty
-          ? ImgLinks.profileImage
-          : Api.imgPath + json['image'].toString().toNullString(),
+      id: json['id'] ?? 1,
+      image: json['image'] != null && json['image'].toString().trim().isNotEmpty
+          ? Api.imgPath + json['image'].toString()
+          : ImgLinks.profileImage,
       activeUser: json['activeUser'] ?? 0,
-      name: json['name']?.toString() ?? '',
+      name: (json['name']?.toString() ?? '').toNullStringOrDemo('Demo User'),
       phone: json['phone']?.toString(),
-      email: json['email']?.toString() ?? '',
+      email: (json['email']?.toString() ?? '').toNullStringOrDemo(
+        'demo@example.com',
+      ),
       address: json['address']?.toString(),
       aboutUs: json['aboutUs']?.toString(),
-      verifiedBy: json['verifiedBy']?.toString() ?? '',
+      verifiedBy: (json['verifiedBy']?.toString() ?? '').toNullStringOrDemo(
+        'google',
+      ),
       sendEmail: json['sendEmail'] ?? 0,
-      password: json['password']?.toString() ?? '',
+      password: (json['password']?.toString() ?? '').toNullStringOrDemo(
+        '12345678',
+      ),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

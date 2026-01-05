@@ -3,6 +3,7 @@ library;
 
 import 'dart:convert';
 import 'package:rent/constants/api_endpoints.dart';
+import 'package:rent/constants/tostring.dart';
 
 import '../constants/images.dart';
 import 'user_model.dart';
@@ -63,15 +64,18 @@ class ItemModel {
     }
 
     return ItemModel(
-      id: json['id'] ?? 0,
-      userId: json['productBy'] ?? 0,
-      title: json['title']?.toString() ?? '',
+      id: json['id'] ?? 1,
+      userId: json['productBy'] ?? 1,
+      title: (json['title']?.toString() ?? '').toNullStringOrDemo(
+        'Demo Item Title',
+      ),
       description: json['description']?.toString(),
       categoryId: int.tryParse(json['category']?.toString() ?? '0'),
-      dailyRate: double.tryParse(json['dailyrate']?.toString() ?? '0') ?? 0.0,
-      weeklyRate: double.tryParse(json['weeklyrate']?.toString() ?? '0') ?? 0.0,
+      dailyRate: double.tryParse(json['dailyrate']?.toString() ?? '0') ?? 25.0,
+      weeklyRate:
+          double.tryParse(json['weeklyrate']?.toString() ?? '0') ?? 150.0,
       monthlyRate:
-          double.tryParse(json['monthlyrate']?.toString() ?? '0') ?? 0.0,
+          double.tryParse(json['monthlyrate']?.toString() ?? '0') ?? 500.0,
       availabilityDays: json['availabilityDays']?.toString(),
       availabilityRange: json['pickupDateRange']?.toString(),
       images:

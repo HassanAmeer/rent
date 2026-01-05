@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
 import 'user_model.dart';
 
 class NotificationModel {
@@ -29,11 +30,15 @@ class NotificationModel {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['id'] ?? 0,
-      from: json['from'] ?? 0,
-      to: json['to'] ?? 0,
-      title: json['title']?.toString() ?? '',
-      description: json['desc']?.toString() ?? '',
+      id: json['id'] ?? 1,
+      from: json['from'] ?? 1,
+      to: json['to'] ?? 1,
+      title: (json['title']?.toString() ?? '').toNullStringOrDemo(
+        'Demo Notification',
+      ),
+      description: (json['desc']?.toString() ?? '').toNullStringOrDemo(
+        'This is a demo notification description',
+      ),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

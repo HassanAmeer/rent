@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
 
 class BlogModel {
   final int id;
@@ -55,14 +56,22 @@ class BlogModel {
     }
 
     return BlogModel(
-      id: json['id'] ?? 0,
-      title: json['title']?.toString() ?? '',
-      content: json['content']?.toString() ?? '',
-      excerpt: json['excerpt']?.toString() ?? '',
-      image: json['image'] != null
+      id: json['id'] ?? 1,
+      title: (json['title']?.toString() ?? '').toNullStringOrDemo(
+        'This Blog Title Is Empty!',
+      ),
+      content: (json['content']?.toString() ?? '').toNullStringOrDemo(
+        'This Blog Content Is Empty!',
+      ),
+      excerpt: (json['excerpt']?.toString() ?? '').toNullStringOrDemo(
+        'This Blog Excerpt Is Empty!',
+      ),
+      image: json['image'] != null && json['image'].toString().trim().isNotEmpty
           ? Api.imgPath + json['image']
           : ImgLinks.noItem,
-      author: json['author']?.toString() ?? '',
+      author: (json['author']?.toString() ?? '').toNullStringOrDemo(
+        'Demo Author',
+      ),
       publishedAt: json['published_at'] != null
           ? DateTime.tryParse(json['published_at'].toString())
           : null,
@@ -73,9 +82,11 @@ class BlogModel {
           ? DateTime.tryParse(json['updated_at'].toString())
           : null,
       tags: parseTags(json['tags']),
-      status: json['status']?.toString() ?? 'draft',
+      status: (json['status']?.toString() ?? '').toNullStringOrDemo('draft'),
       views: json['views'] ?? 0,
-      slug: json['slug']?.toString() ?? '',
+      slug: (json['slug']?.toString() ?? '').toNullStringOrDemo(
+        'demo-blog-slug',
+      ),
     );
   }
 

@@ -19,9 +19,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] ?? 0,
-      image: Api.imgPath + json['image'].toString().toNullString(),
-      name: json['name'].toString().toNullString(),
+      id: json['id'] ?? 1,
+      image: json['image'] != null && json['image'].toString().trim().isNotEmpty
+          ? Api.imgPath + json['image'].toString()
+          : Api.imgPath + 'demo-category.png',
+      name: (json['name']?.toString() ?? '').toNullStringOrDemo(
+        'Demo Category',
+      ),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

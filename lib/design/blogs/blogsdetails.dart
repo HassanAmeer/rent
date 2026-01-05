@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/constants/tostring.dart';
 import 'package:rent/widgets/casheimage.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -220,14 +221,23 @@ class _BlogsdetailsState extends ConsumerState<Blogsdetails> {
                               ),
                               const SizedBox(height: 16),
                               // ✅ HTML Widget for rich text content
-                              HtmlWidget(
-                                blog.content,
-                                textStyle: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                  height: 1.6,
-                                ),
-                              ),
+                              blog.content.toString().toNullString().isEmpty
+                                  ? const Text(
+                                      "No description available",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                        height: 1.6,
+                                      ),
+                                    )
+                                  : HtmlWidget(
+                                      blog.content,
+                                      textStyle: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                        height: 1.6,
+                                      ),
+                                    ),
                             ],
                           )
                           .animate()

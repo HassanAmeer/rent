@@ -12,6 +12,26 @@ extension StringExtensions on String? {
     return this!;
   }
 
+  /// Returns fallback text if null, empty, or "null"
+  String toNullStringOr(String fallback) {
+    if (this == null ||
+        this!.trim().isEmpty ||
+        this!.trim().toLowerCase() == "null") {
+      return fallback;
+    }
+    return this!;
+  }
+
+  /// Returns demo text if null, empty, or "null"
+  String toNullStringOrDemo([String demo = "Demo Text"]) {
+    if (this == null ||
+        this!.trim().isEmpty ||
+        this!.trim().toLowerCase() == "null") {
+      return demo;
+    }
+    return this!;
+  }
+
   /// Capitalizes the first letter of the string
   String capitalize() {
     if (this == null || this!.isEmpty) return "";
@@ -76,12 +96,47 @@ extension StringExtensions on String? {
   }
 }
 
+/// Extension for non-nullable String to support demo text
+extension NonNullableStringExtensions on String {
+  /// Returns fallback text if empty or "null"
+  String toNullStringOr(String fallback) {
+    if (trim().isEmpty || trim().toLowerCase() == "null") {
+      return fallback;
+    }
+    return this;
+  }
+
+  /// Returns demo text if empty or "null"
+  String toNullStringOrDemo([String demo = "Demo Text"]) {
+    if (trim().isEmpty || trim().toLowerCase() == "null") {
+      return demo;
+    }
+    return this;
+  }
+}
+
 /// Enhanced int utilities
 extension IntExtensions on int? {
   /// Returns 0 if null or negative
   int toNullInt() {
     if (this == null || this! <= 0) {
       return 0;
+    }
+    return this!;
+  }
+
+  /// Returns fallback value if null
+  int toNullIntOr(int fallback) {
+    if (this == null) {
+      return fallback;
+    }
+    return this!;
+  }
+
+  /// Returns demo value if null (default: 100)
+  int toNullIntOrDemo([int demo = 100]) {
+    if (this == null) {
+      return demo;
     }
     return this!;
   }
@@ -129,6 +184,22 @@ extension DoubleExtensions on double? {
     return this!;
   }
 
+  /// Returns fallback value if null
+  double toNullDoubleOr(double fallback) {
+    if (this == null) {
+      return fallback;
+    }
+    return this!;
+  }
+
+  /// Returns demo value if null (default: 50.0)
+  double toNullDoubleOrDemo([double demo = 50.0]) {
+    if (this == null) {
+      return demo;
+    }
+    return this!;
+  }
+
   /// Rounds to specified decimal places
   double roundTo(int decimalPlaces) {
     if (this == null) return 0.0;
@@ -148,6 +219,18 @@ extension DateTimeExtensions on DateTime? {
   /// Formats to readable string
   String toReadableString() {
     if (this == null) return "";
+    return DateFormat('MMM dd, yyyy').format(this!);
+  }
+
+  /// Formats to readable string with fallback
+  String toReadableStringOr(String fallback) {
+    if (this == null) return fallback;
+    return DateFormat('MMM dd, yyyy').format(this!);
+  }
+
+  /// Formats to readable string with demo date
+  String toReadableStringOrDemo([String demo = "Jan 01, 2024"]) {
+    if (this == null) return demo;
     return DateFormat('MMM dd, yyyy').format(this!);
   }
 

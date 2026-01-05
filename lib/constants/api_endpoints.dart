@@ -1,6 +1,9 @@
 class Api {
   // API Configuration
-  static const String baseUrl = "https://thelocalrent.com";
+  // static const String baseUrl = "https://thelocalrent.com";
+  // static const String baseUrl = "http://localhost/tlr-web";
+  // static const String baseUrl = "http://127.0.0.1:8000";
+  static const String baseUrl = "http://10.0.2.2:8000";
   static const String apiUrl = "$baseUrl/api/";
   static const String imgPath = "$baseUrl/uploads/";
   static const String uploadsUrl = "$baseUrl/uploads/";
