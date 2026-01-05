@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/services/toast.dart';
+import 'package:rent/services/cache_service.dart';
 
 import '../constants/checkInternet.dart';
 
@@ -40,10 +41,31 @@ class DashboardService with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      setLoading(loadingfor);
-      if (await checkInternet() == false) return;
-      if (dashboardData.isNotEmpty && refresh == false) return;
+      final cacheKey = CacheService.generateKey('dashboard', {'uid': uid});
 
+      // ✅ Load from cache first (instant display)
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null && cachedData is Map) {
+        dashboardData = Map<String, dynamic>.from(cachedData);
+        notifyListeners(); // Show cached data instantly!
+        debugPrint('📦 Dashboard loaded from cache');
+
+        // If not forcing refresh and have fresh cache, skip API call
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 10)) {
+          return;
+        }
+      } else {
+        // No cache, show loading
+        setLoading(loadingfor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading("");
+        return;
+      }
+
+      // ✅ Fetch fresh data from API
       final response = await http.get(
         Uri.parse("${Api.dashboardEndpoint}$uid"),
       );
@@ -53,6 +75,9 @@ class DashboardService with ChangeNotifier {
       debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
+        // Save to cache
+        await CacheService.saveCache(cacheKey, data);
+
         dashboardData.clear();
         dashboardData = data;
       } else {

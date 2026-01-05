@@ -10,6 +10,7 @@ import 'package:rent/services/goto.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/notification_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 // import '../main.dart';
 
@@ -30,20 +31,45 @@ class NotifyData with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (notify.isNotEmpty && refresh == false) return;
+      final cacheKey = CacheService.generateKey('notifications', {'uid': uid});
 
-      setLoading(loadingFor);
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['notifications'] is List) {
+        notify = (cachedData['notifications'] as List)
+            .map<NotificationModel>(
+              (notification) => NotificationModel.fromJson(notification),
+            )
+            .toList();
+        notifyListeners();
+        debugPrint(
+          '📦 Notifications loaded from cache: ${notify.length} items',
+        );
+
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 5)) {
+          return;
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
       final response = await http.get(
         Uri.parse("${Api.notificationsEndpoint}$uid"),
       );
       debugPrint("👉 getNotifyData Response status: ${response.statusCode}");
-      // log(" 👉 getNotifyData Response body: ${response.body}");
       var result = json.decode(response.body);
-      // debugPrint("👉 Response: $result");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // toast(result['msg']);
+        await CacheService.saveCache(cacheKey, result);
+
         List notificationsData = result['notifications'] ?? [];
         notify = notificationsData
             .map<NotificationModel>(

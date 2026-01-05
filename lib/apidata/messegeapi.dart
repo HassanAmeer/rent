@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart';
+import 'package:rent/services/cache_service.dart';
 
 import '../models/chat_model.dart';
 import '../models/chatedUsersModel.dart';
@@ -30,10 +31,33 @@ class ChatApi with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (chatedUsersList.isNotEmpty && refresh == false) return;
+      final cacheKey = CacheService.generateKey('chated_users', {'uid': uid});
 
-      setLoading(loadingFor);
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['chatedUsers'] is List) {
+        chatedUsersList = (cachedData['chatedUsers'] as List)
+            .map((e) => ChatedUsersModel.fromJson(e))
+            .toList();
+        notifyListeners();
+        debugPrint(
+          '📦 Chats loaded from cache: ${chatedUsersList.length} users',
+        );
+
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 5)) {
+          return;
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
 
       final response = await http.get(
         Uri.parse("${Api.getChatedUsersEndpoint}$uid"),
@@ -42,12 +66,12 @@ class ChatApi with ChangeNotifier {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
+        await CacheService.saveCache(cacheKey, data);
+
         List chatedList = data['chatedUsers'] ?? [];
-        // ✅ safe parsing
         chatedUsersList = chatedList
             .map((e) => ChatedUsersModel.fromJson(e))
             .toList();
-        // debugPrint("👉 Response chatedUsersList: $chatedUsersList");
 
         setLoading();
       } else {

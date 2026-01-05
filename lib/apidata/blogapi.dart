@@ -6,6 +6,7 @@ import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/models/blog_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 // ✅ Provider for Blogs
 final blogDataProvider = ChangeNotifierProvider<BlogData>((ref) => BlogData());
@@ -30,10 +31,32 @@ class BlogData with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (blogs.isNotEmpty && !refresh) return;
+      const cacheKey = 'all_blogs';
 
-      setLoading(loadingFor);
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['blogs'] is List) {
+        blogs = (cachedData['blogs'] as List)
+            .map<BlogModel>((blog) => BlogModel.fromJson(blog))
+            .toList();
+        notifyListeners();
+        debugPrint('📦 Blogs loaded from cache: ${blogs.length} items');
+
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 30)) {
+          return;
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
       final response = await http.get(Uri.parse(Api.allBlogsEndpoint));
 
       final data = jsonDecode(response.body);
@@ -42,6 +65,8 @@ class BlogData with ChangeNotifier {
       debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
+        await CacheService.saveCache(cacheKey, data);
+
         blogs.clear();
         List blogsData = data['blogs'] ?? [];
         blogs = blogsData
@@ -66,11 +91,36 @@ class BlogData with ChangeNotifier {
     String loadingFor = "",
   }) async {
     try {
-      if (await checkInternet() == false) return;
+      final cacheKey = CacheService.generateKey('blog_details', {'id': blogId});
+
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null && cachedData is Map) {
+        final blogData =
+            cachedData['blog'] ??
+            cachedData['blogDetails'] ??
+            cachedData['data'] ??
+            {};
+        if (blogData is Map && blogData.isNotEmpty) {
+          blogDetails = BlogModel.fromJson(Map<String, dynamic>.from(blogData));
+          notifyListeners();
+          debugPrint('📦 Blog details loaded from cache');
+
+          if (!CacheService.isCacheStale(cacheKey, maxAgeMinutes: 60)) {
+            return;
+          }
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
 
       debugPrint("Fetching blog details for ID: $blogId");
 
-      setLoading(loadingFor);
       final response = await http.get(
         Uri.parse("${Api.blogDetailsEndpoint}$blogId"),
       );
@@ -81,6 +131,8 @@ class BlogData with ChangeNotifier {
       debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
+        await CacheService.saveCache(cacheKey, data);
+
         final blogData =
             data['blog'] ?? data['blogDetails'] ?? data['data'] ?? {};
         blogDetails = BlogModel.fromJson(blogData);

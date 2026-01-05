@@ -12,6 +12,7 @@ import 'package:rent/design/rentout/rent_out_page.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/item_model.dart';
 import 'package:rent/models/api_response.dart';
+import 'package:rent/services/cache_service.dart';
 
 import '../design/rentin/rent_in_page.dart';
 import '../models/favorite_model.dart';
@@ -37,22 +38,48 @@ class GetAllItems with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (allItems.isNotEmpty && !refresh) return;
+      final cacheKey = CacheService.generateKey('all_items', {
+        'search': search,
+      });
 
-      setLoading(loadingfor);
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['items'] is List) {
+        allItems = (cachedData['items'] as List)
+            .map<ItemModel>((item) => ItemModel.fromJson(item))
+            .toList();
+        notifyListeners();
+        debugPrint('📦 All items loaded from cache: ${allItems.length} items');
+
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 15)) {
+          return;
+        }
+      } else {
+        setLoading(loadingfor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading("");
+        return;
+      }
+
       debugPrint("👉 search: $search");
 
       final response = await http.get(
         Uri.parse("${Api.allItemsEndpoint}$search"),
-        // body: {"search": search, "uid": uid},
       );
 
       final data = jsonDecode(response.body);
 
       debugPrint("👉Response status: ${response.statusCode}");
       debugPrint("👉 data: $data");
+
       if (response.statusCode == 200) {
+        await CacheService.saveCache(cacheKey, data);
+
         allItems.clear();
         List itemsData = data['items'] ?? [];
         allItems = itemsData

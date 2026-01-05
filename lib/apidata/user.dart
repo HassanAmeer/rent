@@ -12,6 +12,7 @@ import 'package:rent/constants/images.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/user_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 import '../design/auth/login.dart';
 import '../design/auth/profile_details_page.dart';
@@ -241,14 +242,38 @@ class UserData with ChangeNotifier {
   /// Fetch user profile data from API
   Future<void> getProfileData() async {
     try {
-      if (await checkInternet() == false) return;
-
       if (_userModel?.id == null) {
         debugPrint("User ID not available for profile fetch");
         return;
       }
 
-      setLoading(true);
+      final cacheKey = CacheService.generateKey('user_profile', {
+        'id': _userModel!.id.toString(),
+      });
+
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['user'] != null) {
+        _userModel = UserModel.fromJson(
+          Map<String, dynamic>.from(cachedData['user']),
+        );
+        notifyListeners();
+        debugPrint('📦 User profile loaded from cache');
+
+        if (!CacheService.isCacheStale(cacheKey, maxAgeMinutes: 30)) {
+          return;
+        }
+      } else {
+        setLoading(true);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading(false);
+        return;
+      }
+
       final response = await http.get(
         Uri.parse("${Api.getUserByIdEndpoint}${_userModel!.id}"),
       );
@@ -258,11 +283,12 @@ class UserData with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final result = json.decode(response.body);
         if (result['success'] == true && result['user'] != null) {
+          await CacheService.saveCache(cacheKey, result);
+
           _userModel = UserModel.fromJson(
             Map<String, dynamic>.from(result['user']),
           );
           notifyListeners();
-          // Don't show toast here as it's called during init
         } else {
           _errorMessage = result['msg'] ?? "Failed to load profile";
           debugPrint("Profile fetch failed: $_errorMessage");

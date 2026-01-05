@@ -7,6 +7,7 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/constants/images.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/models/catgModel.dart';
+import 'package:rent/services/cache_service.dart';
 
 // ✅ Provider for Categories
 final categoryProvider = ChangeNotifierProvider<CategoryData>(
@@ -28,15 +29,46 @@ class CategoryData with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (categories.isNotEmpty && !refresh) return;
-      if (await checkInternet() == false) return;
-      setLoading(loadingFor);
+      const cacheKey = 'categories';
+
+      // ✅ Load from cache first (instant display)
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['catg'] is List) {
+        categories = (cachedData['catg'] as List)
+            .map((item) => CategoryModel.fromJson(item))
+            .toList();
+        notifyListeners(); // Show cached categories instantly!
+        debugPrint(
+          '📦 Categories loaded from cache: ${categories.length} items',
+        );
+
+        // If not forcing refresh and have fresh cache, skip API call
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 60)) {
+          return;
+        }
+      } else {
+        // No cache, show loading
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
+      // ✅ Fetch fresh data from API
       final response = await http.get(Uri.parse(Api.getCatgEndpoint));
       final data = jsonDecode(response.body);
       debugPrint("👉 Response status: ${response.statusCode}");
       debugPrint("👉 Data: $data");
 
       if (response.statusCode == 200) {
+        // Save to cache
+        await CacheService.saveCache(cacheKey, data);
+
         categories.clear();
         if (data['catg'] != null && data['catg'] is List) {
           categories = (data['catg'] as List)

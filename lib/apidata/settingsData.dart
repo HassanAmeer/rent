@@ -9,6 +9,7 @@ import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/goto.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/home_page.dart';
+import 'package:rent/services/cache_service.dart';
 
 import '../models/docModel.dart';
 
@@ -33,9 +34,29 @@ class SettingsDataClass with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (settingsData.isNotEmpty && refresh == false) return;
-      setLoading(loadingFor);
+      const cacheKey = 'settings_data';
+
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['settings'] != null) {
+        settingsData = cachedData['settings'];
+        notifyListeners();
+        debugPrint('📦 Settings data loaded from cache');
+
+        if (!refresh &&
+            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 120)) {
+          return;
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
 
       final response = await http.get(Uri.parse(Api.settingsEndpoint));
 
@@ -43,6 +64,7 @@ class SettingsDataClass with ChangeNotifier {
       debugPrint("👉 Response: $result");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        await CacheService.saveCache(cacheKey, result);
         settingsData = result['settings'];
       } else {
         toast(result['msg'], backgroundColor: Colors.red);
@@ -70,22 +92,44 @@ class SettingsDataClass with ChangeNotifier {
 
   Future getDocData({String loadingFor = ""}) async {
     try {
-      if (await checkInternet() == false) return;
+      const cacheKey = 'docs_data';
 
-      if (docData.id == 00) {
-        setLoading(loadingFor);
-        final response = await http.get(Uri.parse(Api.docEndpoint));
+      // ✅ Load from cache first
+      final cachedData = CacheService.getCache(cacheKey);
+      if (cachedData != null &&
+          cachedData is Map &&
+          cachedData['data'] != null) {
+        docData = DocDataModel.fromJson(cachedData['data']);
+        notifyListeners();
+        debugPrint('📦 Docs data loaded from cache');
 
-        var result = json.decode(response.body);
-        debugPrint("👉 Response: $result");
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          docData = DocDataModel.fromJson(result['data']);
-        } else {
-          toast(result['msg'], backgroundColor: Colors.red);
+        if (!CacheService.isCacheStale(cacheKey, maxAgeMinutes: 1440)) {
+          // 24 hours
+          return;
         }
-        setLoading();
+      } else if (docData.id != 00) {
+        return; // Already loaded
+      } else {
+        setLoading(loadingFor);
       }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
+      final response = await http.get(Uri.parse(Api.docEndpoint));
+
+      var result = json.decode(response.body);
+      debugPrint("👉 Response: $result");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await CacheService.saveCache(cacheKey, result);
+        docData = DocDataModel.fromJson(result['data']);
+      } else {
+        toast(result['msg'], backgroundColor: Colors.red);
+      }
+      setLoading();
     } catch (e, st) {
       debugPrint("💥 getDocData: error: $e, st$st");
       setLoading();

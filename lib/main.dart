@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
+import 'package:rent/services/cache_service.dart';
 import 'apidata/categoryapi.dart';
 import 'apidata/user.dart';
 import 'design/home_page.dart';
@@ -17,9 +18,13 @@ GlobalKey<NavigatorState> contextKey = GlobalKey();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize Hive
   Directory appDocumentsDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentsDir.path);
+
+  // ✅ Initialize Cache Service
+  await CacheService.init();
 
   runApp(const ProviderScope(child: MyApp()));
 }
