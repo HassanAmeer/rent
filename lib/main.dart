@@ -33,9 +33,15 @@ class MyApp extends StatelessWidget {
       title: 'Rent',
       navigatorKey: contextKey,
       theme: ThemeData(
+        // ✅ Tap/Click ripple colors (Cyan theme)
+        splashColor: AppColors.mainColor.withOpacity(0.3),
+        highlightColor: AppColors.mainColor.withOpacity(0.1),
+        hoverColor: AppColors.mainColor.withOpacity(0.05),
+
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: AppColors.btnBgColor,
           foregroundColor: AppColors.btnIconColor,
+          splashColor: AppColors.mainColor.withOpacity(0.3),
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(

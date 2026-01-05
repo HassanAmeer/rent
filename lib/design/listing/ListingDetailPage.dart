@@ -52,34 +52,58 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
             style: TextStyle(color: Colors.black),
           ),
         ),
-        body: ItemContentDetailsWidget(
-          images: listingData.images,
-          title: listingData.displayTitle,
-          description: listingData.description,
-          catgName:
-              "${listingData.categoryId != null
-                  ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
-                        ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).name
-                        : null
-                  : null}",
-          catgImg:
-              "${listingData.categoryId != null
-                  ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
-                        ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).image
-                        : null
-                  : null}",
-          dailyRate: listingData.dailyRate.toString(),
-          weeklyRate: listingData.weeklyRate.toString(),
-          monthlyRate: listingData.monthlyRate.toString(),
-          availability: listingData.availabilityRange,
-          listingDate: listingData.createdAt.toString(),
-          // orderDate: orderDate,
-          userImage: listingData.user?.image,
-          userName: listingData.user?.name,
-          userEmail: listingData.user?.email,
-          userPhone: listingData.user?.phone,
-          userAddress: listingData.user?.address,
-          userAbout: listingData.user?.aboutUs,
+        body: Stack(
+          children: [
+            ItemContentDetailsWidget(
+              images: listingData.images,
+              title: listingData.displayTitle,
+              description: listingData.description,
+              catgName:
+                  "${listingData.categoryId != null
+                      ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
+                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).name
+                            : null
+                      : null}",
+              catgImg:
+                  "${listingData.categoryId != null
+                      ? ref.watch(categoryProvider).categories.where((e) => e.id == listingData.categoryId).isNotEmpty
+                            ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == listingData.categoryId).image
+                            : null
+                      : null}",
+              dailyRate: listingData.dailyRate.toString(),
+              weeklyRate: listingData.weeklyRate.toString(),
+              monthlyRate: listingData.monthlyRate.toString(),
+              availability: listingData.availabilityRange,
+              listingDate: listingData.createdAt.toString(),
+              // orderDate: orderDate,
+              userImage: listingData.user?.image,
+              userName: listingData.user?.name,
+              userEmail: listingData.user?.email,
+              userPhone: listingData.user?.phone,
+              userAddress: listingData.user?.address,
+              userAbout: listingData.user?.aboutUs,
+              // onBookNowTap: (){},
+            ),
+            Positioned(
+              left: 10,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      offset: const Offset(0, 0),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           heroTag: "editListing",

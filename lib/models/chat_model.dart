@@ -150,7 +150,10 @@ class ChatUser {
 
   ChatUser.fromJson(Map<String, dynamic> json) {
     id = json['id'].toString().toNullString();
-    image = (Api.imgPath + json['image']!.toString().toNullString());
+    // ✅ Safe image handling - prevents crash on null
+    image = json['image'] != null && json['image'].toString().trim().isNotEmpty
+        ? Api.imgPath + json['image'].toString()
+        : '';
     activeUser = json['activeUser'] as int?;
     name = json['name']?.toString().toNullString();
     phone = json['phone']?.toString().toNullString();

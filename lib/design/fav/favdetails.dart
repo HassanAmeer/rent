@@ -8,6 +8,7 @@ import 'package:rent/constants/appColors.dart';
 import 'package:rent/constants/images.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:rent/constants/screensizes.dart';
+import 'package:rent/helpers/calendar_theme.dart';
 import '../../apidata/allitemsapi.dart';
 import '../../apidata/categoryapi.dart';
 import '../../apidata/favrtapi.dart';
@@ -156,9 +157,7 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
 
                     var results = await showCalendarDatePicker2Dialog(
                       context: context,
-                      config: CalendarDatePicker2WithActionButtonsConfig(
-                        calendarType: CalendarDatePicker2Type.range,
-                      ),
+                      config: CalendarTheme.getConfig(),
                       dialogSize: const Size(325, 400),
                       value: dates,
                       borderRadius: BorderRadius.circular(15),
@@ -215,8 +214,8 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
                     : Icon(
                         ref.watch(getAllItems).orderedItems.contains(favitem.id)
                             ? Icons
-                                  .shopping_cart // Filled cart
-                            : Icons.shopping_cart_outlined, // Outlined cart
+                                  .calendar_month_sharp // Filled cart
+                            : Icons.calendar_month_outlined, // Outlined cart
                         size: 22,
                         color: Colors.white,
                       ),
@@ -256,50 +255,129 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
             ],
           ),
           body: SafeArea(
-            child: ItemContentDetailsWidget(
-              images: favitem.itemImages,
-              title: favitem.displayTitle,
-              description: favitem.itemDescription,
-              catgName: favitem.products == null
-                  ? null
-                  : "${favitem.products!.category != null
-                        ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
-                              ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).name
-                              : null
-                        : null}",
-              catgImg: favitem.products == null
-                  ? null
-                  : "${favitem.products!.category != null
-                        ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
-                              ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).image
-                              : null
-                        : null}",
-              dailyRate: favitem.products?.dailyrate.toString(),
-              weeklyRate: favitem.products?.weeklyrate.toString(),
-              monthlyRate: favitem.products?.monthlyrate.toString(),
-              availability: favitem.products == null
-                  ? null
-                  : favitem.products!.availabilityDays ?? '',
-              listingDate: favitem.products?.createdAt.toString(),
-              // orderDate: orderDate,
-              userImage: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.image,
-              userName: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.name,
-              userEmail: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.email,
-              userPhone: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.phone,
-              userAddress: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.address,
-              userAbout: favitem.products == null
-                  ? null
-                  : favitem.rentalusers?.aboutUs,
+            child: Stack(
+              children: [
+                ItemContentDetailsWidget(
+                  images: favitem.itemImages,
+                  title: favitem.displayTitle,
+                  description: favitem.itemDescription,
+                  catgName: favitem.products == null
+                      ? null
+                      : "${favitem.products!.category != null
+                            ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
+                                  ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).name
+                                  : null
+                            : null}",
+                  catgImg: favitem.products == null
+                      ? null
+                      : "${favitem.products!.category != null
+                            ? ref.watch(categoryProvider).categories.where((e) => e.id == favitem.products!.category).isNotEmpty
+                                  ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == favitem.products!.category).image
+                                  : null
+                            : null}",
+                  dailyRate: favitem.products?.dailyrate.toString(),
+                  weeklyRate: favitem.products?.weeklyrate.toString(),
+                  monthlyRate: favitem.products?.monthlyrate.toString(),
+                  availability: favitem.products == null
+                      ? null
+                      : favitem.products!.availabilityDays ?? '',
+                  listingDate: favitem.products?.createdAt.toString(),
+                  // orderDate: orderDate,
+                  userImage: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.image,
+                  userName: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.name,
+                  userEmail: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.email,
+                  userPhone: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.phone,
+                  userAddress: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.address,
+                  userAbout: favitem.products == null
+                      ? null
+                      : favitem.rentalusers?.aboutUs,
+                  onBookNowTap: () async {
+                    try {
+                      if (favitem.products == null ||
+                          favitem.rentalusers == null) {
+                        toast("User not Available From Long Time!");
+                        return;
+                      }
+                      List<DateTime?> dates = [];
+
+                      var results = await showCalendarDatePicker2Dialog(
+                        context: context,
+                        config: CalendarTheme.getConfig(),
+                        dialogSize: const Size(325, 400),
+                        value: dates,
+                        borderRadius: BorderRadius.circular(15),
+                      );
+
+                      if (results!.isEmpty) {
+                        toast("Please Pickup date range");
+                      }
+
+                      // print(results.toString());
+                      var startDate = results.first; // DateTime
+                      var endDate = results.last; // DateTime
+
+                      // Formatter
+                      var formatter = DateFormat("d MMMM yyyy");
+
+                      // Convert to string
+                      var finalDateRange =
+                          "${formatter.format(startDate!)} to ${formatter.format(endDate!)}";
+                      // print(finalDateRange.toString());
+                      var daysCount = endDate.difference(startDate).inDays + 1;
+                      debugPrint(
+                        (favitem.products!.dailyrate * daysCount).toString(),
+                      );
+                      ref
+                          .read(getAllItems)
+                          .orderitems(
+                            userCanPickupInDateRange: finalDateRange,
+                            productId: favitem.products!.id.toString(),
+                            totalprice_by:
+                                (favitem.products!.dailyrate * daysCount)
+                                    .toString(),
+                            product_by: favitem.rentalusers!.id.toString(),
+                            userId: ref
+                                .watch(userDataClass)
+                                .userData["id"]
+                                .toString(),
+                            loadingFor: "${favitem.id}order",
+                            context: context,
+                          );
+                    } catch (e) {
+                      toast("Try later! $e");
+                    }
+                  },
+                ),
+                Positioned(
+                  left: 10,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          offset: const Offset(0, 0),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

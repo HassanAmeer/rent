@@ -413,9 +413,9 @@ class _ListingBoxState extends State<ListingBox>
                                                 : Icon(
                                                         widget.isCartFilled
                                                             ? Icons
-                                                                  .shopping_cart
+                                                                  .calendar_month_sharp
                                                             : Icons
-                                                                  .shopping_cart_outlined,
+                                                                  .calendar_month_outlined,
                                                         size: 20,
                                                         color:
                                                             widget.isCartFilled

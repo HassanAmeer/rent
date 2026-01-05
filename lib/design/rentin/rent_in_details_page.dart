@@ -401,34 +401,58 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                 //     ),
                 //   ),
                 // ),
-                ItemContentDetailsWidget(
-                  images: itemIndex.productImage,
-                  title: itemIndex.productTitle,
-                  description: itemIndex.productDesc,
-                  catgName:
-                      "${itemIndex.productby != null
-                          ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
-                                : null
-                          : null}",
-                  catgImg:
-                      "${itemIndex.categoryId != null
-                          ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                                ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
-                                : null
-                          : null}",
-                  dailyRate: itemIndex.dailyrate.toString(),
-                  weeklyRate: itemIndex.weeklyrate.toString(),
-                  monthlyRate: itemIndex.monthlyrate.toString(),
-                  availability: itemIndex.availability ?? '',
-                  listingDate: itemIndex.createdAt.toString(),
-                  // orderDate: orderDate,
-                  userImage: itemIndex.productby?.image,
-                  userName: itemIndex.productby?.name,
-                  userEmail: itemIndex.productby?.email,
-                  userPhone: itemIndex.productby?.phone,
-                  userAddress: itemIndex.productby?.address,
-                  userAbout: itemIndex.productby?.aboutUs,
+                Stack(
+                  children: [
+                    ItemContentDetailsWidget(
+                      images: itemIndex.productImage,
+                      title: itemIndex.productTitle,
+                      description: itemIndex.productDesc,
+                      catgName:
+                          "${itemIndex.productby != null
+                              ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                                    ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                                    : null
+                              : null}",
+                      catgImg:
+                          "${itemIndex.categoryId != null
+                              ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                                    ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                                    : null
+                              : null}",
+                      dailyRate: itemIndex.dailyrate.toString(),
+                      weeklyRate: itemIndex.weeklyrate.toString(),
+                      monthlyRate: itemIndex.monthlyrate.toString(),
+                      availability: itemIndex.availability ?? '',
+                      listingDate: itemIndex.createdAt.toString(),
+                      // orderDate: orderDate,
+                      userImage: itemIndex.productby?.image,
+                      userName: itemIndex.productby?.name,
+                      userEmail: itemIndex.productby?.email,
+                      userPhone: itemIndex.productby?.phone,
+                      userAddress: itemIndex.productby?.address,
+                      userAbout: itemIndex.productby?.aboutUs,
+                    ),
+
+                    Positioned(
+                      left: 10,
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              offset: const Offset(0, 0),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

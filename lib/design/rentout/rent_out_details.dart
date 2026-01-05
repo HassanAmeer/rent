@@ -351,34 +351,57 @@ class _RentOutDetailsPageState extends ConsumerState<RentOutDetailsPage> {
           ),
         ).animate().fade(duration: 1.seconds).slideY(begin: 1),
         body: SafeArea(
-          child: ItemContentDetailsWidget(
-            images: itemIndex.productImages,
-            title: itemIndex.productTitle,
-            description: itemIndex.productDesc,
-            catgName:
-                "${itemIndex.categoryId != null
-                    ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                          ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
-                          : null
-                    : null}",
-            catgImg:
-                "${itemIndex.categoryId != null
-                    ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
-                          ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
-                          : null
-                    : null}",
-            dailyRate: itemIndex.dailyRate.toString(),
-            weeklyRate: itemIndex.weeklyRate.toString(),
-            monthlyRate: itemIndex.monthlyRate.toString(),
-            availability: itemIndex.availability ?? '',
-            listingDate: itemIndex.createdAt.toString(),
-            // orderDate: orderDate,
-            userImage: itemIndex.orderByUser?.image,
-            userName: itemIndex.orderByUser?.name,
-            userEmail: itemIndex.orderByUser?.email,
-            userPhone: itemIndex.orderByUser?.phone,
-            userAddress: itemIndex.orderByUser?.address,
-            userAbout: itemIndex.orderByUser?.aboutUs,
+          child: Stack(
+            children: [
+              ItemContentDetailsWidget(
+                images: itemIndex.productImages,
+                title: itemIndex.productTitle,
+                description: itemIndex.productDesc,
+                catgName:
+                    "${itemIndex.categoryId != null
+                        ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                              ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).name
+                              : null
+                        : null}",
+                catgImg:
+                    "${itemIndex.categoryId != null
+                        ? ref.watch(categoryProvider).categories.where((e) => e.id == itemIndex.categoryId).isNotEmpty
+                              ? ref.watch(categoryProvider).categories.firstWhere((e) => e.id == itemIndex.categoryId).image
+                              : null
+                        : null}",
+                dailyRate: itemIndex.dailyRate.toString(),
+                weeklyRate: itemIndex.weeklyRate.toString(),
+                monthlyRate: itemIndex.monthlyRate.toString(),
+                availability: itemIndex.availability ?? '',
+                listingDate: itemIndex.createdAt.toString(),
+                // orderDate: orderDate,
+                userImage: itemIndex.orderByUser?.image,
+                userName: itemIndex.orderByUser?.name,
+                userEmail: itemIndex.orderByUser?.email,
+                userPhone: itemIndex.orderByUser?.phone,
+                userAddress: itemIndex.orderByUser?.address,
+                userAbout: itemIndex.orderByUser?.aboutUs,
+              ),
+              Positioned(
+                left: 10,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        offset: const Offset(0, 0),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

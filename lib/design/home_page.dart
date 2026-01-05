@@ -25,6 +25,9 @@ import 'package:rent/widgets/dotloader.dart';
 import '../widgets/btmnavbar.dart';
 import '../constants/checkInternet.dart';
 import 'auth/profile_details_page.dart';
+import 'package:rent/providers/home_menu_provider.dart';
+import 'package:rent/helpers/route_helper.dart';
+import 'package:rent/design/settings/customize_home_menu_page.dart';
 
 /// ✅ HomePage
 class HomePage extends ConsumerStatefulWidget {
@@ -58,6 +61,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       } else {
         debugPrint("User ID not available for dashboard fetch");
       }
+
+      // ✅ Initialize home menu items
+      await ref.read(homeMenuProvider).init();
     });
   }
 
@@ -199,7 +205,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 // Text(
                 //   "${dashboardService.dashboardData['orderCountsListForChart']}",
                 // ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 15),
                 // ✅ Earnings & Rating Row
                 Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -234,49 +240,116 @@ class _HomePageState extends ConsumerState<HomePage> {
                     .moveX(duration: Duration(milliseconds: 1500))
                     .fadeIn(duration: Duration(milliseconds: 1500)),
 
-                const SizedBox(height: 5),
+                // const SizedBox(height: 5),
 
-                // ✅ Favorities & Rentals Row
-                SizedBox(
-                      height: ScreenSize.height * 0.19,
-                      child: ListView(
-                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        physics: BouncingScrollPhysics(),
-                        children: [
-                          homeMenuBoxWidget(
-                            label: "My Favorities",
-                            pageName: Favourite(),
-                            icon: Icons.bookmark_border,
+                // ✅ Dynamic Home Menu with Customize Button
+                Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header with customize button
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Quick Access',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const CustomizeHomeMenuPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.edit, size: 16),
+                                label: const Text('Customize'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.mainColor,
+                                ),
+                              ),
+                            ],
                           ),
-                          homeMenuBoxWidget(
-                            label: "Rent Outs",
-                            pageName: RentOutPage(),
-                            icon: Icons.calendar_month_outlined,
-                          ),
-                          homeMenuBoxWidget(
-                            label: "Blogs",
-                            pageName: Blogs(),
-                            icon: Icons.article_outlined,
-                          ),
-                          homeMenuBoxWidget(
-                            label: "Help & support",
-                            pageName: Help(),
-                            icon: Icons.support_agent,
-                          ),
-                        ],
-                      ),
+                        ),
+                        // const SizedBox(height: 5),
+                        // Dynamic menu items
+                        SizedBox(
+                          height: ScreenSize.height * 0.19,
+                          child: ref.watch(homeMenuProvider).isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : ref.watch(homeMenuProvider).menuItems.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.inbox_outlined,
+                                        size: 48,
+                                        color: Colors.grey[400],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'No menu items',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const CustomizeHomeMenuPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text('Add items'),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: ref
+                                      .watch(homeMenuProvider)
+                                      .menuItems
+                                      .length,
+                                  itemBuilder: (context, index) {
+                                    final menuItem = ref
+                                        .watch(homeMenuProvider)
+                                        .menuItems[index];
+                                    final page = RouteHelper.getPageFromRoute(
+                                      menuItem.routeName,
+                                    );
+
+                                    return homeMenuBoxWidget(
+                                      label: menuItem.label,
+                                      pageName: page,
+                                      icon: menuItem.icon,
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     )
-                    .animate(
-                      // onPlay: (controller) => controller.repeat(),
-                    )
+                    .animate()
                     .moveX(
-                      duration: Duration(milliseconds: 800),
+                      duration: const Duration(milliseconds: 800),
                       begin: 100,
                       end: 0,
                     )
-                    .fadeIn(duration: Duration(milliseconds: 800)),
+                    .fadeIn(duration: const Duration(milliseconds: 800)),
 
                 const SizedBox(height: 5),
 

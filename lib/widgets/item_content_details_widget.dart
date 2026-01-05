@@ -28,6 +28,7 @@ class ItemContentDetailsWidget extends StatelessWidget {
   final String? userPhone;
   final String? userAddress;
   final String? userAbout;
+  final Function? onBookNowTap;
 
   const ItemContentDetailsWidget({
     super.key,
@@ -48,6 +49,7 @@ class ItemContentDetailsWidget extends StatelessWidget {
     this.userPhone,
     this.userAddress,
     this.userAbout,
+    this.onBookNowTap,
   });
 
   @override
@@ -433,6 +435,68 @@ class ItemContentDetailsWidget extends StatelessWidget {
 
           const SizedBox(height: 28),
 
+          // add outlined book now button with icon on click same show calender popup for booking
+          onBookNowTap == null
+              ? SizedBox()
+              : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child:
+                          ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                  ),
+                                  side: const BorderSide(
+                                    color: AppColors.mainColor,
+                                    width: 1,
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  foregroundColor: AppColors.mainColor,
+                                ),
+                                onPressed: () {
+                                  onBookNowTap!();
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Book Now"),
+                                    SizedBox(width: 20),
+                                    Icon(Icons.calendar_month)
+                                        .animate(
+                                          onPlay: (controller) =>
+                                              controller.repeat(),
+                                        )
+                                        .scale(
+                                          duration: const Duration(seconds: 1),
+                                          begin: Offset(0.8, 0.8),
+                                          end: Offset(1, 1),
+                                        )
+                                        .shimmer(
+                                          color: Colors.black,
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                  ],
+                                ),
+                              )
+                              .animate(
+                                onPlay: (controller) => controller.repeat(),
+                              )
+                              .shimmer(
+                                color: Colors.black,
+                                duration: const Duration(seconds: 2),
+                              ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 1.6.seconds, duration: 0.8.seconds)
+                    .slideY(begin: 0.1),
+
+          onBookNowTap == null ? SizedBox() : SizedBox(height: 50),
+
+          onBookNowTap == null ? SizedBox() : Divider(),
+          SizedBox(height: 10),
           // User Section
           if (userName != null) ...[
             const Text(
