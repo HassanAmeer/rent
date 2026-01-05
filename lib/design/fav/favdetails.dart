@@ -199,7 +199,8 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
                           context: context,
                         );
                   } catch (e) {
-                    toast("Try later! $e");
+                    // toast("Try later! $e");
+                    toast("Cancelled !");
                   }
                 },
 
@@ -354,7 +355,8 @@ class _FavDetailsPageState extends ConsumerState<FavDetailsPage> {
                             context: context,
                           );
                     } catch (e) {
-                      toast("Try later! $e");
+                      // toast("Try later! $e");
+                      toast("Cancelled !");
                     }
                   },
                 ),

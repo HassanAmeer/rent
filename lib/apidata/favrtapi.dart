@@ -10,6 +10,7 @@ import 'package:rent/services/goto.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/design/home_page.dart';
 import 'package:rent/models/favorite_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 // import '../design/fav/fvrt.dart';
 // import '../main.dart';
@@ -33,10 +34,43 @@ class Favrt with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (favouriteItems.isNotEmpty && !refresh) return;
+      String cacheKey = '';
+      dynamic cachedData;
 
-      setLoading(loadingFor);
+      if (search == null || search.toString().isEmpty) {
+        cacheKey = CacheService.generateKey('fav_items', {'uid': uid});
+        // ✅ Load from cache first ONLY if no search
+        cachedData = CacheService.getCache(cacheKey);
+
+        if (cachedData != null &&
+            cachedData is Map &&
+            cachedData['favItems'] is List) {
+          favouriteItems = (cachedData['favItems'] as List)
+              .map<FavoriteModel>((item) => FavoriteModel.fromJson(item))
+              .toList()
+              .reversed
+              .toList();
+          notifyListeners();
+          debugPrint(
+            '📦 Fav items loaded from cache: ${favouriteItems.length} items',
+          );
+
+          if (!refresh &&
+              !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 10)) {
+            return;
+          }
+        } else {
+          setLoading(loadingFor);
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
       final response = await http.post(
         Uri.parse(Api.getFavEndpoint),
         body: {"uid": uid, "search": search},
@@ -46,6 +80,10 @@ class Favrt with ChangeNotifier {
       // log("👉 data: $data");
 
       if (response.statusCode == 200) {
+        if ((search == null || search.toString().isEmpty)) {
+          await CacheService.saveCache(cacheKey, data);
+        }
+
         favouriteItems.clear();
         List favItems = data['favItems'] ?? [];
         favouriteItems = favItems
@@ -54,10 +92,12 @@ class Favrt with ChangeNotifier {
             .reversed
             .toList();
         // debugPrint("👉 favouriteItems: $favouriteItems");
+        setLoading();
+        notifyListeners();
       } else {
         toast(data['msg']);
+        setLoading();
       }
-      setLoading();
     } catch (e, st) {
       setLoading();
       debugPrint("💥 Error fetching my items: $e,st:$st");

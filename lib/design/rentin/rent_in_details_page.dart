@@ -335,7 +335,8 @@ class _RentInDetailsPageState extends ConsumerState<RentInDetailsPage> {
                           );
                     } catch (e) {
                       debugPrint("error $e");
-                      toast("Try Later! $e");
+                      // toast("Try Later! $e");
+                      toast("Cancelled !");
                     }
                   },
                   icon:

@@ -6,6 +6,7 @@ import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart'; // Apne toast function ke liye import
 import 'package:rent/models/rent_out_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 final rentOutProvider = ChangeNotifierProvider<RentOutProvider>(
   (ref) => RentOutProvider(),
@@ -27,15 +28,46 @@ class RentOutProvider with ChangeNotifier {
     var loadingfor = "",
     bool refresh = false,
   }) async {
-    setLoading(loadingfor);
     try {
-      if (await checkInternet() == false) return;
-      if (comingOrders.isNotEmpty && !refresh) return;
+      String cacheKey = '';
+      dynamic cachedData;
+      String searchTerm = search?.toString() ?? "";
 
-      setLoading(loadingfor);
+      if (searchTerm.isEmpty) {
+        cacheKey = CacheService.generateKey('rent_out', {'uid': uid});
+        // ✅ Load from cache first ONLY if no search
+        cachedData = CacheService.getCache(cacheKey);
+
+        if (cachedData != null &&
+            cachedData is Map &&
+            cachedData['commingOrders'] is List) {
+          comingOrders = (cachedData['commingOrders'] as List)
+              .map<BookingModel>((order) => BookingModel.fromJson(order))
+              .toList();
+          notifyListeners();
+          debugPrint(
+            '📦 Rent out items loaded from cache: ${comingOrders.length} items',
+          );
+
+          if (!refresh &&
+              !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 10)) {
+            return;
+          }
+        } else {
+          setLoading(loadingfor);
+        }
+      } else {
+        setLoading(loadingfor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading("");
+        return;
+      }
+
       final response = await http.post(
         Uri.parse(Api.getRentOutOrdersEndpoint),
-        body: {"uid": uid, "search": search},
+        body: {"uid": uid, "search": searchTerm},
       );
 
       final data = jsonDecode(response.body);
@@ -43,6 +75,10 @@ class RentOutProvider with ChangeNotifier {
       debugPrint("👉 Coming Orders Data: $data");
 
       if (response.statusCode == 200 && data['success'] == true) {
+        if (searchTerm.isEmpty) {
+          await CacheService.saveCache(cacheKey, data);
+        }
+
         final ordersData = data['commingOrders'] ?? [];
         comingOrders = ordersData
             .map<BookingModel>((order) => BookingModel.fromJson(order))
@@ -147,7 +183,8 @@ class RentOutProvider with ChangeNotifier {
     } catch (e) {
       setLoading();
       debugPrint("deleteOrder Error: $e");
-      toast("Try Later: ${e.toString()}");
+      // toast("Try Later: ${e.toString()}");
+      toast("Cancelled !");
     } finally {
       setLoading();
     }

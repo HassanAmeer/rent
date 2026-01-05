@@ -161,7 +161,8 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                         context: context,
                       );
                 } catch (e) {
-                  toast("Try later! $e");
+                  // toast("Try later! $e");
+                  toast("Cancelled !");
                 }
               },
 
@@ -313,7 +314,8 @@ class _AllitemdetailspageState extends ConsumerState<Allitemdetailspage> {
                                 context: context,
                               );
                         } catch (e) {
-                          toast("Try later! $e");
+                          // toast("Try later! $e");
+                          toast("Cancelled !");
                         }
                       },
                     ),

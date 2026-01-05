@@ -376,7 +376,8 @@ class _AllItemsPageState extends ConsumerState<AllItemsPage> {
                                                   );
                                             } catch (e) {
                                               debugPrint("error $e");
-                                              toast("Try Later! $e");
+                                              // toast("Try Later! $e");
+                                              toast("Cancelled !");
                                             }
                                           },
 

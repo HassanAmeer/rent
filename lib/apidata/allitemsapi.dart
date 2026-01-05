@@ -38,24 +38,29 @@ class GetAllItems with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      final cacheKey = CacheService.generateKey('all_items', {
-        'search': search,
-      });
+      String cacheKey = '';
+      dynamic cachedData;
+      if (search.isEmpty) {
+        cacheKey = CacheService.generateKey('all_items', {});
+        // ✅ Load from cache first ONLY if no search
+        cachedData = CacheService.getCache(cacheKey);
+        if (cachedData != null &&
+            cachedData is Map &&
+            cachedData['items'] is List) {
+          allItems = (cachedData['items'] as List)
+              .map<ItemModel>((item) => ItemModel.fromJson(item))
+              .toList();
+          notifyListeners();
+          debugPrint(
+            '📦 All items loaded from cache: ${allItems.length} items',
+          );
 
-      // ✅ Load from cache first
-      final cachedData = CacheService.getCache(cacheKey);
-      if (cachedData != null &&
-          cachedData is Map &&
-          cachedData['items'] is List) {
-        allItems = (cachedData['items'] as List)
-            .map<ItemModel>((item) => ItemModel.fromJson(item))
-            .toList();
-        notifyListeners();
-        debugPrint('📦 All items loaded from cache: ${allItems.length} items');
-
-        if (!refresh &&
-            !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 15)) {
-          return;
+          if (!refresh &&
+              !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 15)) {
+            return;
+          }
+        } else {
+          setLoading(loadingfor);
         }
       } else {
         setLoading(loadingfor);
@@ -78,7 +83,9 @@ class GetAllItems with ChangeNotifier {
       debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
-        await CacheService.saveCache(cacheKey, data);
+        if (search.isEmpty) {
+          await CacheService.saveCache(cacheKey, data);
+        }
 
         allItems.clear();
         List itemsData = data['items'] ?? [];

@@ -8,6 +8,7 @@ import 'package:rent/constants/api_endpoints.dart';
 import 'package:rent/constants/checkInternet.dart';
 import 'package:rent/services/toast.dart';
 import 'package:rent/models/rent_in_model.dart';
+import 'package:rent/services/cache_service.dart';
 
 // Provider for rentals
 final rentInProvider = ChangeNotifierProvider<RentInProvider>(
@@ -30,11 +31,43 @@ class RentInProvider with ChangeNotifier {
     bool refresh = false,
   }) async {
     try {
-      if (await checkInternet() == false) return;
-      if (rentInListData.isNotEmpty && !refresh) return;
-      // debugPrint("Fetching fetchRentIn for user ID: $userId");
+      String cacheKey = '';
+      dynamic cachedData;
 
-      setLoading(loadingFor);
+      if (search.isEmpty) {
+        cacheKey = CacheService.generateKey('rent_in', {'uid': userId});
+        // ✅ Load from cache first ONLY if no search
+        cachedData = CacheService.getCache(cacheKey);
+
+        if (cachedData != null &&
+            cachedData is Map &&
+            cachedData['rentals'] is List) {
+          rentInListData = (cachedData['rentals'] as List)
+              .map<RentInModel>((e) => RentInModel.fromJson(e))
+              .toList()
+              .reversed
+              .toList();
+          notifyListeners();
+          debugPrint(
+            '📦 Rent in items loaded from cache: ${rentInListData.length} items',
+          );
+
+          if (!refresh &&
+              !CacheService.isCacheStale(cacheKey, maxAgeMinutes: 10)) {
+            return;
+          }
+        } else {
+          setLoading(loadingFor);
+        }
+      } else {
+        setLoading(loadingFor);
+      }
+
+      if (await checkInternet() == false) {
+        if (cachedData == null) setLoading();
+        return;
+      }
+
       final response = await http.post(
         Uri.parse(Api.rentInEndpoint),
         body: {'search': search, "uid": userId},
@@ -46,6 +79,10 @@ class RentInProvider with ChangeNotifier {
       debugPrint("👉 data: $data");
 
       if (response.statusCode == 200) {
+        if (search.isEmpty) {
+          await CacheService.saveCache(cacheKey, data);
+        }
+
         rentInListData.clear();
         List rentalsData = data['rentals'] ?? [];
         rentInListData = rentalsData
@@ -121,7 +158,8 @@ class RentInProvider with ChangeNotifier {
     } catch (e) {
       setLoading();
       debugPrint("updateRentalStatus Error: $e");
-      toast("Try Later: ${e.toString()}");
+      // toast("Try Later: ${e.toString()}");
+      toast("Cancelled !");
     } finally {
       setLoading();
     }
@@ -157,7 +195,8 @@ class RentInProvider with ChangeNotifier {
     } catch (e) {
       setLoading();
       debugPrint("deleteOrder Error: $e");
-      toast("Try Later: ${e.toString()}");
+      // toast("Try Later: ${e.toString()}");
+      toast("Cancelled !");
     } finally {
       setLoading();
     }
