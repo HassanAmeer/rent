@@ -38,6 +38,37 @@ class MyApp extends StatelessWidget {
         highlightColor: AppColors.mainColor.withOpacity(0.1),
         hoverColor: AppColors.mainColor.withOpacity(0.05),
 
+        // ✅ Dialog theme (rounded corners)
+        dialogTheme: const DialogThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+        ),
+
+        // ✅ Text button theme (for dialog buttons - Cyan)
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.mainColor,
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+
+        // ✅ Elevated button theme (Cyan background)
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.mainColor,
+            foregroundColor: Colors.white,
+            elevation: 2,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: AppColors.btnBgColor,
           foregroundColor: AppColors.btnIconColor,

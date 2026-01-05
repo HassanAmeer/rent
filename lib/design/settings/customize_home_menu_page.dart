@@ -115,6 +115,7 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
                       return Container(
                         key: ValueKey(item.id),
                         child: Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.only(bottom: 12),
                           elevation: 2,
                           child: ListTile(
@@ -168,7 +169,7 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
 
           // Available Items Section
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
                 const Text(
@@ -186,7 +187,7 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
 
           // Available Items Grid
           Expanded(
-            flex: 3,
+            flex: 1,
             child: availableItems.isEmpty
                 ? Center(
                     child: Column(
@@ -213,8 +214,8 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 8,
                           childAspectRatio: 0.9,
                         ),
                     itemCount: availableItems.length,
@@ -227,6 +228,7 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
                                   .addMenuItem(item.id);
                             },
                             child: Card(
+                              color: Colors.white,
                               elevation: 2,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -244,11 +246,11 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
                                     ),
                                     child: Icon(
                                       item.icon,
-                                      size: 32,
+                                      size: 25,
                                       color: AppColors.mainColor,
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 5),
                                   Text(
                                     item.label,
                                     textAlign: TextAlign.center,
@@ -262,7 +264,7 @@ class _CustomizeHomeMenuPageState extends ConsumerState<CustomizeHomeMenuPage> {
                                   const SizedBox(height: 4),
                                   const Icon(
                                     Icons.add_circle_outline,
-                                    size: 16,
+                                    size: 18,
                                     color: Colors.green,
                                   ),
                                 ],
