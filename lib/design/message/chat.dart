@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rent/apidata/messegeapi.dart';
@@ -25,6 +26,8 @@ class _ChatsState extends ConsumerState<Chats> {
 
   ScrollController scrollController = ScrollController();
 
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
@@ -41,16 +44,46 @@ class _ChatsState extends ConsumerState<Chats> {
               widget.msgdata.sid.toString()
           ? widget.msgdata.rid
           : widget.msgdata.sid;
+
+      // Initial Fetch
       await ref
-          .watch(chatClass)
+          .read(chatClass)
           .getUserMsgs(
             loadingfor: "getallchats",
             senderId: senderId.toString(),
             recieverId: recieverId.toString(),
             scrollController: scrollController,
-          )
-          .then((v) {});
+          );
+
+      // Start Stream (Polling)
+      _startChatStream(senderId.toString(), recieverId.toString());
     });
+  }
+
+  void _startChatStream(String senderId, String recieverId) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      await ref
+          .read(chatClass)
+          .getUserMsgs(
+            loadingfor:
+                "background", // Use a different loading state to avoid full loader
+            senderId: senderId,
+            recieverId: recieverId,
+            scrollController: scrollController,
+          );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _sendMessage() async {
